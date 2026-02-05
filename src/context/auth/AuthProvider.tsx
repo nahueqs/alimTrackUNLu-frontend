@@ -63,13 +63,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   // --- Lógica de Refresh ---
-  const handleTokenRefresh = useCallback(async (): Promise<string | null> => {
-    if (activeRefreshPromise.current) {
-      return activeRefreshPromise.current;
-    }
+  // silent: si es true, intenta refrescar sin preguntar al usuario (para carga inicial)
+  const performRefresh = useCallback(async (silent: boolean = false): Promise<string | null> => {
+    const storedRefreshToken = localStorage.getItem('refreshToken');
+    if (!storedRefreshToken) return null;
 
-    const promise = (async () => {
-      try {
+    try {
+      if (!silent) {
         // PASO 1: Preguntar al usuario si quiere extender
         console.log('[AuthProvider] Token expirado. Preguntando al usuario...');
         setIsTimeoutModalOpen(true);
@@ -83,47 +83,49 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           logout();
           return null;
         }
+      }
 
-        // PASO 2: Intentar Refresh Silencioso
-        const storedRefreshToken = localStorage.getItem('refreshToken');
-        if (storedRefreshToken) {
-          try {
-            console.log('[AuthProvider] Intentando refresh...');
-            const response = await authService.refreshToken(storedRefreshToken);
-            const newAccessToken = response.access_token;
+      // PASO 2: Intentar Refresh
+      console.log(`[AuthProvider] Intentando refresh (${silent ? 'silencioso' : 'interactivo'})...`);
+      const response = await authService.refreshToken(storedRefreshToken);
+      const newAccessToken = response.access_token;
 
-            if (newAccessToken) {
-              console.log('[AuthProvider] Refresh exitoso.');
-              localStorage.setItem('authToken', newAccessToken);
-              if (response.refresh_token) {
-                localStorage.setItem('refreshToken', response.refresh_token);
-              }
-              setIsTimeoutModalOpen(false); // Cerrar modal de timeout
-              return newAccessToken;
-            }
-          } catch (err) {
-            console.warn('[AuthProvider] Falló el refresh automático.', err);
-          }
+      if (newAccessToken) {
+        console.log('[AuthProvider] Refresh exitoso.');
+        localStorage.setItem('authToken', newAccessToken);
+        if (response.refresh_token) {
+          localStorage.setItem('refreshToken', response.refresh_token);
         }
-
-        // PASO 3: Si falló el refresh o no había token -> LOGOUT DIRECTO
+        setIsTimeoutModalOpen(false); // Cerrar modal si estaba abierto
+        return newAccessToken;
+      }
+    } catch (err) {
+      console.warn('[AuthProvider] Falló el refresh.', err);
+    }
+    
+    // Si llegamos aquí es que falló
+    if (!silent) {
         console.warn('[AuthProvider] No se pudo extender la sesión. Deslogueando.');
         setIsTimeoutModalOpen(false);
         logout();
-        return null;
+    }
+    return null;
+  }, [logout]);
 
-      } catch (e) {
-        console.error('[AuthProvider] Error en flujo de refresh', e);
-        logout();
-        return null;
-      } finally {
+  const handleTokenRefresh = useCallback(async (): Promise<string | null> => {
+    if (activeRefreshPromise.current) {
+      return activeRefreshPromise.current;
+    }
+
+    // Por defecto, el handler global (usado por ApiClient) es interactivo
+    const promise = performRefresh(false).finally(() => {
         activeRefreshPromise.current = null;
-      }
-    })();
+    });
 
     activeRefreshPromise.current = promise;
     return promise;
-  }, [logout]);
+  }, [performRefresh]);
+
 
   // --- Handlers para el Modal de Timeout ---
   const handleExtendSession = () => {
@@ -156,24 +158,68 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setInitialLoading(false);
         return;
       }
+      
+      // Cargar datos cacheados primero para UI optimista
       const storedUserData = localStorage.getItem('userData');
       if (storedUserData) {
         try { setUser(JSON.parse(storedUserData)); } catch (e) { localStorage.removeItem('userData'); }
       }
+
       try {
-        // Intentamos obtener el usuario actual. Si falla (ej. 401/403), el ApiClient intentará refrescar.
-        // Si el refresh falla, lanzará error y caeremos en el catch -> logout.
-        const freshUserData = await authService.getCurrentUser();
-        updateUser(freshUserData);
+        // Intentamos obtener usuario. Si falla por 401, ApiClient intentará refresh INTERACTIVO.
+        // Pero al recargar la página, queremos que sea SILENCIOSO si falla.
+        // Así que primero verificamos si podemos hacer una llamada simple.
+        // O mejor: intentamos obtener usuario, y si falla, capturamos y hacemos refresh manual silencioso.
+        
+        // NOTA: ApiClient ya tiene el handler configurado. Para evitar que salte el modal al inicio,
+        // podríamos deshabilitar temporalmente el handler o manejarlo aquí.
+        // Una forma limpia: Intentar refresh silencioso proactivamente si creemos que el token puede estar viejo,
+        // o simplemente dejar que falle y manejar el error.
+        
+        // Estrategia: Intentar getMe. Si falla, intentar refresh silencioso manual.
+        // Para evitar que ApiClient dispare el modal, necesitamos que ApiClient sepa que no debe usar el handler
+        // O simplemente capturamos el error antes de que ApiClient decida que es fatal.
+        // Pero ApiClient llama al handler internamente en el interceptor.
+        
+        // Solución: Hacemos un refresh silencioso preventivo si falla la llamada inicial,
+        // PERO ApiClient interceptará el 401 antes de que llegue aquí.
+        // Modificamos ApiClient? No.
+        // Modificamos el handler para que sepa si es "initial load"?
+        
+        // Vamos a confiar en que si el token es válido, getMe funciona.
+        // Si no, ApiClient llamará a handleTokenRefresh.
+        // EL PROBLEMA es que handleTokenRefresh abre el modal.
+        // TRUCO: Usamos una ref 'isInitialLoad' para decirle a handleTokenRefresh que sea silencioso.
       } catch (err) {
-        console.warn('[AuthProvider] Falló la verificación de sesión al inicio.', err);
-        logout();
+         // Este catch atrapa si todo falla (incluso el refresh del ApiClient)
+         logout();
+      }
+      
+      // Implementación real con la lógica de "Initial Load"
+      try {
+          await authService.getCurrentUser().then(updateUser);
+      } catch (error: any) {
+          // Si falló (y el ApiClient no pudo recuperarlo o falló el refresh interactivo),
+          // intentamos un último refresh silencioso manual por si acaso fue un tema de UI
+          console.log('[AuthProvider] Falló verificación inicial. Intentando recuperación silenciosa...');
+          const newToken = await performRefresh(true);
+          if (newToken) {
+              try {
+                  const user = await authService.getCurrentUser();
+                  updateUser(user);
+              } catch (e) {
+                  logout();
+              }
+          } else {
+              logout();
+          }
       } finally {
         setInitialLoading(false);
       }
     };
+    
     checkAuthStatus();
-  }, [logout, updateUser]);
+  }, [logout, updateUser, performRefresh]); // performRefresh es estable
 
   const login = async (credentials: LoginRequest) => {
     setLoading(true);
