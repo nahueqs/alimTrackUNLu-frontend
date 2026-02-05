@@ -161,9 +161,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try { setUser(JSON.parse(storedUserData)); } catch (e) { localStorage.removeItem('userData'); }
       }
       try {
+        // Intentamos obtener el usuario actual. Si falla (ej. 401/403), el ApiClient intentará refrescar.
+        // Si el refresh falla, lanzará error y caeremos en el catch -> logout.
         const freshUserData = await authService.getCurrentUser();
         updateUser(freshUserData);
       } catch (err) {
+        console.warn('[AuthProvider] Falló la verificación de sesión al inicio.', err);
         logout();
       } finally {
         setInitialLoading(false);
