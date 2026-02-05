@@ -16,7 +16,7 @@ interface ApiError extends Error {
   };
 }
 
-// URL base por defecto: usa la variable de entorno si existe, sino localhost
+// URL base por defecto: usa la variable de entorno si existe, sino la de producción
 const DEFAULT_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'https://alimtrackunlu.onrender.com/api/v1';
 
