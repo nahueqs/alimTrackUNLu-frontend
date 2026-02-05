@@ -166,37 +166,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       try {
-        // Intentamos obtener usuario. Si falla por 401, ApiClient intentará refresh INTERACTIVO.
-        // Pero al recargar la página, queremos que sea SILENCIOSO si falla.
-        // Así que primero verificamos si podemos hacer una llamada simple.
-        // O mejor: intentamos obtener usuario, y si falla, capturamos y hacemos refresh manual silencioso.
-        
-        // NOTA: ApiClient ya tiene el handler configurado. Para evitar que salte el modal al inicio,
-        // podríamos deshabilitar temporalmente el handler o manejarlo aquí.
-        // Una forma limpia: Intentar refresh silencioso proactivamente si creemos que el token puede estar viejo,
-        // o simplemente dejar que falle y manejar el error.
-        
-        // Estrategia: Intentar getMe. Si falla, intentar refresh silencioso manual.
-        // Para evitar que ApiClient dispare el modal, necesitamos que ApiClient sepa que no debe usar el handler
-        // O simplemente capturamos el error antes de que ApiClient decida que es fatal.
-        // Pero ApiClient llama al handler internamente en el interceptor.
-        
-        // Solución: Hacemos un refresh silencioso preventivo si falla la llamada inicial,
-        // PERO ApiClient interceptará el 401 antes de que llegue aquí.
-        // Modificamos ApiClient? No.
-        // Modificamos el handler para que sepa si es "initial load"?
-        
-        // Vamos a confiar en que si el token es válido, getMe funciona.
-        // Si no, ApiClient llamará a handleTokenRefresh.
-        // EL PROBLEMA es que handleTokenRefresh abre el modal.
-        // TRUCO: Usamos una ref 'isInitialLoad' para decirle a handleTokenRefresh que sea silencioso.
-      } catch (err) {
-         // Este catch atrapa si todo falla (incluso el refresh del ApiClient)
-         logout();
-      }
-      
-      // Implementación real con la lógica de "Initial Load"
-      try {
           await authService.getCurrentUser().then(updateUser);
       } catch (error: any) {
           // Si falló (y el ApiClient no pudo recuperarlo o falló el refresh interactivo),
