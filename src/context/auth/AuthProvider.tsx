@@ -187,7 +187,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     };
     
-    checkAuthStatus();
+    void checkAuthStatus();
   }, [logout, updateUser, performRefresh]); // performRefresh es estable
 
   const login = async (credentials: LoginRequest) => {

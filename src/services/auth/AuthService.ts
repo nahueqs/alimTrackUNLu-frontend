@@ -55,7 +55,15 @@ export const authService = {
 
   async getCurrentUser(): Promise<User> {
     try {
-      const user = await apiClient.get<User>('/auth/me');
+      // Obtenemos el token explícitamente para asegurar que se envíe
+      const token = localStorage.getItem('authToken');
+      const headers: Record<string, string> = {};
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const user = await apiClient.get<User>('/auth/me', {}, { headers });
       return user;
     } catch (error: any) {
       if (import.meta.env.DEV) {
