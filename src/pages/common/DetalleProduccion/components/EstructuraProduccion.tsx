@@ -170,25 +170,27 @@ const SeccionProduccion: React.FC<SeccionProduccionProps> = React.memo(
             </span>
           )}
         </Title>
-        <Form layout="vertical">
-          {seccion.camposSimples.map((campo) => (
-            <Form.Item key={`campo-${campo.id}`} label={campo.nombre}>
-              <ManualSaveInput
-                value={respuestasCampos[campo.id] || ''}
-                onChange={(valor) => onCampoChange(campo.id, valor, campo.tipoDato)}
-                placeholder={`Ingrese ${campo.nombre.toLowerCase()}`}
-                disabled={!isEditable}
-                tipoDato={campo.tipoDato}
-              />
-            </Form.Item>
-          ))}
-          {seccion.gruposCampos.map((grupo) => (
-            <GrupoDeCampos key={`grupo-${grupo.id}`} grupo={grupo} isEditable={isEditable} />
-          ))}
-          {seccion.tablas.map((tabla) => (
-            <TablaProduccion key={`tabla-${tabla.id}`} tabla={tabla} isEditable={isEditable} />
-          ))}
-        </Form>
+        <div className="section-content-wrapper">
+          <Form layout="vertical">
+            {seccion.camposSimples.map((campo) => (
+              <Form.Item key={`campo-${campo.id}`} label={campo.nombre}>
+                <ManualSaveInput
+                  value={respuestasCampos[campo.id] || ''}
+                  onChange={(valor) => onCampoChange(campo.id, valor, campo.tipoDato)}
+                  placeholder={`Ingrese ${campo.nombre.toLowerCase()}`}
+                  disabled={!isEditable}
+                  tipoDato={campo.tipoDato}
+                />
+              </Form.Item>
+            ))}
+            {seccion.gruposCampos.map((grupo) => (
+              <GrupoDeCampos key={`grupo-${grupo.id}`} grupo={grupo} isEditable={isEditable} />
+            ))}
+            {seccion.tablas.map((tabla) => (
+              <TablaProduccion key={`tabla-${tabla.id}`} tabla={tabla} isEditable={isEditable} />
+            ))}
+          </Form>
+        </div>
       </Card>
     );
   }

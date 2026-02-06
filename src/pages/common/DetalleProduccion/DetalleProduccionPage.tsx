@@ -13,7 +13,6 @@ import type {
 } from '@/types/production';
 import { TipoDatoCampo } from '@/pages/Recetas/types/TipoDatoCampo';
 import { ProductionState } from '@/constants/ProductionStates';
-// import { PublicHeader } from "@/components/layout/PublicHeader/PublicHeader.tsx"; // Removed direct import
 
 type RespuestasProduccion = RespuestasProduccionPublicDTO | RespuestasProduccionProtectedDTO;
 
@@ -21,7 +20,6 @@ interface ProductionDisplayProps {
   estructura: EstructuraProduccionDTO;
   respuestas: RespuestasProduccion;
   isEditable?: boolean;
-  // Actualizamos las firmas para devolver Promise<void>
   onCampoChange?: (idCampo: number, valor: string, tipoDato: TipoDatoCampo) => Promise<void>;
   onTablaChange?: (
     idTabla: number,
@@ -32,7 +30,7 @@ interface ProductionDisplayProps {
   ) => Promise<void>;
   onMetadataChange?: (data: ProduccionMetadataModifyRequestDTO) => void;
   onCambioEstado?: (nuevoEstado: ProductionState) => void;
-  HeaderComponent: React.ElementType; // New prop for the header component
+  HeaderComponent: React.ElementType;
 }
 
 const noOp = async () => {};
@@ -45,7 +43,7 @@ export const DetalleProduccionPage: React.FC<ProductionDisplayProps> = ({
   onTablaChange = noOp,
   onMetadataChange = noOp,
   onCambioEstado,
-  HeaderComponent, // Destructure the new prop
+  HeaderComponent,
 }) => {
   const respuestasCamposMap = useMemo(() => {
     return respuestas.respuestasCampos.reduce(
@@ -69,8 +67,8 @@ export const DetalleProduccionPage: React.FC<ProductionDisplayProps> = ({
 
   return (
     <>
-      <HeaderComponent /> {/* Render the passed HeaderComponent */}
-      <div id="production-content" style={{ padding: '24px' }}>
+      <HeaderComponent />
+      <div id="production-content">
         <Row gutter={[24, 24]}>
           <Col xs={24} lg={16}>
             <InfoProduccionCard

@@ -9,6 +9,7 @@
     position: sticky; /* Fija el header al hacer scroll */
     top: 0;
     z-index: 10;
+    width: 100%; /* Asegura que ocupe todo el ancho */
 }
 
 .public-dashboard-header__title {
@@ -16,4 +17,27 @@
     font-weight: 600;
     color: var(--text-primary);
     margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .public-dashboard-header {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .public-dashboard-header__title {
+        font-size: 1.25rem;
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Ajustar el componente Space de Ant Design dentro del header */
+    .public-dashboard-header .ant-space {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
 }

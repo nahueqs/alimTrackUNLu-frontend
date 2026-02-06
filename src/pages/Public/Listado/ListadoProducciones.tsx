@@ -72,11 +72,13 @@ export const ListadoProducciones: React.FC = () => {
     setSearchTerm(e.target.value);
   };
 
-  const filteredProducciones = producciones.filter(
-    (p) =>
-      p.codigoProduccion.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (p.lote && p.lote.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredProducciones = producciones
+    .filter(
+      (p) =>
+        p.codigoProduccion.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (p.lote && p.lote.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
+    .sort((a, b) => new Date(b.fechaInicio).getTime() - new Date(a.fechaInicio).getTime());
 
   const columns = getPublicProductionColumns({
     onView: handleView,

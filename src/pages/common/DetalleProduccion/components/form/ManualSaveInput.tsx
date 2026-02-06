@@ -219,6 +219,15 @@ export const ManualSaveInput: React.FC<ManualSaveInputProps> = ({
     }
   };
 
+  // Si está deshabilitado (modo lectura), renderizamos solo el input sin el botón de guardar
+  if (rest.disabled) {
+    return (
+      <div style={{ width: '100%' }}>
+        {renderInput()}
+      </div>
+    );
+  }
+
   return (
     <div style={{ width: '100%' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>

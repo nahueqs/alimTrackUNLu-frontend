@@ -12,6 +12,7 @@ import {
   PRODUCTION_STATE_LABELS,
   ProductionState,
 } from '@/constants/ProductionStates';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -33,12 +34,16 @@ export const InfoProduccionCard: React.FC<InfoProduccionCardProps> = ({
 }) => {
   const [isEditing, setIsEditable] = useState(false);
   const [form] = Form.useForm();
+  const isMobile = useIsMobile();
+
+  // Check if we are in a protected context (has 'emailCreador' property)
+  const isProtected = 'emailCreador' in produccion;
 
   const handleEdit = () => {
     form.setFieldsValue({
       lote: produccion.lote,
-      encargado: (produccion as any).encargado, // Cast as any because public DTO might not have it, but form handles it
-      observaciones: (produccion as any).observaciones,
+      encargado: produccion.encargado,
+      observaciones: isProtected ? (produccion as ProduccionProtectedResponseDTO).observaciones : undefined,
     });
     setIsEditable(true);
   };
@@ -75,9 +80,6 @@ export const InfoProduccionCard: React.FC<InfoProduccionCardProps> = ({
     return <Tag color={color}>{text}</Tag>;
   };
 
-  // Check if we are in a protected context (has 'encargado' property)
-  const isProtected = 'encargado' in produccion;
-
   return (
     <Card className="info-card">
       <div className="info-card-header">
@@ -86,12 +88,12 @@ export const InfoProduccionCard: React.FC<InfoProduccionCardProps> = ({
         </Title>
         {isEditable && !isEditing && isProtected && (
           <Button type="text" icon={<EditOutlined />} onClick={handleEdit}>
-            Editar
+            {isMobile ? '' : 'Editar'}
           </Button>
         )}
         {isEditable && isEditing && isProtected && (
           <Button type="primary" icon={<SaveOutlined />} onClick={handleSave}>
-            Guardar
+            {isMobile ? '' : 'Guardar'}
           </Button>
         )}
       </div>
@@ -109,7 +111,13 @@ export const InfoProduccionCard: React.FC<InfoProduccionCardProps> = ({
           </Form.Item>
         </Form>
       ) : (
-        <Descriptions column={{ xxl: 2, xl: 2, lg: 2, md: 1, sm: 1, xs: 1 }} bordered size="small">
+        <Descriptions 
+          column={1} 
+          bordered 
+          size="small"
+          layout={isMobile ? 'vertical' : 'horizontal'}
+          style={{ width: '100%' }}
+        >
           <Descriptions.Item label="Código">{produccion.codigoProduccion}</Descriptions.Item>
           <Descriptions.Item label="Lote">
             <Text strong>{produccion.lote || '-'}</Text>
@@ -118,7 +126,7 @@ export const InfoProduccionCard: React.FC<InfoProduccionCardProps> = ({
             {isEditable && isProtected ? (
               <Select
                 defaultValue={produccion.estado}
-                style={{ width: 120 }}
+                style={{ width: '100%', minWidth: 120 }}
                 onChange={handleEstadoChange}
                 disabled={
                   produccion.estado === ProductionState.FINALIZADA ||
@@ -142,22 +150,22 @@ export const InfoProduccionCard: React.FC<InfoProduccionCardProps> = ({
           <Descriptions.Item label="Fecha Fin">
             {produccion.fechaFin ? new Date(produccion.fechaFin).toLocaleString() : '-'}
           </Descriptions.Item>
-          {(produccion as any).encargado && (
+          {produccion.encargado && (
             <Descriptions.Item label="Encargado">
-              {(produccion as any).encargado}
+              {produccion.encargado}
             </Descriptions.Item>
           )}
-          {(produccion as any).emailCreador && (
+          {isProtected && (produccion as ProduccionProtectedResponseDTO).emailCreador && (
             <Descriptions.Item label="Creado por">
-              {(produccion as any).emailCreador}
+              {(produccion as ProduccionProtectedResponseDTO).emailCreador}
             </Descriptions.Item>
           )}
         </Descriptions>
       )}
-      {!isEditing && (produccion as any).observaciones && (
+      {!isEditing && isProtected && (produccion as ProduccionProtectedResponseDTO).observaciones && (
         <div style={{ marginTop: 16 }}>
           <Text strong>Observaciones:</Text>
-          <p>{(produccion as any).observaciones}</p>
+          <p>{(produccion as ProduccionProtectedResponseDTO).observaciones}</p>
         </div>
       )}
     </Card>

@@ -19,6 +19,7 @@ export interface ProduccionPublicMetadataDTO {
   codigoProduccion: string;
   codigoVersion: string;
   lote: string | null;
+  encargado: string | null;
   estado: ProductionState;
   fechaInicio: string;
   fechaFin: string | null;

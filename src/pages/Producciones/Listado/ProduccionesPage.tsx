@@ -75,7 +75,7 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
       }
 
       return true;
-    });
+    }).sort((a, b) => new Date(b.fechaInicio).getTime() - new Date(a.fechaInicio).getTime());
   }, [producciones, filters]);
 
   const handleView = (record: ProduccionProtectedResponseDTO) => {

@@ -3,7 +3,7 @@ import SockJS from 'sockjs-client';
 
 // Helper para obtener la URL base del WebSocket
 const getWebSocketUrl = () => {
-  const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
+  const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://alimtrackunlu.onrender.com/api/v1';
   // Eliminamos '/api/v1' o '/api' del final para obtener la raíz
   const rootUrl = apiBase.replace(/\/api\/v1\/?$/, '').replace(/\/api\/?$/, '');
   // Aseguramos que no termine en slash

@@ -1,10 +1,15 @@
+/* --- Estilos Generales --- */
+#production-content {
+    padding: 24px;
+}
+
 /* --- Estilos para InfoProduccionCard --- */
 .info-card {
     background-color: var(--bg-primary);
     border: 1px solid var(--border-light);
     border-radius: var(--radius-lg);
-    height: 100%; /* Asegura que la tarjeta ocupe toda la altura de la columna */
-    margin-bottom: 1rem; /* Espacio inferior en móvil */
+    height: 100%;
+    margin-bottom: 1rem;
 }
 
 .info-card-header {
@@ -68,7 +73,7 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
-    margin-top: 24px; /* Añade espacio sobre la estructura */
+    margin-top: 24px;
 }
 
 .section-card {
@@ -77,15 +82,26 @@
     border-radius: var(--radius-lg);
 }
 
+.section-card .ant-card-body {
+    padding: 0 !important;
+}
+
+.section-content-wrapper {
+    padding: 24px;
+}
+
 .section-title {
     color: var(--text-primary);
-    margin-bottom: 24px !important;
-    padding-bottom: 16px;
+    margin-bottom: 0 !important;
+    padding: 16px 24px;
     border-bottom: 1px solid var(--border-light);
     display: flex;
     align-items: center;
     gap: 12px;
-    flex-wrap: wrap; /* Permitir wrap en móvil */
+    flex-wrap: wrap;
+    background-color: var(--bg-secondary);
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: var(--radius-lg);
 }
 
 .section-number {
@@ -96,7 +112,7 @@
     height: 32px;
     border-radius: 50%;
     background-color: var(--primary-500);
-    color: white;
+    color: var(--neutral-50);
     font-size: 1rem;
     font-weight: 700;
     flex-shrink: 0;
@@ -105,7 +121,7 @@
 .section-progress-text {
     font-size: 0.9em;
     color: var(--text-secondary);
-    margin-left: auto; /* Empujar a la derecha */
+    margin-left: auto;
 }
 
 .section-card .ant-form-item-label > label {
@@ -129,19 +145,24 @@
     color: var(--text-tertiary) !important;
 }
 
-/* Estilos específicos para inputs deshabilitados en modo público */
-.public-readonly .ant-input[disabled],
+/* --- Estilos para Modo Lectura Público (.public-readonly) --- */
+/* Inputs y controles deshabilitados */
+.public-readonly .ant-input-disabled,
+.public-readonly .ant-input-number-disabled,
+.public-readonly .ant-picker-disabled,
 .public-readonly .ant-input-number-input[disabled],
 .public-readonly .ant-picker-input > input[disabled] {
-    background-color: #ffffff !important; /* Fondo blanco */
-    color: #000000 !important; /* Texto negro */
+    background-color: transparent !important;
+    color: var(--text-primary) !important;
     cursor: default !important;
-    border-color: #d9d9d9 !important;
-    opacity: 1 !important; /* Asegurar opacidad completa */
-    -webkit-text-fill-color: #000000 !important; /* Para Safari/Chrome */
+    border-color: transparent !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+    padding-left: 0 !important;
 }
 
-/* Ocultar placeholder en modo público */
+/* Ocultar placeholders */
 .public-readonly .ant-input[disabled]::placeholder,
 .public-readonly .ant-input-number-input[disabled]::placeholder,
 .public-readonly .ant-picker-input > input[disabled]::placeholder {
@@ -149,40 +170,36 @@
     opacity: 0 !important;
 }
 
-/* Asegurar que el contenedor del InputNumber también se vea bien */
-.public-readonly .ant-input-number-disabled {
-    background-color: #ffffff !important;
-    border-color: #d9d9d9 !important;
-    color: #000000 !important;
-}
-
-/* Asegurar que el contenedor del DatePicker/TimePicker también se vea bien */
-.public-readonly .ant-picker-disabled {
-    background-color: #ffffff !important;
-    border-color: #d9d9d9 !important;
-    color: #000000 !important;
-}
-
-/* Checkbox deshabilitado pero visible */
+/* Checkboxes */
 .public-readonly .ant-checkbox-disabled + span {
-    color: #000000 !important;
+    color: var(--text-primary) !important;
     cursor: default !important;
 }
 
 .public-readonly .ant-checkbox-disabled .ant-checkbox-inner {
-    background-color: #f5f5f5 !important;
-    border-color: #d9d9d9 !important;
+    background-color: transparent !important;
+    border-color: var(--border-medium) !important;
 }
 
 .public-readonly .ant-checkbox-checked.ant-checkbox-disabled .ant-checkbox-inner {
-    background-color: #1890ff !important; /* Mantener color azul si está marcado */
-    border-color: #1890ff !important;
+    background-color: var(--primary-500) !important;
+    border-color: var(--primary-500) !important;
 }
 
 .public-readonly .ant-checkbox-checked.ant-checkbox-disabled .ant-checkbox-inner::after {
-    border-color: #ffffff !important;
+    border-color: var(--neutral-50) !important;
 }
 
+/* Tablas en modo lectura */
+.public-readonly .ant-table-cell .ant-input-number-disabled,
+.public-readonly .ant-table-cell .ant-input-disabled {
+    background-color: transparent !important;
+    border: none !important;
+    text-align: left;
+    padding: 0 !important;
+}
+
+/* --- Estilos para Grupos y Tablas --- */
 .group-card {
     background-color: var(--bg-secondary);
     border: 1px solid var(--border-light);
@@ -199,7 +216,7 @@
 
 .production-table-container {
     margin-bottom: 24px;
-    overflow-x: auto; /* Scroll horizontal para tablas */
+    overflow-x: auto;
     border: 1px solid var(--border-light);
     border-radius: var(--radius-md);
     padding: 1rem;
@@ -224,28 +241,47 @@
     background: var(--bg-primary) !important;
 }
 
+/* Contenedor principal con padding responsive */
+.production-detail-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.notification-selector-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin: 16px 0 8px;
+}
+
 /* --- Estilos para Mobile --- */
 @media (max-width: 768px) {
+    .production-detail-container {
+        padding: 0 12px;
+    }
+
     #production-content {
         padding: 1rem !important;
     }
 
-    .info-card, .progress-card {
+    .info-card, 
+    .progress-card {
         margin-bottom: 1rem;
     }
 
-    .section-card .ant-card-body {
+    .section-content-wrapper {
         padding: 16px;
     }
 
     .section-title {
         font-size: 1.2rem !important;
         gap: 8px;
+        padding: 12px 16px;
     }
     
     .section-progress-text {
         width: 100%;
-        margin-left: 40px; /* Alinear con el texto del título */
+        margin-left: 40px;
         margin-top: 4px;
     }
 

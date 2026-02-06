@@ -63,7 +63,7 @@ export const App: React.FC = () => {
     <ErrorBoundary>
       <ThemeProvider>
         <Router>
-          <div className="app">
+          <div className="app" style={{ width: '100%' }}>
             <Suspense fallback={<Loader />}>
               <AppRoutes />
             </Suspense>

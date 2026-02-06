@@ -8,16 +8,12 @@ import { useProductionActions } from '@/hooks/useProductionActions';
 import { ProductionStatusDisplay } from '@/components/ProductionStatusDisplay';
 import { SavingIndicator } from '@/components/SavingIndicator';
 import { ProductionState } from '@/constants/ProductionStates';
-import { BellOutlined } from '@ant-design/icons';
-import { Select, Space, Typography } from 'antd';
 import { usePageTitle } from '@/hooks/usePageTitle.ts';
-
-const { Text } = Typography;
+import { NotificationSelector } from '@/pages/common/DetalleProduccion/components/NotificationSelector';
 
 const DetalleProduccionProtectedPage: React.FC = () => {
   const { codigoProduccion } = useParams<{ codigoProduccion: string }>();
   
-  // Usamos el código de producción para el título, o un mensaje genérico si no está disponible
   usePageTitle(codigoProduccion ? `Producción ${codigoProduccion}` : 'Detalle de Producción');
 
   const [notificationLevel, setNotificationLevel] = useState<NotificationLevel>('ALL');
@@ -81,39 +77,13 @@ const DetalleProduccionProtectedPage: React.FC = () => {
     >
       <SavingIndicator isSaving={isSaving} />
       
-      {/* Selector de notificaciones */}
-      <div
-        style={{
-          padding: '0 24px',
-          marginTop: '16px',
-          display: 'flex',
-          justifyContent: 'flex-end',
-          maxWidth: '1200px',
-          margin: '16px auto 0',
-        }}
-      >
-        <Space>
-          <BellOutlined style={{ color: '#8c8c8c' }} />
-          <Text type="secondary" style={{ fontSize: '14px' }}>
-            Avisos:
-          </Text>
-          <Select
-            value={notificationLevel}
-            onChange={setNotificationLevel}
-            style={{ width: 180 }}
-            size="small"
-            placement="bottomRight"
-            getPopupContainer={() => document.body}
-            options={[
-              { value: 'ALL', label: 'Todos los cambios' },
-              { value: 'STATE_ONLY', label: 'Solo estado' },
-              { value: 'NONE', label: 'Silenciar' },
-            ]}
-          />
-        </Space>
-      </div>
+      <div className="production-detail-container">
+        <NotificationSelector
+          value={notificationLevel}
+          onChange={setNotificationLevel}
+          className="notification-selector-wrapper"
+        />
 
-      <div style={{ marginTop: '-24px' }}>
         <DetalleProduccionPage
           estructura={estructura!}
           respuestas={estadoActual!}

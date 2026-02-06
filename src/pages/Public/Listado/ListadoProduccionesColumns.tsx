@@ -28,11 +28,17 @@ export const getPublicProductionColumns = ({
       responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {
-      title: 'Lote',
-      dataIndex: 'lote',
-      key: 'lote',
-      render: (text) => text || '-',
+      title: 'Versión Receta',
+      dataIndex: 'codigoVersion',
+      key: 'codigoVersion',
       responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+    },
+    {
+      title: 'Inicio',
+      dataIndex: 'fechaInicio',
+      key: 'fechaInicio',
+      render: (date) => dayjs(date).format('DD/MM/YYYY HH:mm:ss'),
+      responsive: ['sm', 'md', 'lg', 'xl'], // Oculto en móvil muy pequeño
     },
     {
       title: 'Estado',
@@ -46,11 +52,18 @@ export const getPublicProductionColumns = ({
       responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {
-      title: 'Inicio',
-      dataIndex: 'fechaInicio',
-      key: 'fechaInicio',
-      render: (date) => dayjs(date).format('DD/MM/YYYY HH:mm:ss'),
-      responsive: ['sm', 'md', 'lg', 'xl'], // Oculto en móvil muy pequeño
+      title: 'Lote',
+      dataIndex: 'lote',
+      key: 'lote',
+      render: (text) => text || '-',
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+    },
+    {
+      title: 'Encargado',
+      dataIndex: 'encargado',
+      key: 'encargado',
+      render: (text) => text || '-',
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {
       title: 'Acciones',

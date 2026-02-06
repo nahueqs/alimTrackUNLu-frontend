@@ -32,50 +32,11 @@ export const getProductionColumns = ({
       responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {
-      title: 'Lote',
-      dataIndex: 'lote',
-      key: 'lote',
-      sorter: (a: ProduccionProtectedResponseDTO, b: ProduccionProtectedResponseDTO) =>
-        (a.lote || '').localeCompare(b.lote || ''),
-      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
-    },
-    {
       title: 'Versión Receta',
       dataIndex: 'codigoVersion',
       key: 'codigoVersion',
       sorter: (a: ProduccionProtectedResponseDTO, b: ProduccionProtectedResponseDTO) =>
         a.codigoVersion.localeCompare(b.codigoVersion),
-      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
-    },
-    {
-      title: 'Encargado',
-      dataIndex: 'encargado',
-      key: 'encargado',
-      sorter: (a: ProduccionProtectedResponseDTO, b: ProduccionProtectedResponseDTO) =>
-        (a.encargado || '').localeCompare(b.encargado || ''),
-      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
-    },
-    {
-      title: 'Fecha Inicio',
-      dataIndex: 'fechaInicio',
-      key: 'fechaInicio',
-      sorter: (a: ProduccionProtectedResponseDTO, b: ProduccionProtectedResponseDTO) =>
-        new Date(a.fechaInicio).getTime() - new Date(b.fechaInicio).getTime(),
-      render: (date: string) => dayjs(date).format('DD/MM/YYYY HH:mm:ss'),
-      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
-    },
-    {
-      title: 'Fecha Fin',
-      dataIndex: 'fechaFin',
-      key: 'fechaFin',
-      sorter: (a: ProduccionProtectedResponseDTO, b: ProduccionProtectedResponseDTO) => {
-        if (!a.fechaFin && !b.fechaFin) return 0;
-        if (!a.fechaFin) return -1;
-        if (!b.fechaFin) return 1;
-        return new Date(a.fechaFin).getTime() - new Date(b.fechaFin).getTime();
-      },
-      render: (date: string | null) => (date ? dayjs(date).format('DD/MM/YYYY HH:mm:ss') : '-'),
-      defaultSortOrder: 'descend',
       responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {
@@ -89,6 +50,32 @@ export const getProductionColumns = ({
         const text = PRODUCTION_STATE_LABELS[estado] || estado;
         return <Tag color={color}>{text}</Tag>;
       },
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+    },
+    {
+      title: 'Fecha Inicio',
+      dataIndex: 'fechaInicio',
+      key: 'fechaInicio',
+      sorter: (a: ProduccionProtectedResponseDTO, b: ProduccionProtectedResponseDTO) =>
+        new Date(a.fechaInicio).getTime() - new Date(b.fechaInicio).getTime(),
+      render: (date: string) => dayjs(date).format('DD/MM/YYYY HH:mm:ss'),
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+    },
+
+    {
+      title: 'Lote',
+      dataIndex: 'lote',
+      key: 'lote',
+      sorter: (a: ProduccionProtectedResponseDTO, b: ProduccionProtectedResponseDTO) =>
+        (a.lote || '').localeCompare(b.lote || ''),
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
+    },
+    {
+      title: 'Encargado',
+      dataIndex: 'encargado',
+      key: 'encargado',
+      sorter: (a: ProduccionProtectedResponseDTO, b: ProduccionProtectedResponseDTO) =>
+        (a.encargado || '').localeCompare(b.encargado || ''),
       responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {
