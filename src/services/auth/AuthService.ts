@@ -4,78 +4,57 @@ import type { User } from './User.ts';
 
 export const authService = {
   async login(credentials: LoginRequest): Promise<AuthResponse> {
-    try {
-      const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
-      if (!response.access_token || !response.user) {
-        throw new Error('Respuesta de login inválida desde el servidor.');
-      }
-      return response;
-    } catch (error: any) {
-      if (import.meta.env.DEV) {
-        console.error('Error en el login:', error);
-      }
-      throw error;
+    console.log('[AuthService] Login attempt for:', credentials.email);
+    const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
+
+    if (!response.access_token || !response.user) {
+      throw new Error('Respuesta de login inválida desde el servidor.');
     }
+
+    console.log('[AuthService] Login successful');
+    return response;
   },
 
   async register(userData: RegisterRequest): Promise<AuthResponse> {
-    try {
-      const response = await apiClient.post<AuthResponse>('/auth/register', userData);
-      if (!response.access_token || !response.user) {
-        throw new Error('Respuesta de registro inválida desde el servidor.');
-      }
-      return response;
-    } catch (error: any) {
-      if (import.meta.env.DEV) {
-        console.error('Error en el registro:', error);
-      }
-      throw error;
+    console.log('[AuthService] Register attempt for:', userData.email);
+    const response = await apiClient.post<AuthResponse>('/auth/register', userData);
+
+    if (!response.access_token || !response.user) {
+      throw new Error('Respuesta de registro inválida desde el servidor.');
     }
+
+    console.log('[AuthService] Registration successful');
+    return response;
   },
 
-  async refreshToken(token: string): Promise<AuthResponse> {
-    try {
-      // Enviamos el refresh token en el header Authorization
-      return await apiClient.post<AuthResponse>(
-        '/auth/refresh-token',
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-    } catch (error: any) {
-      if (import.meta.env.DEV) {
-        console.error('Error al refrescar token:', error);
+  async refreshToken(refreshToken: string): Promise<AuthResponse> {
+    console.log('[AuthService] Attempting token refresh');
+
+    // IMPORTANTE: Enviar el refresh token en el header
+    return await apiClient.post<AuthResponse>(
+      '/auth/refresh-token',
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${refreshToken}`,
+        },
       }
-      throw error;
-    }
+    );
   },
 
   async getCurrentUser(): Promise<User> {
-    try {
-      // Obtenemos el token explícitamente para asegurar que se envíe
-      const token = localStorage.getItem('authToken');
-      const headers: Record<string, string> = {};
-      
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
+    console.log('[AuthService] Getting current user');
 
-      const user = await apiClient.get<User>('/auth/me', {}, { headers });
-      return user;
-    } catch (error: any) {
-      if (import.meta.env.DEV) {
-        console.error('Error obteniendo el usuario actual:', error);
-      }
-      throw error;
-    }
+    const user = await apiClient.get<User>('/auth/me');
+
+    console.log('[AuthService] Current user retrieved:', user.email);
+    return user;
   },
 
   logout() {
+    console.log('[AuthService] Logging out');
     localStorage.removeItem('authToken');
-    localStorage.removeItem('refreshToken'); // Limpiamos también el refresh token
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('userData');
   },
 };
