@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { DetalleProduccionPage } from '@/pages/common/DetalleProduccion/DetalleProduccionPage';
 import { AppHeader } from '@/components/AppHeader/AppHeader.tsx';
 import { useProductionData } from '@/hooks/useProductionData';
@@ -11,9 +11,12 @@ import { ProductionState } from '@/constants/ProductionStates';
 import { usePageTitle } from '@/hooks/usePageTitle.ts';
 import { NotificationSelector } from '@/pages/common/DetalleProduccion/components/NotificationSelector';
 import { PrintButton } from '@/components/common/PrintButton';
+import { notificationService } from '@/services/notificaciones/notificationService';
+import { message } from 'antd';
 
 const DetalleProduccionProtectedPage: React.FC = () => {
   const { codigoProduccion } = useParams<{ codigoProduccion: string }>();
+  const navigate = useNavigate();
   
   usePageTitle(codigoProduccion ? `Producción ${codigoProduccion}` : 'Detalle de Producción');
 
@@ -47,6 +50,22 @@ const DetalleProduccionProtectedPage: React.FC = () => {
     updateProductionMetadata,
     notificationLevel,
   });
+
+  // Efecto para manejar la eliminación de la producción vía WebSocket
+  useEffect(() => {
+    if (!codigoProduccion) return;
+
+    const unsubscribe = notificationService.subscribeToProduccionEliminada((msg) => {
+      if (msg.payload.codigoProduccion === codigoProduccion) {
+        message.warning('La producción que estabas visualizando ha sido eliminada.');
+        navigate('/producciones');
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [codigoProduccion, navigate]);
 
   const {
     debouncedCampoChange,

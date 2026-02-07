@@ -33,6 +33,7 @@ export const ListadoProducciones: React.FC = () => {
   useEffect(() => {
     let unsubscribeState: (() => void) | undefined;
     let unsubscribeCreated: (() => void) | undefined;
+    let unsubscribeDeleted: (() => void) | undefined;
 
     const connectAndSubscribe = () => {
       notificationService.connect(() => {
@@ -54,6 +55,14 @@ export const ListadoProducciones: React.FC = () => {
             getProduccionesPublicas();
           }
         });
+
+        // Suscribirse a producciones eliminadas
+        unsubscribeDeleted = notificationService.subscribeToProduccionEliminada((message) => {
+          if (message.type === 'PRODUCTION_DELETED') {
+            // Recargar la lista cuando se elimina una producción
+            getProduccionesPublicas();
+          }
+        });
       });
     };
 
@@ -62,6 +71,7 @@ export const ListadoProducciones: React.FC = () => {
     return () => {
       if (unsubscribeState) unsubscribeState();
       if (unsubscribeCreated) unsubscribeCreated();
+      if (unsubscribeDeleted) unsubscribeDeleted();
       notificationService.disconnect();
     };
   }, [updateProductionStateInList, getProduccionesPublicas]);

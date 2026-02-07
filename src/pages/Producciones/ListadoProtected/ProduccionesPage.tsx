@@ -16,6 +16,7 @@ import isBetween from 'dayjs/plugin/isBetween';
 import { Button as UiButton } from '@/components/ui';
 import { ArrowLeftIcon } from 'lucide-react';
 import { PrintButton } from '@/components/common/PrintButton';
+import { notificationService } from '@/services/notificaciones/notificationService';
 
 // Extendemos dayjs con el plugin isBetween
 dayjs.extend(isBetween);
@@ -38,6 +39,31 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
   // Cargar TODAS las producciones al montar el componente (sin filtros de backend)
   useEffect(() => {
     getProducciones({}); 
+  }, [getProducciones]);
+
+  // Suscripción a WebSockets para actualizaciones en tiempo real
+  useEffect(() => {
+    let unsubscribeDeleted: (() => void) | undefined;
+
+    const connectAndSubscribe = () => {
+      notificationService.connect(() => {
+        // Suscribirse a producciones eliminadas
+        unsubscribeDeleted = notificationService.subscribeToProduccionEliminada((message) => {
+          if (message.type === 'PRODUCTION_DELETED') {
+            // Recargar la lista cuando se elimina una producción
+            getProducciones({});
+          }
+        });
+      });
+    };
+
+    connectAndSubscribe();
+
+    return () => {
+      if (unsubscribeDeleted) unsubscribeDeleted();
+      // No desconectamos aquí porque otros componentes podrían estar usando el servicio
+      // notificationService.disconnect(); 
+    };
   }, [getProducciones]);
 
   // Lógica de filtrado en el cliente

@@ -153,6 +153,10 @@ class NotificationService {
   public subscribeToProduccionCancelada(callback: (message: any) => void): () => void {
     return this.subscribe(`/topic/produccion/cancelled`, callback);
   }
+
+  public subscribeToProduccionEliminada(callback: (message: any) => void): () => void {
+    return this.subscribe(`/topic/produccion/deleted`, callback);
+  }
 }
 
 export const notificationService = new NotificationService();

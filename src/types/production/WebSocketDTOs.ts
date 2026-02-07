@@ -33,3 +33,8 @@ export interface ProductionMetadataUpdatedPayload {
   encargado: string;
   observaciones: string;
 }
+
+export interface ProductionDeletedPayload {
+  codigoProduccion: string;
+  timestamp: string;
+}
