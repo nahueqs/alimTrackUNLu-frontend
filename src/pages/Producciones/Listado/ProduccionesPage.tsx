@@ -13,7 +13,7 @@ import './ProduccionesPage.css';
 import { useIsMobile } from '@/hooks/useIsMobile.ts';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
-import { Button as UiButton } from '@/components/ui'; // Importamos nuestro botón UI
+import { Button as UiButton } from '@/components/ui';
 import { ArrowLeftIcon } from 'lucide-react';
 
 // Extendemos dayjs con el plugin isBetween

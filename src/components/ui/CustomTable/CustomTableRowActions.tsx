@@ -1,4 +1,3 @@
-import React from 'react';
 import type { MenuProps } from 'antd';
 import { Button, Dropdown, Tooltip } from 'antd';
 import { DeleteOutlined, EditOutlined, EllipsisOutlined, EyeOutlined } from '@ant-design/icons';

@@ -73,7 +73,7 @@ export const NuevaProduccionPage: React.FC = () => {
   };
 
   const handleBack = () => {
-    navigate('/producciones');
+    navigate('/dashboard');
   };
 
   if (!user) {
@@ -90,7 +90,7 @@ export const NuevaProduccionPage: React.FC = () => {
       <main className="dashboard__main container">
         <div className="productions-list__header">
           <Button icon={<ArrowLeftIcon />} onClick={handleBack} variant={'secondary'}>
-            Volver a Producciones
+            Volver al Dashboard
           </Button>
         </div>
         {loadingVersions ? (
