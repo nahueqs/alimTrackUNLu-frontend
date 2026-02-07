@@ -15,9 +15,9 @@ import { TipoDatoCampo } from '@/pages/Recetas/types/TipoDatoCampo';
 // Inicializar fuentes (necesario para pdfmake en cliente)
 // La estructura de pdfmake/vfs_fonts puede variar según la versión y el bundler
 // Intentamos asignar de forma segura
-if (pdfFonts && pdfFonts.pdfMake && pdfFonts.pdfMake.vfs) {
+if (pdfFonts && (pdfFonts as any).pdfMake && (pdfFonts as any).pdfMake.vfs) {
     // @ts-ignore
-    pdfMake.vfs = pdfFonts.pdfMake.vfs;
+    pdfMake.vfs = (pdfFonts as any).pdfMake.vfs;
 } else if (pdfFonts && (pdfFonts as any).vfs) {
     // @ts-ignore
     pdfMake.vfs = (pdfFonts as any).vfs;
