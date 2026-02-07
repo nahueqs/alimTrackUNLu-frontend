@@ -119,4 +119,14 @@
     .ant-table-cell-fix-right.actions-column::after {
         box-shadow: none !important;
     }
+    
+    /* Ensure the table wrapper allows horizontal scrolling */
+    .data-table-content .ant-table-wrapper {
+        overflow-x: auto;
+    }
+    
+    /* Ensure the table content itself doesn't overflow its container in a weird way */
+    .data-table-content .ant-table-content {
+        overflow-x: auto !important;
+    }
 }
