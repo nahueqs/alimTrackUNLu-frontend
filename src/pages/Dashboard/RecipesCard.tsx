@@ -1,6 +1,7 @@
 import React from 'react';
 import { DashboardCard } from './DashboardCard.tsx';
 import { Button } from '@/components/ui';
+import { Link } from 'react-router-dom';
 
 // 1. Las props ahora describen eventos, no acciones de navegación.
 interface RecetasCardProps {
@@ -8,7 +9,7 @@ interface RecetasCardProps {
   onViewAll: () => void;
 }
 
-export const RecetasCard: React.FC<RecetasCardProps> = ({ onAddNew, onViewAll }) => {
+export const RecetasCard: React.FC<RecetasCardProps> = () => {
   return (
     <DashboardCard
       title="Recetas"
@@ -16,12 +17,16 @@ export const RecetasCard: React.FC<RecetasCardProps> = ({ onAddNew, onViewAll })
       variant="default"
       hoverEffect={true}
     >
-      {/* 2. Cada botón llama a su propio evento semántico. */}
-      <Button onClick={onAddNew}>Crear Receta</Button>
+      {/* 2. Usamos Link para navegación semántica */}
+      <Link to="/recetas/nueva" style={{ textDecoration: 'none' }}>
+        <Button style={{ width: '100%' }}>Crear Receta</Button>
+      </Link>
 
-      <Button variant={'secondary'} onClick={onViewAll}>
-        Ver Listado de recetas
-      </Button>
+      <Link to="/recetas/versiones" style={{ textDecoration: 'none' }}>
+        <Button variant={'secondary'} style={{ width: '100%' }}>
+          Ver Listado de recetas
+        </Button>
+      </Link>
     </DashboardCard>
   );
 };

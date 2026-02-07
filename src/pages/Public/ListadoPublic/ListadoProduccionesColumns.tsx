@@ -10,12 +10,10 @@ import {
 import { CustomTableRowActions } from '@/components/ui/CustomTable/CustomTableRowActions.tsx';
 
 interface PublicProductionColumnsProps {
-  onView: (record: ProduccionPublicMetadataDTO) => void;
   isMobile: boolean;
 }
 
 export const getPublicProductionColumns = ({
-  onView,
   isMobile,
 }: PublicProductionColumnsProps): ColumnsType<ProduccionPublicMetadataDTO> => {
   return [
@@ -73,7 +71,7 @@ export const getPublicProductionColumns = ({
       render: (_, record) => (
         <CustomTableRowActions<ProduccionPublicMetadataDTO>
           record={record}
-          onView={onView}
+          viewPath={(r) => `/public/producciones/ver/${r.codigoProduccion}`}
           getRecordId={(r) => r.codigoProduccion}
           isMobile={isMobile}
         />

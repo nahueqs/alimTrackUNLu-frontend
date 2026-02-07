@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { Button, message, Modal } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { type LocalProductionFilters, ProduccionFilters } from './ProduccionFilters.tsx';
-import type { ProduccionProtectedResponseDTO } from '@/types/production';
 import { usePageTitle } from '@/hooks/usePageTitle.ts';
 import './ProduccionesPage.css';
 import { useIsMobile } from '@/hooks/useIsMobile.ts';
@@ -108,14 +107,6 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
     }).sort((a, b) => new Date(b.fechaInicio).getTime() - new Date(a.fechaInicio).getTime());
   }, [producciones, filters]);
 
-  const handleView = (record: ProduccionProtectedResponseDTO) => {
-    window.open(`/public/producciones/ver/${record.codigoProduccion}`, '_blank');
-  };
-
-  const handleEdit = (record: ProduccionProtectedResponseDTO) => {
-    window.open(`/producciones/ver/${record.codigoProduccion}`, '_blank');
-  };
-
   const handleDelete = (codigoProduccion: string) => {
     Modal.confirm({
       title: '¿Estás seguro de eliminar esta producción?',
@@ -181,8 +172,6 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
   };
 
   const columns = getProductionColumns({
-    onView: handleView,
-    onEdit: handleEdit,
     onDelete: handleDelete,
     isMobile,
   });

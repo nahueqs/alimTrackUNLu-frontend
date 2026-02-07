@@ -4,7 +4,6 @@ import { CustomTable } from '@/components/ui/CustomTable/CustomTable.tsx';
 import { getColumns } from './ListadoVersionRecetaColumnas.tsx';
 import { useNavigate } from 'react-router-dom';
 import { useVersionRecetaService } from '@/services/recetas/useVersionRecetaService.ts';
-import type { VersionRecetaMetadataResponseDTO } from '@/types/production';
 import { useIsMobile } from '@/hooks/useIsMobile.ts';
 import { usePageTitle } from '@/hooks/usePageTitle.ts';
 import { Button } from '@/components/ui';
@@ -20,14 +19,6 @@ export const VersionRecetasPage: React.FC = () => {
   useEffect(() => {
     getAllVersiones();
   }, [getAllVersiones]);
-
-  const handleView = (record: VersionRecetaMetadataResponseDTO) => {
-    navigate(`/recetas/ver/${record.codigoVersionReceta}`);
-  };
-
-  const handleEdit = (record: VersionRecetaMetadataResponseDTO) => {
-    navigate(`/recetas/versiones/editar/${record.codigoVersionReceta}`);
-  };
 
   const handleDelete = (id: string) => {
     console.log('Eliminar versión', id);
@@ -50,8 +41,6 @@ export const VersionRecetasPage: React.FC = () => {
   );
 
   const columns = getColumns({
-    onView: handleView,
-    onEdit: handleEdit,
     onDelete: handleDelete,
     isMobile,
   });

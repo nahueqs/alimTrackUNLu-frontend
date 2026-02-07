@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/auth/AuthProvider';
 import logoCideta from '../../assets/logoCideta.png';
 import './AppHeader.css';
@@ -42,27 +42,27 @@ export const AppHeader: React.FC<HeaderProps> = ({
 
   const renderProtectedNav = () => (
     <>
-      <a className="header__nav-link" onClick={() => handleNavigation('/dashboard')}>
+      <Link className="header__nav-link" to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
         Dashboard
-      </a>
-      <a className="header__nav-link" onClick={() => handleNavigation('/producciones')}>
+      </Link>
+      <Link className="header__nav-link" to="/producciones" onClick={() => setIsMobileMenuOpen(false)}>
         Producciones
-      </a>
-      <a className="header__nav-link" onClick={() => handleNavigation('/recetas/versiones')}>
+      </Link>
+      <Link className="header__nav-link" to="/recetas/versiones" onClick={() => setIsMobileMenuOpen(false)}>
         Recetas
-      </a>
-      <a className="header__nav-link" onClick={() => handleNavigation('/public/producciones')}>
+      </Link>
+      <Link className="header__nav-link" to="/public/producciones" onClick={() => setIsMobileMenuOpen(false)}>
         Vista Pública
-      </a>
+      </Link>
     </>
   );
 
   const renderPublicNav = () => (
     <>
-      <a className="header__nav-link" onClick={() => handleNavigation('/public/producciones')}>
+      <Link className="header__nav-link" to="/public/producciones" onClick={() => setIsMobileMenuOpen(false)}>
         <ListIcon size={16} style={{ marginRight: 4 }} />
         Listado Público
-      </a>
+      </Link>
     </>
   );
 
@@ -75,9 +75,9 @@ export const AppHeader: React.FC<HeaderProps> = ({
         <span>{user?.nombre}</span>
       </div>
       <div className="header__user-dropdown">
-        <a className="header__dropdown-item" onClick={() => handleNavigation('/profile')}>
+        <Link className="header__dropdown-item" to="/profile" onClick={() => setIsMobileMenuOpen(false)}>
           Mi Perfil
-        </a>
+        </Link>
         <hr className="header__separator" />
         <a className="header__dropdown-item" onClick={logout}>
           Cerrar Sesión
@@ -141,18 +141,18 @@ export const AppHeader: React.FC<HeaderProps> = ({
         {variant === 'protected' ? (
           // Menú Móvil Protegido
           <>
-            <a className="header__dropdown-item" onClick={() => handleNavigation('/dashboard')}>
+            <Link className="header__dropdown-item" to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
               Dashboard
-            </a>
-            <a className="header__dropdown-item" onClick={() => handleNavigation('/producciones')}>
+            </Link>
+            <Link className="header__dropdown-item" to="/producciones" onClick={() => setIsMobileMenuOpen(false)}>
               Producciones
-            </a>
-            <a className="header__dropdown-item" onClick={() => handleNavigation('/recetas/versiones')}>
+            </Link>
+            <Link className="header__dropdown-item" to="/recetas/versiones" onClick={() => setIsMobileMenuOpen(false)}>
               Recetas
-            </a>
-            <a className="header__dropdown-item" onClick={() => handleNavigation('/public/producciones')}>
+            </Link>
+            <Link className="header__dropdown-item" to="/public/producciones" onClick={() => setIsMobileMenuOpen(false)}>
               Vista Pública
-            </a>
+            </Link>
             <hr className="header__separator" />
             {user && (
               <div className="header__mobile-user-info">
@@ -160,9 +160,9 @@ export const AppHeader: React.FC<HeaderProps> = ({
                 <p className="header__mobile-user-role">{user.rol}</p>
               </div>
             )}
-            <a className="header__dropdown-item" onClick={() => handleNavigation('/profile')}>
+            <Link className="header__dropdown-item" to="/profile" onClick={() => setIsMobileMenuOpen(false)}>
               Mi Perfil
-            </a>
+            </Link>
             <hr className="header__separator" />
             <a className="header__dropdown-item" onClick={logout}>
               Cerrar Sesión
@@ -171,10 +171,10 @@ export const AppHeader: React.FC<HeaderProps> = ({
         ) : (
           // Menú Móvil Público
           <>
-            <a className="header__dropdown-item" onClick={() => handleNavigation('/public/producciones')}>
+            <Link className="header__dropdown-item" to="/public/producciones" onClick={() => setIsMobileMenuOpen(false)}>
               <ListIcon size={16} style={{ marginRight: 8 }} />
               Listado Público
-            </a>
+            </Link>
             <hr className="header__separator" />
             <a 
               className="header__dropdown-item" 

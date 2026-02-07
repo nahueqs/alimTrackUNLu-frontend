@@ -10,15 +10,11 @@ import {
 } from '@/constants/ProductionStates';
 
 interface ProductionsColumnsProps {
-  onView?: (record: ProduccionProtectedResponseDTO) => void;
-  onEdit?: (record: ProduccionProtectedResponseDTO) => void;
   onDelete?: (id: string) => void;
   isMobile: boolean;
 }
 
 export const getProductionColumns = ({
-  onView,
-  onEdit,
   onDelete,
   isMobile,
 }: ProductionsColumnsProps): ColumnsType<ProduccionProtectedResponseDTO> => {
@@ -88,8 +84,8 @@ export const getProductionColumns = ({
       render: (_: unknown, record: ProduccionProtectedResponseDTO) => (
         <CustomTableRowActions<ProduccionProtectedResponseDTO>
           record={record}
-          onView={onView}
-          onEdit={onEdit}
+          viewPath={(r) => `/public/producciones/ver/${r.codigoProduccion}`}
+          editPath={(r) => `/producciones/editar/${r.codigoProduccion}`}
           onDelete={onDelete}
           getRecordId={(r) => r.codigoProduccion}
           isMobile={isMobile}

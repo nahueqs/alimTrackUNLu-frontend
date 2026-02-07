@@ -76,10 +76,6 @@ export const ListadoProducciones: React.FC = () => {
     };
   }, [updateProductionStateInList, getProduccionesPublicas]);
 
-  const handleView = (record: ProduccionPublicMetadataDTO) => {
-    navigate(`/public/producciones/ver/${record.codigoProduccion}`);
-  };
-
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
@@ -97,7 +93,6 @@ export const ListadoProducciones: React.FC = () => {
     .sort((a, b) => new Date(b.fechaInicio).getTime() - new Date(a.fechaInicio).getTime());
 
   const columns = getPublicProductionColumns({
-    onView: handleView,
     isMobile,
   });
 

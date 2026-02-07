@@ -4,15 +4,11 @@ import type { VersionRecetaMetadataResponseDTO } from '@/types/production'; // C
 import { formatDate } from '@/hooks/useFormatDate.ts';
 
 interface GetColumnsProps {
-  onView?: (record: VersionRecetaMetadataResponseDTO) => void; // Changed type
-  onEdit?: (record: VersionRecetaMetadataResponseDTO) => void; // Changed type
   onDelete?: (id: string) => void;
   isMobile: boolean; // Add isMobile prop
 }
 
 export const getColumns = ({
-  onView,
-  onEdit,
   onDelete,
   isMobile, // Destructure isMobile
 }: GetColumnsProps): ColumnsType<VersionRecetaMetadataResponseDTO> => {
@@ -67,8 +63,8 @@ export const getColumns = ({
       ) => (
         <CustomTableRowActions<VersionRecetaMetadataResponseDTO> // Changed type
           record={record}
-          onView={onView}
-          onEdit={onEdit}
+          viewPath={(r) => `/recetas/ver/${r.codigoVersionReceta}`}
+          editPath={(r) => `/recetas/versiones/editar/${r.codigoVersionReceta}`}
           onDelete={onDelete}
           getRecordId={(r) => r.codigoVersionReceta}
           isMobile={isMobile} // Pass isMobile prop
