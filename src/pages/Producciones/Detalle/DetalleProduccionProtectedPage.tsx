@@ -82,11 +82,11 @@ const DetalleProduccionProtectedPage: React.FC = () => {
       
       <div className="production-detail-container">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', marginBottom: '8px' }}>
-          <PrintButton />
+          <PrintButton estructura={estructura} respuestas={estadoActual} />
           <NotificationSelector
             value={notificationLevel}
             onChange={setNotificationLevel}
-            className="" // Remove default wrapper class to handle layout here
+            className=""
           />
         </div>
 
