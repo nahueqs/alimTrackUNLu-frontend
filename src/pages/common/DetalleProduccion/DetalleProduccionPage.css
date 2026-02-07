@@ -129,8 +129,11 @@
     font-weight: 500;
 }
 
-.section-card .ant-input {
-    background-color: var(--bg-secondary) !important;
+/* Estilos para inputs en secciones (Protected/Editable) */
+.section-card .ant-input,
+.section-card .ant-input-number-input,
+.section-card .ant-picker-input > input {
+    background-color: var(--bg-primary) !important; /* Fondo blanco para inputs editables */
     border-color: var(--border-light) !important;
     color: var(--text-primary) !important;
 }
@@ -152,14 +155,15 @@
 .public-readonly .ant-picker-disabled,
 .public-readonly .ant-input-number-input[disabled],
 .public-readonly .ant-picker-input > input[disabled] {
-    background-color: transparent !important;
+    background-color: var(--bg-secondary) !important; /* Fondo gris claro para indicar deshabilitado pero visible */
     color: var(--text-primary) !important;
     cursor: default !important;
-    border-color: transparent !important;
+    border: 1px solid var(--border-light) !important; /* Borde visible */
+    border-radius: var(--radius-sm) !important;
     box-shadow: none !important;
     opacity: 1 !important;
     -webkit-text-fill-color: var(--text-primary) !important;
-    padding-left: 0 !important;
+    padding-left: 11px !important; /* Restaurar padding estándar de Ant Design */
 }
 
 /* Ocultar placeholders */
@@ -177,7 +181,7 @@
 }
 
 .public-readonly .ant-checkbox-disabled .ant-checkbox-inner {
-    background-color: transparent !important;
+    background-color: var(--bg-secondary) !important;
     border-color: var(--border-medium) !important;
 }
 

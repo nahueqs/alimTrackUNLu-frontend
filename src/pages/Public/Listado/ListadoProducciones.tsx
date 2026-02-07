@@ -90,9 +90,9 @@ export const ListadoProducciones: React.FC = () => {
       <PublicHeader />
       <main className="public-main container">
         <div className="public-list-header">
-          <h1 className="public-list-title">Producciones Públicas</h1>
+          <h1 className="public-list-title">Producciones - CIDETA UNLu</h1>
           <p className="public-list-subtitle">
-            Consulta el estado y avance de las producciones en curso.
+            Consulte el estado y avance de las producciones de la planta.
           </p>
         </div>
 
