@@ -1,76 +1,105 @@
 /* ListadoProducciones.css */
 
-.public-dashboard-page {
+.public-layout {
     background-color: var(--bg-secondary);
     min-height: 100vh;
-}
-
-.public-dashboard-header {
-    background-color: var(--bg-primary);
-    padding: 1rem 2rem;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--border-light);
-    box-shadow: var(--shadow-sm);
-    position: sticky; /* Fija el header al hacer scroll */
-    top: 0;
-    z-index: 10;
+    flex-direction: column;
 }
 
-.public-dashboard-header__title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0;
-}
-
-.public-dashboard-main {
+.public-main {
+    flex: 1;
     padding-top: 2rem;
     padding-bottom: 2rem;
+    width: 100%;
+    max-width: 1200px; /* Ancho máximo para pantallas grandes */
+    margin: 0 auto; /* Centrado horizontal */
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .public-list-header {
-    margin-top: 1rem; /* Agregado margen superior */
+    margin-top: 1rem;
     margin-bottom: 2rem;
+    text-align: center; /* Centrado en móvil por defecto */
 }
 
-.public-dashboard__feedback {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 50vh;
+.public-list-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
 }
 
-.production-table-container {
+.public-list-subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.public-search-container {
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.public-search-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
     background-color: var(--bg-primary);
-    padding: 1.5rem;
+    color: var(--text-primary);
+}
+
+.public-search-input:focus {
+    outline: none;
+    border-color: var(--primary-500);
+    box-shadow: 0 0 0 2px var(--primary-100);
+}
+
+.public-list-content {
+    background-color: var(--bg-primary);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
+    padding: 1rem;
+    overflow: hidden; /* Para contener bordes redondeados */
 }
 
-/* Estilos para que la tabla de Ant Design se vea bien con el tema */
-.production-table-container .ant-table {
-    background-color: transparent;
-}
-
-.production-table-container .ant-table-thead > tr > th {
-    background-color: var(--bg-secondary);
-    color: var(--text-primary);
-    font-weight: 600;
-}
-
-.production-table-container .ant-table-tbody > tr > td {
-    background-color: var(--bg-primary);
-    color: var(--text-secondary);
-}
-
-.production-table-container .ant-table-tbody > tr.ant-table-row:hover > td {
-    background-color: var(--bg-tertiary);
-}
-
+/* Ajustes responsive */
 @media (min-width: 768px) {
-    .public-list-header {
-        margin-top: 1.5rem; /* Aumentado margen superior en desktop */
+    .public-main {
+        padding-left: 2rem;
+        padding-right: 2rem;
     }
+
+    .public-list-header {
+        text-align: left; /* Alineado a la izquierda en desktop */
+        margin-top: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .public-list-title {
+        font-size: 2rem;
+    }
+
+    .public-search-container {
+        margin-left: 0; /* Alinear búsqueda a la izquierda en desktop si se prefiere, o mantener centrado */
+        /* Para mantener consistencia con el header alineado a la izquierda: */
+        margin-left: 0; 
+        max-width: 400px;
+    }
+
+    .public-list-content {
+        padding: 1.5rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    /* Ajustes adicionales para pantallas muy grandes si es necesario */
 }
