@@ -29,7 +29,7 @@ export const DashboardPage: React.FC = () => {
         <div className="dashboard__welcome">
           <h1 className="dashboard__welcome-title">¡Bienvenido, {user?.nombre}!</h1>
           <p className="dashboard__welcome-subtitle">
-            Sistema de gestión de producciones alimenticias - UNLu
+            Sistema de gestión de producciones alimenticias
           </p>
 
           <div className="dashboard__grid">

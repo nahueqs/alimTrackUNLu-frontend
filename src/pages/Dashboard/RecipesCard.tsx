@@ -20,7 +20,7 @@ export const RecetasCard: React.FC<RecetasCardProps> = ({ onAddNew, onViewAll })
       <Button onClick={onAddNew}>Crear Receta</Button>
 
       <Button variant={'secondary'} onClick={onViewAll}>
-        Ver Listado
+        Ver Listado de recetas
       </Button>
     </DashboardCard>
   );

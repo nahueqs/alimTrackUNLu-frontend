@@ -4,14 +4,14 @@ import { PublicRoute } from '@/context/auth/PublicRoute.tsx';
 import { DashboardPage } from '@/pages/Dashboard/DashboardPage.tsx';
 import LoginPage from '@/pages/Auth/LoginPage.tsx';
 import { NuevaProduccionPage } from '@/pages/Producciones/Nueva/NuevaProduccionPage.tsx';
-import ProductionsResultPage from '@/pages/Producciones/Listado/ProduccionesPage.tsx';
+import ProductionsResultPage from '@/pages/Producciones/ListadoProtected/ProduccionesPage.tsx';
 import DetalleProduccionPublicPage from '@/pages/Public/Detalle/DetalleProduccionPublicPage.tsx';
 import DetalleProduccionProtectedPage from '@/pages/Producciones/Detalle/DetalleProduccionProtectedPage.tsx';
-import { ListadoProducciones } from '@/pages/Public/Listado/ListadoProducciones.tsx';
+import { ListadoProducciones } from '@/pages/Public/ListadoPublic/ListadoProducciones.tsx';
 import { VersionRecetasPage } from '@/pages/Recetas/Listado/VersionRecetasPage.tsx';
 import { VisualizarRecetaPage } from '@/pages/Recetas/Detalle/VisualizarRecetaPage.tsx';
 import { ProductionState } from '@/constants/ProductionStates';
-import type { LocalProductionFilters } from '@/pages/Producciones/Listado/ProduccionFilters.tsx';
+import type { LocalProductionFilters } from '@/pages/Producciones/ListadoProtected/ProduccionFilters.tsx';
 
 const produccionesActivasFilters: Partial<LocalProductionFilters> = {
   estado: ProductionState.EN_PROCESO,

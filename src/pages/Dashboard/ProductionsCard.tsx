@@ -17,7 +17,7 @@ export const ProductionsCard: React.FC<ProductionsCardProps> = ({
   return (
     <DashboardCard
       title="Producciones"
-      description="Gestiona las producciones activas y crea nuevas órdenes de producción."
+      description="Gestiona las producciones."
     >
       {/* 2. Cada botón llama a su propio evento semántico. */}
       <Button onClick={onAddNew}>Iniciar producción</Button>

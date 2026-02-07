@@ -5,7 +5,7 @@ import { CustomTable } from '@/components/ui/CustomTable/CustomTable.tsx';
 import { getProductionColumns } from './ProduccionesColumns.tsx';
 import { useNavigate } from 'react-router-dom';
 import { Button, message, Modal } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { type LocalProductionFilters, ProduccionFilters } from './ProduccionFilters.tsx';
 import type { ProduccionProtectedResponseDTO } from '@/types/production';
 import { usePageTitle } from '@/hooks/usePageTitle.ts';
@@ -31,6 +31,7 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
   
   // Estado para los filtros locales
   const [filters, setFilters] = useState<LocalProductionFilters>(initialFilters as LocalProductionFilters);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const isMobile = useIsMobile();
 
   // Cargar TODAS las producciones al montar el componente (sin filtros de backend)
@@ -107,12 +108,49 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
     });
   };
 
+  const handleBatchDelete = () => {
+    if (selectedRowKeys.length === 0) return;
+
+    Modal.confirm({
+      title: `¿Estás seguro de eliminar ${selectedRowKeys.length} producciones?`,
+      content: 'Esta acción no se puede deshacer.',
+      okText: 'Sí, eliminar',
+      okType: 'danger',
+      cancelText: 'Cancelar',
+      onOk: async () => {
+        try {
+          // Ejecutar eliminaciones en paralelo
+          // Nota: Idealmente el backend debería tener un endpoint para batch delete
+          const deletePromises = selectedRowKeys.map(key => deleteProduction(key.toString()));
+          await Promise.all(deletePromises);
+          
+          message.success(`${selectedRowKeys.length} producciones eliminadas exitosamente`);
+          setSelectedRowKeys([]); // Limpiar selección
+        } catch (err: any) {
+          console.error('Error al eliminar producciones:', err);
+          message.error('Ocurrió un error al eliminar algunas producciones. Por favor recarga la página.');
+          // Recargar para asegurar consistencia
+          getProducciones({});
+        }
+      },
+    });
+  };
+
   const handleFilterChange = (newFilters: LocalProductionFilters) => {
     setFilters(newFilters);
   };
 
   const handleBack = () => {
     navigate('/dashboard');
+  };
+
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
   };
 
   const columns = getProductionColumns({
@@ -133,9 +171,20 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
             </UiButton>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '1rem' }}>
               <h1 className="productions-list__title">Listado de Producciones</h1>
-              <Button icon={<PlusOutlined />} onClick={() => navigate('/producciones/nueva')}>
-                Nueva Producción
-              </Button>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {selectedRowKeys.length > 0 && (
+                  <Button 
+                    danger 
+                    icon={<DeleteOutlined />} 
+                    onClick={handleBatchDelete}
+                  >
+                    Eliminar ({selectedRowKeys.length})
+                  </Button>
+                )}
+                <Button icon={<PlusOutlined />} onClick={() => navigate('/producciones/nueva')}>
+                  Nueva Producción
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -147,6 +196,7 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
 
         <div className="productions-list__content">
           <CustomTable
+            rowSelection={rowSelection}
             columns={columns}
             dataSource={filteredProducciones} // Usamos la lista filtrada localmente
             loading={loading}

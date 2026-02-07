@@ -170,9 +170,8 @@ export const getProduccionFormFields = (
       label: 'Observaciones',
       type: 'textarea',
       placeholder:
-        'Ej: Producción especial para cliente corporativo, control de calidad adicional requerido',
+        'Ej: Presencia de partículas. Color normal',
       rules: [
-        { min: 1, message: 'Las observaciones deben tener al menos 1 carácter' },
         { max: 255, message: 'No puede exceder 255 caracteres' },
       ],
       props: {
