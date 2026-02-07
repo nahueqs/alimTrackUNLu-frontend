@@ -1,4 +1,5 @@
 import pdfMake from 'pdfmake/build/pdfmake';
+// @ts-ignore
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import type { 
   EstructuraProduccionDTO, 
@@ -12,8 +13,17 @@ import dayjs from 'dayjs';
 import { TipoDatoCampo } from '@/pages/Recetas/types/TipoDatoCampo';
 
 // Inicializar fuentes (necesario para pdfmake en cliente)
-// @ts-ignore
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+// La estructura de pdfmake/vfs_fonts puede variar según la versión y el bundler
+// Intentamos asignar de forma segura
+if (pdfFonts && pdfFonts.pdfMake && pdfFonts.pdfMake.vfs) {
+    // @ts-ignore
+    pdfMake.vfs = pdfFonts.pdfMake.vfs;
+} else if (pdfFonts && (pdfFonts as any).vfs) {
+    // @ts-ignore
+    pdfMake.vfs = (pdfFonts as any).vfs;
+} else {
+    console.warn('No se pudieron cargar las fuentes de pdfmake. Es posible que el PDF no se genere correctamente.');
+}
 
 type RespuestasProduccion = RespuestasProduccionPublicDTO | RespuestasProduccionProtectedDTO;
 
