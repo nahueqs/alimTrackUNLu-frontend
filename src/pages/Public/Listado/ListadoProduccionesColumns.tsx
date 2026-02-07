@@ -1,6 +1,4 @@
 import type { ColumnsType } from 'antd/es/table';
-import { Button, Tooltip } from 'antd';
-import { EyeOutlined } from '@ant-design/icons';
 import { Tag } from 'antd';
 import dayjs from 'dayjs';
 import type { ProduccionPublicMetadataDTO } from '@/types/production';
@@ -9,6 +7,7 @@ import {
   PRODUCTION_STATE_LABELS,
   ProductionState,
 } from '@/constants/ProductionStates';
+import { CustomTableRowActions } from '@/components/ui/CustomTable/CustomTableRowActions.tsx';
 
 interface PublicProductionColumnsProps {
   onView: (record: ProduccionPublicMetadataDTO) => void;
@@ -66,20 +65,18 @@ export const getPublicProductionColumns = ({
       responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {
-      title: 'Acciones',
+      title: <span className="actions-title-text">Acciones</span>,
       key: 'actions',
       fixed: 'right',
       width: isMobile ? 50 : 100,
+      className: 'actions-column',
       render: (_, record) => (
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <Tooltip title="Ver detalle">
-            <Button 
-              type="text" // Botón tipo texto para que sea más limpio
-              icon={<EyeOutlined style={{ fontSize: '18px', color: '#1890ff' }} />} 
-              onClick={() => onView(record)} 
-            />
-          </Tooltip>
-        </div>
+        <CustomTableRowActions<ProduccionPublicMetadataDTO>
+          record={record}
+          onView={onView}
+          getRecordId={(r) => r.codigoProduccion}
+          isMobile={isMobile}
+        />
       ),
     },
   ];
