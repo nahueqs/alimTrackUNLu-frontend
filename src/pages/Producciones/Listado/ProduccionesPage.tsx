@@ -13,6 +13,8 @@ import './ProduccionesPage.css';
 import { useIsMobile } from '@/hooks/useIsMobile.ts';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
+import { Button as UiButton } from '@/components/ui'; // Importamos nuestro botón UI
+import { ArrowLeftIcon } from 'lucide-react';
 
 // Extendemos dayjs con el plugin isBetween
 dayjs.extend(isBetween);
@@ -109,6 +111,10 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
     setFilters(newFilters);
   };
 
+  const handleBack = () => {
+    navigate('/dashboard');
+  };
+
   const columns = getProductionColumns({
     onView: handleView,
     onEdit: handleEdit,
@@ -121,10 +127,17 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
       <AppHeader title="AlimTrack" />
       <main className="dashboard__main container">
         <div className="productions-list__header">
-          <h1 className="productions-list__title">Listado de Producciones</h1>
-          <Button icon={<PlusOutlined />} onClick={() => navigate('/producciones/nueva')}>
-            Nueva Producción
-          </Button>
+          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <UiButton icon={<ArrowLeftIcon />} onClick={handleBack} variant={'secondary'} style={{ alignSelf: 'flex-start' }}>
+              Volver al Dashboard
+            </UiButton>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '1rem' }}>
+              <h1 className="productions-list__title">Listado de Producciones</h1>
+              <Button icon={<PlusOutlined />} onClick={() => navigate('/producciones/nueva')}>
+                Nueva Producción
+              </Button>
+            </div>
+          </div>
         </div>
 
         <ProduccionFilters 

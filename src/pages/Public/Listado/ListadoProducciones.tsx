@@ -9,6 +9,8 @@ import { useIsMobile } from '@/hooks/useIsMobile.ts';
 import './ListadoProducciones.css';
 import { notificationService } from '@/services/notificaciones/notificationService.ts';
 import { usePageTitle } from '@/hooks/usePageTitle.ts';
+import { Button } from '@/components/ui';
+import { ArrowLeftIcon } from 'lucide-react';
 
 export const ListadoProducciones: React.FC = () => {
   usePageTitle('Producciones');
@@ -72,6 +74,10 @@ export const ListadoProducciones: React.FC = () => {
     setSearchTerm(e.target.value);
   };
 
+  const handleBack = () => {
+    navigate('/'); // O a donde corresponda volver desde la vista pública
+  };
+
   const filteredProducciones = producciones
     .filter(
       (p) =>
@@ -90,6 +96,11 @@ export const ListadoProducciones: React.FC = () => {
       <PublicHeader />
       <main className="public-main container">
         <div className="public-list-header">
+          <div style={{ marginBottom: '1rem', width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
+             <Button icon={<ArrowLeftIcon />} onClick={handleBack} variant={'secondary'}>
+                Volver al Inicio
+             </Button>
+          </div>
           <h1 className="public-list-title">Producciones - CIDETA UNLu</h1>
           <p className="public-list-subtitle">
             Consulte el estado y avance de las producciones de la planta.

@@ -7,6 +7,8 @@ import { useVersionRecetaService } from '@/services/recetas/useVersionRecetaServ
 import type { VersionRecetaMetadataResponseDTO } from '@/types/production';
 import { useIsMobile } from '@/hooks/useIsMobile.ts';
 import { usePageTitle } from '@/hooks/usePageTitle.ts';
+import { Button } from '@/components/ui';
+import { ArrowLeftIcon } from 'lucide-react';
 
 export const VersionRecetasPage: React.FC = () => {
   usePageTitle('Versiones de Recetas');
@@ -36,6 +38,10 @@ export const VersionRecetasPage: React.FC = () => {
     setSearchTerm(e.target.value);
   };
 
+  const handleBack = () => {
+    navigate('/dashboard');
+  };
+
   const filteredVersiones = versiones.filter(
     (v) =>
       v.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -54,7 +60,10 @@ export const VersionRecetasPage: React.FC = () => {
     <div className="dashboard">
       <AppHeader title="AlimTrack" />
       <main className="dashboard__main container">
-        <div className="productions-list__header" style={{ marginTop: '1.5rem' }}>
+        <div className="productions-list__header" style={{ marginTop: '1.5rem', flexDirection: 'column', alignItems: 'flex-start', gap: '1rem' }}>
+          <Button icon={<ArrowLeftIcon />} onClick={handleBack} variant={'secondary'}>
+            Volver al Dashboard
+          </Button>
           <h1 className="productions-list__title">Versiones de Recetas</h1>
           {/* Aquí podrías agregar un botón de "Nueva Versión" si fuera necesario */}
         </div>
