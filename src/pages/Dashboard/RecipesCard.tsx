@@ -3,13 +3,7 @@ import { DashboardCard } from './DashboardCard.tsx';
 import { Button } from '@/components/ui';
 import { Link } from 'react-router-dom';
 
-// 1. Las props ahora describen eventos, no acciones de navegación.
-interface RecetasCardProps {
-  onAddNew: () => void;
-  onViewAll: () => void;
-}
-
-export const RecetasCard: React.FC<RecetasCardProps> = () => {
+export const RecetasCard: React.FC = () => {
   return (
     <DashboardCard
       title="Recetas"

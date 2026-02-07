@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { AppHeader } from '@/components/AppHeader/AppHeader.tsx';
 import { CustomTable } from '@/components/ui/CustomTable/CustomTable.tsx';
 import { getPublicProductionColumns } from './ListadoProduccionesColumns.tsx';
-import type { ProduccionPublicMetadataDTO } from '@/types/production';
 import { usePublicService } from '@/services/public/usePublicService.ts';
 import { useIsMobile } from '@/hooks/useIsMobile.ts';
 import './ListadoProducciones.css';

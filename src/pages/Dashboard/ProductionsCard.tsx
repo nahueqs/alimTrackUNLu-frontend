@@ -3,14 +3,7 @@ import { DashboardCard } from './DashboardCard.tsx';
 import { Button } from '@/components/ui';
 import { Link } from 'react-router-dom';
 
-// 1. Las props ahora describen eventos, no acciones.
-interface ProductionsCardProps {
-  onAddNew: () => void;
-  onViewActive: () => void;
-  onViewAll: () => void;
-}
-
-export const ProductionsCard: React.FC<ProductionsCardProps> = () => {
+export const ProductionsCard: React.FC = () => {
   return (
     <DashboardCard
       title="Producciones"
