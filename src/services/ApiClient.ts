@@ -144,14 +144,16 @@ class ApiClient {
       if (isUnauthorizedOrForbidden && tokenRefreshHandler) {
         // Silencioso para el log general, se maneja abajo
       } else {
-        console.groupCollapsed(`[ApiClient] Error Capturado`);
-        console.error(error);
+        if (import.meta.env.DEV) {
+          console.groupCollapsed(`[ApiClient] Error Capturado`);
+          console.error(error);
+        }
       }
 
       let friendlyError: Error;
 
       if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-        console.log('[ApiClient] Interpretado como: Error de Red.');
+        if (import.meta.env.DEV) console.log('[ApiClient] Interpretado como: Error de Red.');
         friendlyError = new Error('Error de Conexión: No se pudo comunicar con el servidor.');
       } else if (error.response) {
         const status = error.response.status;
@@ -173,14 +175,16 @@ class ApiClient {
               endpoint.includes('/auth/me');
 
             if (tokenRefreshHandler && !isAuthRequest) {
-              console.log(`[ApiClient] ${status} detectado en:`, endpoint);
-              console.log('[ApiClient] Intentando recuperar sesión...');
+              if (import.meta.env.DEV) {
+                console.log(`[ApiClient] ${status} detectado en:`, endpoint);
+                console.log('[ApiClient] Intentando recuperar sesión...');
+              }
               try {
                 const newToken = await tokenRefreshHandler();
-                console.log('[ApiClient] Resultado refresh:', newToken ? 'Éxito' : 'Falló/Cancelado');
+                if (import.meta.env.DEV) console.log('[ApiClient] Resultado refresh:', newToken ? 'Éxito' : 'Falló/Cancelado');
                 
                 if (newToken) {
-                  console.log('[ApiClient] Reintentando petición original...');
+                  if (import.meta.env.DEV) console.log('[ApiClient] Reintentando petición original...');
                   
                   // Reconstruir headers asegurando que Authorization sea el nuevo
                   // Usamos un objeto plano para evitar problemas con Headers iterables
@@ -214,22 +218,22 @@ class ApiClient {
                 console.error('[ApiClient] Falló la recuperación de sesión (Excepción).', refreshError);
               }
             } else {
-                console.log(`[ApiClient] ${status} sin intento de refresh. Handler:`, !!tokenRefreshHandler, 'IsAuth:', isAuthRequest);
+                if (import.meta.env.DEV) console.log(`[ApiClient] ${status} sin intento de refresh. Handler:`, !!tokenRefreshHandler, 'IsAuth:', isAuthRequest);
             }
             
             // Si llegamos aquí es porque falló el refresh o no había handler
-            console.log(`[ApiClient] Interpretado como: Error HTTP ${status}. Ejecutando logout.`);
+            if (import.meta.env.DEV) console.log(`[ApiClient] Interpretado como: Error HTTP ${status}. Ejecutando logout.`);
             friendlyError = new Error(
               apiMessage || 'Sesión expirada o sin permisos. Por favor, inicie sesión de nuevo.'
             );
             if (onUnauthorized) onUnauthorized();
             break;
           case 404:
-            console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
+            if (import.meta.env.DEV) console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
             friendlyError = new Error(apiMessage || 'El recurso solicitado no fue encontrado.');
             break;
           case 409:
-            console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
+            if (import.meta.env.DEV) console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
             friendlyError = new Error(
               apiMessage || 'Conflicto: El recurso ya existe o hay un conflicto de datos.'
             );
@@ -238,18 +242,18 @@ class ApiClient {
           case 502:
           case 503:
           case 504:
-            console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
+            if (import.meta.env.DEV) console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
             friendlyError = new Error(
               'Error del Servidor: Problema inesperado. Intente más tarde.'
             );
             break;
           default:
-            console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
+            if (import.meta.env.DEV) console.log(`[ApiClient] Interpretado como: Error HTTP ${status}.`);
             friendlyError = error;
             break;
         }
       } else if (error instanceof SyntaxError) {
-        console.log('[ApiClient] Interpretado como: Error de parseo JSON.');
+        if (import.meta.env.DEV) console.log('[ApiClient] Interpretado como: Error de parseo JSON.');
         friendlyError = new Error(
           'Error de Respuesta: El formato de la respuesta del servidor no es válido.'
         );
@@ -261,7 +265,7 @@ class ApiClient {
       if (
         !(error.response && (error.response.status === 401 || error.response.status === 403) && tokenRefreshHandler)
       ) {
-          console.groupEnd();
+          if (import.meta.env.DEV) console.groupEnd();
       }
       
       throw friendlyError;

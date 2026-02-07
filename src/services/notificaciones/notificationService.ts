@@ -29,14 +29,13 @@ class NotificationService {
       heartbeatOutgoing: 20000,
       // debug: (str) => { if (import.meta.env.DEV) console.log(str); }, 
       onConnect: () => {
-        console.log('[NotificationService] Conectado exitosamente');
-        // this.connectionAttempts = 0; // Removed unused variable usage
+        if (import.meta.env.DEV) console.log('[NotificationService] Conectado exitosamente');
         if (this.onConnectCallback) {
           this.onConnectCallback();
         }
       },
       onDisconnect: () => {
-        console.log('[NotificationService] Desconectado');
+        if (import.meta.env.DEV) console.log('[NotificationService] Desconectado');
         // No limpiamos el callback aquí para permitir reconexión automática y resuscripción
       },
       onStompError: (frame) => {
@@ -44,7 +43,7 @@ class NotificationService {
         console.error('[NotificationService] Additional details: ' + frame.body);
       },
       onWebSocketClose: () => {
-        console.log('[NotificationService] WebSocket cerrado');
+        if (import.meta.env.DEV) console.log('[NotificationService] WebSocket cerrado');
         // La reconexión es manejada automáticamente por stompjs si reconnectDelay > 0
       },
       webSocketFactory: () => new SockJS(this.websocketEndpoint),
@@ -60,7 +59,7 @@ class NotificationService {
     }
     
     if (this.stompClient && !this.stompClient.active) {
-      console.log('[NotificationService] Iniciando conexión...');
+      if (import.meta.env.DEV) console.log('[NotificationService] Iniciando conexión...');
       this.stompClient.activate();
     } else if (this.stompClient && this.stompClient.connected && onConnect) {
       // Si ya está conectado, ejecutar callback inmediatamente
@@ -70,7 +69,7 @@ class NotificationService {
 
   public disconnect(): void {
     if (this.stompClient && this.stompClient.active) {
-      console.log('[NotificationService] Desconectando manualmente...');
+      if (import.meta.env.DEV) console.log('[NotificationService] Desconectando manualmente...');
       this.stompClient.deactivate();
     }
     this.onConnectCallback = null;
@@ -108,7 +107,7 @@ class NotificationService {
     } else {
         // Si no está conectado, esperamos al evento onConnect
         // Esto es un patrón simple, para algo más robusto se podría usar una cola de suscripciones pendientes
-        console.log(`[NotificationService] Cola de suscripción para ${destination} (esperando conexión)`);
+        if (import.meta.env.DEV) console.log(`[NotificationService] Cola de suscripción para ${destination} (esperando conexión)`);
         
         // Guardamos la referencia original del callback de conexión
         const originalOnConnect = this.onConnectCallback;

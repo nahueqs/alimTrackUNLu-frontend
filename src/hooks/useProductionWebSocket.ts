@@ -55,10 +55,12 @@ export const useProductionWebSocket = ({
   useEffect(() => {
     const handleVisibilityChange = () => {
       isPageVisible.current = document.visibilityState === 'visible';
-      console.log(
-        '[WebSocket] Visibilidad cambiada:',
-        isPageVisible.current ? 'VISIBLE' : 'OCULTO'
-      );
+      if (import.meta.env.DEV) {
+        console.log(
+          '[WebSocket] Visibilidad cambiada:',
+          isPageVisible.current ? 'VISIBLE' : 'OCULTO'
+        );
+      }
     };
     // Inicializar valor correcto
     isPageVisible.current = document.visibilityState === 'visible';
@@ -72,7 +74,7 @@ export const useProductionWebSocket = ({
   useEffect(() => {
     notificationService.connect(() => {
       setIsConnected(true);
-      console.log('[WebSocket] Conectado');
+      if (import.meta.env.DEV) console.log('[WebSocket] Conectado');
     });
 
     return () => {
@@ -85,10 +87,10 @@ export const useProductionWebSocket = ({
       console.warn('[WebSocket] Este navegador no soporta notificaciones de escritorio');
     } else if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
       Notification.requestPermission().then((permission) => {
-        console.log('[WebSocket] Permiso de notificaciones:', permission);
+        if (import.meta.env.DEV) console.log('[WebSocket] Permiso de notificaciones:', permission);
       });
     } else {
-      console.log('[WebSocket] Estado de permisos de notificación:', Notification.permission);
+      if (import.meta.env.DEV) console.log('[WebSocket] Estado de permisos de notificación:', Notification.permission);
     }
   }, []);
 
@@ -153,11 +155,13 @@ export const useProductionWebSocket = ({
             if (notificationLevel === 'NONE') return;
             if (notificationLevel === 'STATE_ONLY' && type !== 'STATE_CHANGED') return;
 
-            console.log('[WebSocket] Intentando mostrar notificación:', {
-              visible: isPageVisible.current,
-              permission: Notification.permission,
-              title,
-            });
+            if (import.meta.env.DEV) {
+              console.log('[WebSocket] Intentando mostrar notificación:', {
+                visible: isPageVisible.current,
+                permission: Notification.permission,
+                title,
+              });
+            }
 
             if (!isPageVisible.current && Notification.permission === 'granted') {
               try {
