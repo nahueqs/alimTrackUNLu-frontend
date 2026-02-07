@@ -166,6 +166,12 @@
     padding-left: 11px !important; /* Restaurar padding estándar de Ant Design */
 }
 
+/* Eliminar borde negro en pickers dentro de inputs deshabilitados */
+.public-readonly .ant-picker-disabled {
+    border: 1px solid var(--border-light) !important;
+    background-color: var(--bg-secondary) !important;
+}
+
 /* Ocultar placeholders */
 .public-readonly .ant-input[disabled]::placeholder,
 .public-readonly .ant-input-number-input[disabled]::placeholder,

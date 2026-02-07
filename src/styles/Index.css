@@ -4,17 +4,17 @@
 :root {
     /* Light Theme Colors */
 
-    /* Primary Colors (Green) */
+    /* Primary Colors (Green) - Ajustado para contraste */
     --primary-50: #e6f7ed;
     --primary-100: #b9e6d2;
     --primary-200: #8cd4b7;
     --primary-300: #5fbf9c;
     --primary-400: #32ac81;
-    --primary-500: #059966; /* Main primary green */
-    --primary-600: #048a5b;
-    --primary-700: #037a50;
-    --primary-800: #026b45;
-    --primary-900: #015c3a;
+    --primary-500: #048a5b; /* Oscurecido de #059966 a #048a5b para cumplir WCAG AA sobre blanco */
+    --primary-600: #037a50;
+    --primary-700: #026b45;
+    --primary-800: #015c3a;
+    --primary-900: #014d30;
 
     /* Secondary Colors (Red #D7263D) */
     --secondary-50: #fde8eb;
@@ -34,11 +34,11 @@
     --neutral-200: #eeeeee; /* Light gray */
     --neutral-300: #e0e0e0; /* Medium light gray */
     --neutral-400: #bdbdbd; /* Medium gray */
-    --neutral-500: #9e9e9e; /* Medium dark gray */
-    --neutral-600: #757575; /* Dark gray */
-    --neutral-700: #616161; /* Very dark gray */
-    --neutral-800: #424242; /* Almost black */
-    --neutral-900: #212121; /* Black */
+    --neutral-500: #757575; /* Oscurecido de #9e9e9e a #757575 para cumplir WCAG AA como texto terciario */
+    --neutral-600: #616161; /* Dark gray */
+    --neutral-700: #424242; /* Very dark gray */
+    --neutral-800: #212121; /* Almost black */
+    --neutral-900: #1a1a1a; /* Black */
 
     /* Backgrounds */
     --bg-primary: var(--neutral-50); /* White for cards/main elements */
@@ -48,8 +48,8 @@
 
     /* Text Colors */
     --text-primary: var(--neutral-900); /* Black for main headings/body */
-    --text-secondary: var(--neutral-700); /* Dark gray for descriptions */
-    --text-tertiary: var(--neutral-500); /* Medium dark gray for placeholders/hints */
+    --text-secondary: var(--neutral-600); /* Dark gray for descriptions */
+    --text-tertiary: var(--neutral-500); /* Medium dark gray for placeholders/hints - AHORA CUMPLE */
 
     /* Borders */
     --border-light: var(--neutral-300);
