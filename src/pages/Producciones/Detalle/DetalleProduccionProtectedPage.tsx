@@ -10,6 +10,7 @@ import { SavingIndicator } from '@/components/SavingIndicator';
 import { ProductionState } from '@/constants/ProductionStates';
 import { usePageTitle } from '@/hooks/usePageTitle.ts';
 import { NotificationSelector } from '@/pages/common/DetalleProduccion/components/NotificationSelector';
+import { PrintButton } from '@/components/common/PrintButton';
 
 const DetalleProduccionProtectedPage: React.FC = () => {
   const { codigoProduccion } = useParams<{ codigoProduccion: string }>();
@@ -80,11 +81,14 @@ const DetalleProduccionProtectedPage: React.FC = () => {
       <AppHeader />
       
       <div className="production-detail-container">
-        <NotificationSelector
-          value={notificationLevel}
-          onChange={setNotificationLevel}
-          className="notification-selector-wrapper"
-        />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', marginBottom: '8px' }}>
+          <PrintButton />
+          <NotificationSelector
+            value={notificationLevel}
+            onChange={setNotificationLevel}
+            className="" // Remove default wrapper class to handle layout here
+          />
+        </div>
 
         <DetalleProduccionPage
           estructura={estructura!}

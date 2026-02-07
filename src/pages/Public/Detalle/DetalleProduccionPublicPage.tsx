@@ -6,6 +6,7 @@ import { ProductionStatusDisplay } from '@/components/ProductionStatusDisplay';
 import { usePageTitle } from '@/hooks/usePageTitle.ts';
 import { NotificationSelector } from '@/pages/common/DetalleProduccion/components/NotificationSelector';
 import { usePublicProductionData } from '@/hooks/usePublicProductionData';
+import { PrintButton } from '@/components/common/PrintButton';
 
 const DetalleProduccionPublicPage: React.FC = () => {
   const { codigoProduccion } = useParams<{ codigoProduccion: string }>();
@@ -33,11 +34,14 @@ const DetalleProduccionPublicPage: React.FC = () => {
         redirectLabel="Volver al Listado Público"
       >
         <div className="production-detail-container">
-          <NotificationSelector
-            value={notificationLevel}
-            onChange={setNotificationLevel}
-            className="notification-selector-wrapper"
-          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', marginBottom: '8px' }}>
+            <PrintButton />
+            <NotificationSelector
+              value={notificationLevel}
+              onChange={setNotificationLevel}
+              className="" // Remove default wrapper class to handle layout here
+            />
+          </div>
 
           <div className="public-readonly">
             <DetalleProduccionPage

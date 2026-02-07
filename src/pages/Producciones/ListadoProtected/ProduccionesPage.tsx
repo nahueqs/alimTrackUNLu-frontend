@@ -15,6 +15,7 @@ import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import { Button as UiButton } from '@/components/ui';
 import { ArrowLeftIcon } from 'lucide-react';
+import { PrintButton } from '@/components/common/PrintButton';
 
 // Extendemos dayjs con el plugin isBetween
 dayjs.extend(isBetween);
@@ -172,6 +173,7 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '1rem' }}>
               <h1 className="productions-list__title">Listado de Producciones</h1>
               <div style={{ display: 'flex', gap: '8px' }}>
+                <PrintButton />
                 {selectedRowKeys.length > 0 && (
                   <Button 
                     danger 
