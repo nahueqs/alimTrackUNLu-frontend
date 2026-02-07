@@ -1,53 +1,61 @@
-import { TipoDatoCampo } from '@/pages/Recetas/types/TipoDatoCampo';
+import { TipoDatoCampo } from '../types/TipoDatoCampo';
 
-export interface DraftCampo {
-  tempId: string;
-  nombre: string;
-  tipoDato: TipoDatoCampo;
-  orden: number;
+// Tipos para el Builder (Frontend Only)
+// Usamos string para IDs temporales (UUIDs generados en cliente)
+
+export interface DraftRecipe {
+  metadata: DraftMetadata;
+  sections: DraftSection[];
 }
 
-export interface DraftGrupo {
-  tempId: string;
-  subtitulo: string;
-  orden: number;
-  campos: DraftCampo[];
-}
-
-export interface DraftColumna {
-  tempId: string;
-  nombre: string;
-  tipoDato: TipoDatoCampo;
-  orden: number;
-}
-
-export interface DraftFila {
-  tempId: string;
-  nombre: string;
-  orden: number;
-}
-
-export interface DraftTabla {
-  tempId: string;
+export interface DraftMetadata {
   nombre: string;
   descripcion: string;
-  orden: number;
-  columnas: DraftColumna[];
-  filas: DraftFila[];
+  codigoRecetaPadre: string; // Si es nueva versión
+  codigoVersion: string;     // Identificador de la versión
 }
 
-export interface DraftSeccion {
-  tempId: string;
+export interface DraftSection {
+  id: string; // UUID temporal
   titulo: string;
   orden: number;
-  camposSimples: DraftCampo[];
-  gruposCampos: DraftGrupo[];
-  tablas: DraftTabla[];
+  campos: DraftField[];
+  grupos: DraftGroup[];
+  tablas: DraftTable[];
 }
 
-export interface DraftReceta {
+export interface DraftGroup {
+  id: string;
+  subtitulo: string;
+  orden: number;
+  campos: DraftField[];
+}
+
+export interface DraftField {
+  id: string;
   nombre: string;
-  descripcion: string;
-  codigoRecetaPadre: string;
-  secciones: DraftSeccion[];
+  tipoDato: TipoDatoCampo;
+  orden: number;
+  // Propiedades futuras: requerido, valorPorDefecto, etc.
+}
+
+export interface DraftTable {
+  id: string;
+  nombre: string;
+  orden: number;
+  columnas: DraftColumn[];
+  filas: DraftRow[];
+}
+
+export interface DraftColumn {
+  id: string;
+  nombre: string;
+  tipoDato: TipoDatoCampo;
+  orden: number;
+}
+
+export interface DraftRow {
+  id: string;
+  nombre: string;
+  orden: number;
 }

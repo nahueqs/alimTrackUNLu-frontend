@@ -10,6 +10,7 @@ import DetalleProduccionProtectedPage from '@/pages/Producciones/Detalle/Detalle
 import { ListadoProducciones } from '@/pages/Public/ListadoPublic/ListadoProducciones.tsx';
 import { VersionRecetasPage } from '@/pages/Recetas/Listado/VersionRecetasPage.tsx';
 import { VisualizarRecetaPage } from '@/pages/Recetas/Detalle/VisualizarRecetaPage.tsx';
+import { RecipeBuilderPage } from '@/pages/Recetas/Builder/RecipeBuilderPage.tsx';
 import { ProductionState } from '@/constants/ProductionStates';
 import type { LocalProductionFilters } from '@/pages/Producciones/ListadoProtected/ProduccionFilters.tsx';
 
@@ -115,6 +116,14 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <VisualizarRecetaPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/recetas/nueva',
+    element: (
+      <ProtectedRoute>
+        <RecipeBuilderPage />
       </ProtectedRoute>
     ),
   },
