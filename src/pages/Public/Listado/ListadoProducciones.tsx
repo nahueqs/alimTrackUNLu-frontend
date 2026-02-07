@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PublicHeader } from '@/components/layout/PublicHeader/PublicHeader.tsx';
+import { AppHeader } from '@/components/AppHeader/AppHeader.tsx';
 import { CustomTable } from '@/components/ui/CustomTable/CustomTable.tsx';
 import { getPublicProductionColumns } from './ListadoProduccionesColumns.tsx';
 import type { ProduccionPublicMetadataDTO } from '@/types/production';
@@ -93,7 +93,7 @@ export const ListadoProducciones: React.FC = () => {
 
   return (
     <div className="public-layout">
-      <PublicHeader />
+      <AppHeader title="AlimTrack UNLu" variant="public" />
       <main className="public-main container">
         <div className="public-list-header">
           <div style={{ marginBottom: '1rem', width: '100%', display: 'flex', justifyContent: 'flex-start' }}>

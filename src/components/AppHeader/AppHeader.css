@@ -9,7 +9,7 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    width: 100%; /* Asegura que ocupe todo el ancho */
+    width: 100%;
 }
 
 .header__nav {
@@ -26,6 +26,7 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    flex-shrink: 0; /* Evita que el logo se encoja */
 }
 
 .header__brand-logo {
@@ -37,6 +38,7 @@
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--text-primary);
+    white-space: nowrap; /* Evita que el título se rompa en dos líneas */
 }
 
 .header__actions {
@@ -91,6 +93,7 @@
     visibility: hidden;
     transform: translateY(-10px);
     transition: all 0.2s ease-out;
+    z-index: 99;
 }
 
 .header__mobile-menu-content--open {
@@ -129,7 +132,7 @@
     .header__desktop-nav {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 1rem; /* Espaciado entre elementos del menú */
     }
 
     .header__nav-link,
@@ -146,6 +149,7 @@
         cursor: pointer;
         text-decoration: none;
         transition: background-color 0.2s ease, color 0.2s ease;
+        white-space: nowrap;
     }
 
     .header__nav-link:hover,
@@ -160,27 +164,33 @@
         color: currentColor;
     }
 
+    /* Separador vertical opcional */
+    .header__divider {
+        width: 1px;
+        height: 24px;
+        background-color: var(--border-light);
+        margin: 0 0.5rem;
+    }
+
     /* CONTENEDOR DEL MENÚ DE USUARIO CON PUENTE INVISIBLE */
     .header__user-menu {
         position: relative;
     }
 
-    /* EL PUENTE INVISIBLE: Pseudoelemento que conecta el botón con el menú */
     .header__user-menu::before {
         content: '';
         position: absolute;
         top: 100%;
         left: 0;
         right: 0;
-        height: 0.75rem; /* Altura del puente invisible */
+        height: 0.75rem;
         background: transparent;
     }
 
-    /* Menú desplegable */
     .header__user-dropdown {
         display: none;
         position: absolute;
-        top: calc(100% + 0.75rem); /* Empieza después del puente invisible */
+        top: calc(100% + 0.75rem);
         right: 0;
         background-color: var(--bg-primary);
         border: 1px solid var(--border-light);
@@ -191,20 +201,23 @@
         z-index: 101;
     }
 
-    /* Mostrar menú al hover sobre el contenedor o el puente invisible */
     .header__user-menu:hover .header__user-dropdown {
         display: block;
     }
 }
 
-@media (max-width: 380px) {
+@media (max-width: 480px) {
     .header__brand-title {
-        display: none;
+        font-size: 1rem; /* Reducir tamaño en móviles muy pequeños */
+    }
+    
+    .header__nav {
+        padding: 0 1rem;
     }
 }
 
 /* ==========================================================================
-   ESTILOS COMUNES (Dropdown items, etc.)
+   ESTILOS COMUNES
    ========================================================================== */
 
 .header__dropdown-item {
@@ -228,9 +241,9 @@
     background-color: var(--bg-tertiary);
 }
 
-.header__theme-toggle-container {
-    cursor: default;
-}
-.header__theme-toggle-container:hover {
-    background-color: transparent;
+/* Ajuste para botones de Ant Design dentro del header */
+.header__action-btn.ant-btn {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
 }

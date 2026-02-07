@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { DetalleProduccionPage } from '@/pages/common/DetalleProduccion/DetalleProduccionPage';
 import { usePublicService } from '@/services/public/usePublicService';
-import { PublicHeader } from '@/components/layout/PublicHeader/PublicHeader.tsx';
+import { AppHeader } from '@/components/AppHeader/AppHeader.tsx';
 import { useProductionWebSocket, type NotificationLevel } from '@/hooks/useProductionWebSocket';
 import { ProductionStatusDisplay } from '@/components/ProductionStatusDisplay';
 import { usePageTitle } from '@/hooks/usePageTitle.ts';
@@ -51,7 +51,7 @@ const DetalleProduccionPublicPage: React.FC = () => {
 
   return (
     <>
-      <PublicHeader />
+      <AppHeader title="AlimTrack UNLu" variant="public" />
       <ProductionStatusDisplay
         loading={loading && !respuestas}
         error={error}

@@ -77,6 +77,8 @@ const DetalleProduccionProtectedPage: React.FC = () => {
     >
       <SavingIndicator isSaving={isSaving} />
       
+      <AppHeader />
+      
       <div className="production-detail-container">
         <NotificationSelector
           value={notificationLevel}
@@ -92,7 +94,7 @@ const DetalleProduccionProtectedPage: React.FC = () => {
           onTablaChange={debouncedTablaChange}
           onMetadataChange={debouncedMetadataChange}
           onCambioEstado={handleCambioEstado}
-          HeaderComponent={AppHeader}
+          HeaderComponent={() => null} // Header is now rendered outside
         />
       </div>
     </ProductionStatusDisplay>

@@ -188,6 +188,11 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* Force Montserrat on all form elements and Ant Design components */
+input, button, textarea, select, .ant-btn, .ant-input, .ant-typography, .ant-menu, .ant-table {
+    font-family: 'Montserrat', sans-serif !important;
+}
+
 /* ==========================================================================
    App-specific Global Utilities (only if truly needed)
    ========================================================================== */

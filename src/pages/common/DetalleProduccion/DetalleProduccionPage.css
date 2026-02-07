@@ -155,7 +155,7 @@
 .public-readonly .ant-picker-disabled,
 .public-readonly .ant-input-number-input[disabled],
 .public-readonly .ant-picker-input > input[disabled] {
-    background-color: var(--bg-secondary) !important; /* Fondo gris claro para indicar deshabilitado pero visible */
+    background-color: var(--bg-primary) !important; /* Fondo blanco para inputs deshabilitados en modo público */
     color: var(--text-primary) !important;
     cursor: default !important;
     border: 1px solid var(--border-light) !important; /* Borde visible */
@@ -169,7 +169,7 @@
 /* Eliminar borde negro en pickers dentro de inputs deshabilitados */
 .public-readonly .ant-picker-disabled {
     border: 1px solid var(--border-light) !important;
-    background-color: var(--bg-secondary) !important;
+    background-color: var(--bg-primary) !important; /* Fondo blanco */
 }
 
 /* Ocultar placeholders */
@@ -187,7 +187,7 @@
 }
 
 .public-readonly .ant-checkbox-disabled .ant-checkbox-inner {
-    background-color: var(--bg-secondary) !important;
+    background-color: var(--bg-primary) !important; /* Fondo blanco */
     border-color: var(--border-medium) !important;
 }
 
