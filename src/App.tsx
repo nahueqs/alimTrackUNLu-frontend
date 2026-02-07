@@ -1,54 +1,35 @@
 import React, { memo, Suspense } from 'react';
 import { BrowserRouter as Router, useRoutes } from 'react-router-dom';
-import { ThemeProvider } from './styles/darkMode/ThemeContexts.tsx';
+import { ConfigProvider } from 'antd';
+import esES from 'antd/locale/es_ES';
 import { routes } from './index.tsx';
+import { ErrorBoundary } from '@/components/ErrorBoundary/ErrorBoundary.tsx';
+import { antdThemeConfig } from '@/config/themeConfig.ts';
 
 // Import global styles
 import './components/ui/Button/Button.css';
-import './styles/darkMode/ThemeToggle.css';
+// import './styles/darkMode/ThemeToggle.css'; // Ya no se usa
 
 // Componente de carga para Suspense
 const Loader = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+  <div style={{ 
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    minHeight: '100vh',
+    width: '100%'
+  }}>
+    <div className="animate-spin" style={{
+      width: '48px',
+      height: '48px',
+      borderRadius: '50%',
+      borderTop: '2px solid var(--primary-500)',
+      borderBottom: '2px solid var(--primary-500)',
+      borderLeft: '2px solid transparent',
+      borderRight: '2px solid transparent'
+    }}></div>
   </div>
 );
-
-// Componente de error para los límites de error
-class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
-  constructor(props: { children: React.ReactNode }) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    if (import.meta.env.DEV) {
-      console.error('Error en el componente:', error, errorInfo);
-    }
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="p-4 text-center">
-          <h2 className="text-xl font-bold text-red-600">Algo salió mal</h2>
-          <button
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            onClick={() => this.setState({ hasError: false })}
-          >
-            Reintentar
-          </button>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
 
 // Componente de rutas con memo para evitar re-renders innecesarios
 const AppRoutes = memo(() => {
@@ -58,18 +39,17 @@ const AppRoutes = memo(() => {
 AppRoutes.displayName = 'AppRoutes';
 
 export const App: React.FC = () => {
-
   return (
     <ErrorBoundary>
-      <ThemeProvider>
+      <ConfigProvider theme={antdThemeConfig} locale={esES}>
         <Router>
-          <div className="app" style={{ width: '100%' }}>
+          <div className="app" style={{ width: '100%', minHeight: '100vh', backgroundColor: 'var(--bg-secondary)' }}>
             <Suspense fallback={<Loader />}>
               <AppRoutes />
             </Suspense>
           </div>
         </Router>
-      </ThemeProvider>
+      </ConfigProvider>
     </ErrorBoundary>
   );
 };

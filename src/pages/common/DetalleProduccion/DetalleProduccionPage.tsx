@@ -30,7 +30,6 @@ interface ProductionDisplayProps {
   ) => Promise<void>;
   onMetadataChange?: (data: ProduccionMetadataModifyRequestDTO) => void;
   onCambioEstado?: (nuevoEstado: ProductionState) => void;
-  HeaderComponent: React.ElementType;
 }
 
 const noOp = async () => {};
@@ -43,8 +42,8 @@ export const DetalleProduccionPage: React.FC<ProductionDisplayProps> = ({
   onTablaChange = noOp,
   onMetadataChange = noOp,
   onCambioEstado,
-  HeaderComponent,
 }) => {
+  // Optimización: Crear el mapa de respuestas solo cuando cambian las respuestas
   const respuestasCamposMap = useMemo(() => {
     return respuestas.respuestasCampos.reduce(
       (acc, resp) => {
@@ -55,41 +54,39 @@ export const DetalleProduccionPage: React.FC<ProductionDisplayProps> = ({
     );
   }, [respuestas.respuestasCampos]);
 
+  // Optimización: El contexto solo recibe funciones de cambio si es editable
   const contextValue = useMemo(
     () => ({
       respuestasCampos: respuestasCamposMap,
       respuestasTablas: respuestas.respuestasTablas,
-      onCampoChange,
-      onTablaChange,
+      onCampoChange: isEditable ? onCampoChange : noOp,
+      onTablaChange: isEditable ? onTablaChange : noOp,
     }),
-    [respuestasCamposMap, respuestas.respuestasTablas, onCampoChange, onTablaChange]
+    [respuestasCamposMap, respuestas.respuestasTablas, onCampoChange, onTablaChange, isEditable]
   );
 
   return (
-    <>
-      <HeaderComponent />
-      <div id="production-content">
-        <Row gutter={[24, 24]}>
-          <Col xs={24} lg={16}>
-            <InfoProduccionCard
-              produccion={respuestas.produccion}
-              versionReceta={estructura}
-              isEditable={isEditable}
-              onCambioEstado={onCambioEstado}
-              onMetadataChange={onMetadataChange}
-            />
-          </Col>
-          <Col xs={24} lg={8}>
-            <ProgresoProduccionCard progreso={respuestas.progreso} />
-          </Col>
-        </Row>
+    <div id="production-content">
+      <Row gutter={[24, 24]}>
+        <Col xs={24} lg={16}>
+          <InfoProduccionCard
+            produccion={respuestas.produccion}
+            versionReceta={estructura}
+            isEditable={isEditable}
+            onCambioEstado={onCambioEstado}
+            onMetadataChange={onMetadataChange}
+          />
+        </Col>
+        <Col xs={24} lg={8}>
+          <ProgresoProduccionCard progreso={respuestas.progreso} />
+        </Col>
+      </Row>
 
-        <RespuestasContext.Provider value={contextValue}>
-          <EstructuraProduccion estructura={estructura.estructura} isEditable={isEditable} />
-        </RespuestasContext.Provider>
+      <RespuestasContext.Provider value={contextValue}>
+        <EstructuraProduccion estructura={estructura.estructura} isEditable={isEditable} />
+      </RespuestasContext.Provider>
 
-        <FloatingActionButtons />
-      </div>
-    </>
+      {isEditable && <FloatingActionButtons />}
+    </div>
   );
 };

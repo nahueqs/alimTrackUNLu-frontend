@@ -13,6 +13,7 @@ import {
   ProductionState,
 } from '@/constants/ProductionStates';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { isProtectedProduction } from '@/utils/production/typeGuards';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -36,14 +37,13 @@ export const InfoProduccionCard: React.FC<InfoProduccionCardProps> = ({
   const [form] = Form.useForm();
   const isMobile = useIsMobile();
 
-  // Check if we are in a protected context (has 'emailCreador' property)
-  const isProtected = 'emailCreador' in produccion;
+  const isProtected = isProtectedProduction(produccion);
 
   const handleEdit = () => {
     form.setFieldsValue({
       lote: produccion.lote,
       encargado: produccion.encargado,
-      observaciones: isProtected ? (produccion as ProduccionProtectedResponseDTO).observaciones : undefined,
+      observaciones: isProtected ? produccion.observaciones : undefined,
     });
     setIsEditable(true);
   };
@@ -155,17 +155,17 @@ export const InfoProduccionCard: React.FC<InfoProduccionCardProps> = ({
               {produccion.encargado}
             </Descriptions.Item>
           )}
-          {isProtected && (produccion as ProduccionProtectedResponseDTO).emailCreador && (
+          {isProtected && produccion.emailCreador && (
             <Descriptions.Item label="Creado por">
-              {(produccion as ProduccionProtectedResponseDTO).emailCreador}
+              {produccion.emailCreador}
             </Descriptions.Item>
           )}
         </Descriptions>
       )}
-      {!isEditing && isProtected && (produccion as ProduccionProtectedResponseDTO).observaciones && (
+      {!isEditing && isProtected && produccion.observaciones && (
         <div style={{ marginTop: 16 }}>
           <Text strong>Observaciones:</Text>
-          <p>{(produccion as ProduccionProtectedResponseDTO).observaciones}</p>
+          <p>{produccion.observaciones}</p>
         </div>
       )}
     </Card>

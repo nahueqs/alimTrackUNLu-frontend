@@ -94,7 +94,6 @@ const DetalleProduccionProtectedPage: React.FC = () => {
           onTablaChange={debouncedTablaChange}
           onMetadataChange={debouncedMetadataChange}
           onCambioEstado={handleCambioEstado}
-          HeaderComponent={() => null} // Header is now rendered outside
         />
       </div>
     </ProductionStatusDisplay>
