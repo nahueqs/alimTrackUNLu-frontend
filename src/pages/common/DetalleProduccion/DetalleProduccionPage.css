@@ -132,15 +132,28 @@
 }
 
 /* --- Estilos de Inputs (Modo Editable) --- */
-.section-card .ant-input,
-.section-card .ant-input-number,
-.section-card .ant-input-number-input {
+/* Inputs de texto normales */
+.section-card .ant-input {
     background-color: var(--bg-primary) !important;
     border-color: var(--border-light) !important;
     color: var(--text-primary) !important;
 }
 
-.section-card .ant-input::placeholder,
+.section-card .ant-input::placeholder {
+    color: var(--text-tertiary) !important;
+}
+
+/* Input Number - contenedor y input interno */
+.section-card .ant-input-number {
+    background-color: var(--bg-primary) !important;
+    border-color: var(--border-light) !important;
+}
+
+.section-card .ant-input-number .ant-input-number-input {
+    background-color: transparent !important;
+    color: var(--text-primary) !important;
+}
+
 .section-card .ant-input-number-input::placeholder {
     color: var(--text-tertiary) !important;
 }
@@ -158,9 +171,8 @@
 }
 
 /* --- Modo Lectura Público (.public-readonly) --- */
-.public-readonly .ant-input[disabled],
-.public-readonly .ant-input-number-disabled,
-.public-readonly .ant-input-number-input[disabled] {
+/* Inputs text deshabilitados */
+.public-readonly .ant-input[disabled] {
     background-color: var(--bg-primary) !important;
     color: var(--text-primary) !important;
     border: 1px solid var(--border-light) !important;
@@ -172,25 +184,61 @@
     padding-left: 11px !important;
 }
 
-/* Pickers deshabilitados */
+/* Input number deshabilitados - contenedor */
+.public-readonly .ant-input-number-disabled {
+    background-color: var(--bg-primary) !important;
+    border: 1px solid var(--border-light) !important;
+    border-radius: var(--radius-sm) !important;
+    cursor: default !important;
+    opacity: 1 !important;
+    box-shadow: none !important;
+    padding: 4px 11px !important;
+}
+
+/* Input number deshabilitados - wrapper del input */
+.public-readonly .ant-input-number-disabled .ant-input-number-input-wrap {
+    padding: 0 !important;
+}
+
+/* Input number deshabilitados - input interno */
+.public-readonly .ant-input-number-disabled .ant-input-number-input[disabled] {
+    background-color: transparent !important;
+    color: var(--text-primary) !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    cursor: default !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+    padding-left: 0 !important;
+}
+
+/* Ocultar los botones de incremento/decremento en modo readonly */
+.public-readonly .ant-input-number-disabled .ant-input-number-handler-wrap {
+    display: none !important;
+}
+
+/* Pickers deshabilitados - contenedor */
 .public-readonly .ant-picker-disabled {
     background-color: var(--bg-primary) !important;
     border: 1px solid var(--border-light) !important;
 }
 
-.public-readonly .ant-picker-disabled .ant-picker-input > input {
+/* Pickers deshabilitados - input interno */
+.public-readonly .ant-picker-disabled .ant-picker-input > input[disabled] {
     background-color: transparent !important;
     border: none !important;
     color: var(--text-primary) !important;
     -webkit-text-fill-color: var(--text-primary) !important;
 }
 
-/* Ocultar placeholders en modo readonly */
-.public-readonly .ant-input[disabled]::placeholder,
-.public-readonly .ant-input-number-input[disabled]::placeholder,
-.public-readonly .ant-picker-input > input[disabled]::placeholder {
+/* Ocultar TODOS los placeholders en modo readonly */
+.public-readonly input[disabled]::placeholder,
+.public-readonly input[disabled]::-webkit-input-placeholder,
+.public-readonly input[disabled]::-moz-placeholder,
+.public-readonly input[disabled]:-ms-input-placeholder {
     color: transparent !important;
     opacity: 0 !important;
+    visibility: hidden !important;
 }
 
 /* Checkboxes deshabilitados */
