@@ -3,8 +3,15 @@
     padding: 24px;
 }
 
-/* --- Estilos para InfoProduccionCard --- */
-.info-card {
+.production-detail-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* --- Cards de Información y Progreso --- */
+.info-card,
+.progress-card {
     background-color: var(--bg-primary);
     border: 1px solid var(--border-light);
     border-radius: var(--radius-lg);
@@ -19,11 +26,18 @@
     margin-bottom: 1rem;
 }
 
-.info-card-title {
+.info-card-title,
+.progress-card-title {
     margin: 0 !important;
     color: var(--text-primary);
 }
 
+.progress-card-title {
+    text-align: center;
+    margin-bottom: 1rem !important;
+}
+
+/* Descriptions */
 .info-card .ant-descriptions-title {
     color: var(--text-primary);
 }
@@ -45,21 +59,7 @@
     border-color: var(--border-light) !important;
 }
 
-/* --- Estilos para ProgresoProduccionCard --- */
-.progress-card {
-    background-color: var(--bg-primary);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    height: 100%;
-}
-
-.progress-card-title {
-    margin: 0 !important;
-    color: var(--text-primary);
-    text-align: center;
-    margin-bottom: 1rem !important;
-}
-
+/* Statistics */
 .progress-card .ant-statistic-title {
     color: var(--text-secondary);
 }
@@ -68,7 +68,7 @@
     color: var(--text-primary);
 }
 
-/* --- Estilos para EstructuraProduccion --- */
+/* --- Estructura de Producción (Secciones) --- */
 .production-structure {
     display: flex;
     flex-direction: column;
@@ -90,6 +90,7 @@
     padding: 24px;
 }
 
+/* Título de sección */
 .section-title {
     color: var(--text-primary);
     margin-bottom: 0 !important;
@@ -124,55 +125,67 @@
     margin-left: auto;
 }
 
+/* Labels de formularios */
 .section-card .ant-form-item-label > label {
     color: var(--text-primary);
     font-weight: 500;
 }
 
-/* Estilos para inputs en secciones (Protected/Editable) */
+/* --- Estilos de Inputs (Modo Editable) --- */
 .section-card .ant-input,
-.section-card .ant-input-number-input,
-.section-card .ant-picker-input > input {
-    background-color: var(--bg-primary) !important; /* Fondo blanco para inputs editables */
+.section-card .ant-input-number,
+.section-card .ant-input-number-input {
+    background-color: var(--bg-primary) !important;
     border-color: var(--border-light) !important;
     color: var(--text-primary) !important;
 }
 
-/* Forzar color de texto normal en inputs habilitados */
-.section-card .ant-input:not([disabled]),
-.section-card .ant-input-number-input:not([disabled]) {
-    color: var(--text-primary) !important;
-}
-
-.section-card .ant-input::placeholder {
+.section-card .ant-input::placeholder,
+.section-card .ant-input-number-input::placeholder {
     color: var(--text-tertiary) !important;
 }
 
-/* --- Estilos para Modo Lectura Público (.public-readonly) --- */
-/* Inputs y controles deshabilitados */
-.public-readonly .ant-input-disabled,
-.public-readonly .ant-input-number-disabled,
-.public-readonly .ant-picker-disabled,
-.public-readonly .ant-input-number-input[disabled],
-.public-readonly .ant-picker-input > input[disabled] {
-    background-color: var(--bg-primary) !important; /* Fondo blanco para inputs deshabilitados en modo público */
+/* Pickers - solo el contenedor tiene borde */
+.section-card .ant-picker {
+    background-color: var(--bg-primary) !important;
+    border-color: var(--border-light) !important;
+}
+
+.section-card .ant-picker-input > input {
+    background-color: transparent !important;
+    border: none !important;
     color: var(--text-primary) !important;
-    cursor: default !important;
-    border: 1px solid var(--border-light) !important; /* Borde visible */
-    border-radius: var(--radius-sm) !important;
-    box-shadow: none !important;
-    opacity: 1 !important;
-    -webkit-text-fill-color: var(--text-primary) !important;
-    padding-left: 11px !important; /* Restaurar padding estándar de Ant Design */
 }
 
-/* Eliminar borde negro en pickers dentro de inputs deshabilitados */
-.public-readonly .ant-picker-disabled {
+/* --- Modo Lectura Público (.public-readonly) --- */
+.public-readonly .ant-input[disabled],
+.public-readonly .ant-input-number-disabled,
+.public-readonly .ant-input-number-input[disabled] {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
     border: 1px solid var(--border-light) !important;
-    background-color: var(--bg-primary) !important; /* Fondo blanco */
+    border-radius: var(--radius-sm) !important;
+    cursor: default !important;
+    opacity: 1 !important;
+    box-shadow: none !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+    padding-left: 11px !important;
 }
 
-/* Ocultar placeholders */
+/* Pickers deshabilitados */
+.public-readonly .ant-picker-disabled {
+    background-color: var(--bg-primary) !important;
+    border: 1px solid var(--border-light) !important;
+}
+
+.public-readonly .ant-picker-disabled .ant-picker-input > input {
+    background-color: transparent !important;
+    border: none !important;
+    color: var(--text-primary) !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+}
+
+/* Ocultar placeholders en modo readonly */
 .public-readonly .ant-input[disabled]::placeholder,
 .public-readonly .ant-input-number-input[disabled]::placeholder,
 .public-readonly .ant-picker-input > input[disabled]::placeholder {
@@ -180,14 +193,14 @@
     opacity: 0 !important;
 }
 
-/* Checkboxes */
+/* Checkboxes deshabilitados */
 .public-readonly .ant-checkbox-disabled + span {
     color: var(--text-primary) !important;
     cursor: default !important;
 }
 
 .public-readonly .ant-checkbox-disabled .ant-checkbox-inner {
-    background-color: var(--bg-primary) !important; /* Fondo blanco */
+    background-color: var(--bg-primary) !important;
     border-color: var(--border-medium) !important;
 }
 
@@ -200,16 +213,16 @@
     border-color: var(--neutral-50) !important;
 }
 
-/* Tablas en modo lectura */
+/* Inputs en tablas en modo readonly - sin borde */
 .public-readonly .ant-table-cell .ant-input-number-disabled,
-.public-readonly .ant-table-cell .ant-input-disabled {
+.public-readonly .ant-table-cell .ant-input[disabled] {
     background-color: transparent !important;
     border: none !important;
     text-align: left;
     padding: 0 !important;
 }
 
-/* --- Estilos para Grupos y Tablas --- */
+/* --- Grupos y Tablas --- */
 .group-card {
     background-color: var(--bg-secondary);
     border: 1px solid var(--border-light);
@@ -251,20 +264,14 @@
     background: var(--bg-primary) !important;
 }
 
-/* Contenedor principal con padding responsive */
-.production-detail-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 24px;
-}
-
+/* --- Notificaciones --- */
 .notification-selector-wrapper {
     display: flex;
     justify-content: flex-end;
     margin: 16px 0 8px;
 }
 
-/* --- Estilos para Mobile --- */
+/* --- Responsive Mobile --- */
 @media (max-width: 768px) {
     .production-detail-container {
         padding: 0 12px;
@@ -274,7 +281,7 @@
         padding: 1rem !important;
     }
 
-    .info-card, 
+    .info-card,
     .progress-card {
         margin-bottom: 1rem;
     }
@@ -288,7 +295,7 @@
         gap: 8px;
         padding: 12px 16px;
     }
-    
+
     .section-progress-text {
         width: 100%;
         margin-left: 40px;

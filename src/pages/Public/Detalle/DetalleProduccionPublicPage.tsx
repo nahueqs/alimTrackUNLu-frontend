@@ -51,7 +51,7 @@ const DetalleProduccionPublicPage: React.FC = () => {
 
   return (
     <>
-      <AppHeader title="AlimTrack UNLu" variant="public" />
+      <AppHeader title="AlimTrack" variant="public" />
       <ProductionStatusDisplay
         loading={loading && !respuestas}
         error={error}

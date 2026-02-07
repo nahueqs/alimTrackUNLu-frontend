@@ -93,7 +93,7 @@ export const ListadoProducciones: React.FC = () => {
 
   return (
     <div className="public-layout">
-      <AppHeader title="AlimTrack UNLu" variant="public" />
+      <AppHeader title="AlimTrack" variant="public" />
       <main className="public-main container">
         <div className="public-list-header">
           <div style={{ marginBottom: '1rem', width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
