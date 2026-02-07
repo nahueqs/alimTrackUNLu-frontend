@@ -151,7 +151,7 @@ export const pdfService = {
     campos.forEach((campo, i) => {
       const valor = respuestasMap[campo.id] || '-';
       
-      // Formatear valor si es booleano, decimal, fecha u hora
+      // Formatear valor si es booleano, decimal, entero, fecha u hora
       let displayValue = valor;
       if (campo.tipoDato === TipoDatoCampo.BOOLEANO) {
           displayValue = valor === 'true' ? 'Sí' : (valor === 'false' ? 'No' : '-');
@@ -159,6 +159,11 @@ export const pdfService = {
           const num = parseFloat(valor);
           if (!isNaN(num)) {
               displayValue = num.toFixed(2);
+          }
+      } else if (campo.tipoDato === TipoDatoCampo.ENTERO && valor !== '-') {
+          const num = parseFloat(valor);
+          if (!isNaN(num)) {
+              displayValue = Math.floor(num).toString();
           }
       } else if (campo.tipoDato === TipoDatoCampo.FECHA && valor !== '-') {
           displayValue = dayjs(valor).format('DD/MM/YYYY');
@@ -213,6 +218,11 @@ export const pdfService = {
                 const num = parseFloat(val);
                 if (!isNaN(num)) {
                     val = num.toFixed(2);
+                }
+            } else if (col.tipoDato === TipoDatoCampo.ENTERO) {
+                const num = parseFloat(val);
+                if (!isNaN(num)) {
+                    val = Math.floor(num).toString();
                 }
             } else if (col.tipoDato === TipoDatoCampo.FECHA) {
                 val = dayjs(val).format('DD/MM/YYYY');
