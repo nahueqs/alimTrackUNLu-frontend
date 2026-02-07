@@ -151,10 +151,28 @@ export const pdfService = {
     campos.forEach((campo, i) => {
       const valor = respuestasMap[campo.id] || '-';
       
-      // Formatear valor si es booleano
+      // Formatear valor si es booleano, decimal, fecha u hora
       let displayValue = valor;
       if (campo.tipoDato === TipoDatoCampo.BOOLEANO) {
           displayValue = valor === 'true' ? 'Sí' : (valor === 'false' ? 'No' : '-');
+      } else if (campo.tipoDato === TipoDatoCampo.DECIMAL && valor !== '-') {
+          const num = parseFloat(valor);
+          if (!isNaN(num)) {
+              displayValue = num.toFixed(2);
+          }
+      } else if (campo.tipoDato === TipoDatoCampo.FECHA && valor !== '-') {
+          displayValue = dayjs(valor).format('DD/MM/YYYY');
+      } else if (campo.tipoDato === TipoDatoCampo.HORA && valor !== '-') {
+          // Si el valor es una fecha completa, extraemos la hora, si es solo hora, la dejamos
+          // Asumimos que si viene de un input time puede ser HH:mm o HH:mm:ss
+          // Si viene como ISO string, dayjs lo parsea
+          if (valor.includes('T') || valor.includes('-')) {
+             displayValue = dayjs(valor).format('HH:mm:ss');
+          } else {
+             // Si ya es hora, intentamos asegurar formato HH:mm:ss si es posible, o dejarlo como está
+             // A veces los inputs time devuelven HH:mm
+             displayValue = valor; 
+          }
       }
 
       currentRow.push({
@@ -188,7 +206,24 @@ export const pdfService = {
 
       tabla.columnas?.forEach(col => {
         const resp = respuestasTablas.find((r: any) => r.idTabla === tabla.id && r.idFila === fila.id && r.idColumna === col.id);
-        row.push({ text: resp?.valor || '-', style: 'tableCell' });
+        let val = resp?.valor || '-';
+
+        if (val !== '-') {
+            if (col.tipoDato === TipoDatoCampo.DECIMAL) {
+                const num = parseFloat(val);
+                if (!isNaN(num)) {
+                    val = num.toFixed(2);
+                }
+            } else if (col.tipoDato === TipoDatoCampo.FECHA) {
+                val = dayjs(val).format('DD/MM/YYYY');
+            } else if (col.tipoDato === TipoDatoCampo.HORA) {
+                if (val.includes('T') || val.includes('-')) {
+                    val = dayjs(val).format('HH:mm:ss');
+                }
+            }
+        }
+
+        row.push({ text: val, style: 'tableCell' });
       });
 
       return row;
