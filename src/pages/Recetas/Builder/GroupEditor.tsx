@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Input, Button, Space, Typography } from 'antd';
 import { DeleteOutlined, PlusOutlined, DragOutlined } from '@ant-design/icons';
-import { DraftGroup } from './types';
+import type { DraftGroup } from './types';
 import { TipoDatoCampo } from '../types/TipoDatoCampo';
 
 interface GroupEditorProps {

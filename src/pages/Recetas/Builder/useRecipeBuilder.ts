@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { DraftRecipe, DraftSection, DraftField, DraftGroup, DraftTable, DraftColumn, DraftRow } from './types';
+import type { DraftRecipe, DraftSection, DraftField, DraftGroup, DraftTable, DraftColumn, DraftRow } from './types';
 import { TipoDatoCampo } from '../types/TipoDatoCampo';
 
 // Simple ID generator replacement for uuid

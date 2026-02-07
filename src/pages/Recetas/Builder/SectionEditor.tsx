@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, Input, Button, Space, Typography, Divider } from 'antd';
 import { DeleteOutlined, PlusOutlined, DragOutlined } from '@ant-design/icons';
-import { DraftSection } from './types';
+import type { DraftSection } from './types';
 import { TipoDatoCampo } from '../types/TipoDatoCampo';
 import { GroupEditor } from './GroupEditor';
 import { TableEditor } from './TableEditor';
@@ -117,7 +117,7 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({
         {/* Grupos */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography.Text strong>Grupos de Campos</Typography.Text>
-            <Button size="small" dashed icon={<PlusOutlined />} onClick={onAddGroup}>Agregar Grupo</Button>
+            <Button size="small" type="dashed" icon={<PlusOutlined />} onClick={onAddGroup}>Agregar Grupo</Button>
         </div>
         
         {section.grupos.map(group => (
@@ -137,7 +137,7 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({
         {/* Tablas */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography.Text strong>Tablas</Typography.Text>
-            <Button size="small" dashed icon={<PlusOutlined />} onClick={onAddTable}>Agregar Tabla</Button>
+            <Button size="small" type="dashed" icon={<PlusOutlined />} onClick={onAddTable}>Agregar Tabla</Button>
         </div>
 
         {section.tablas.map(table => (

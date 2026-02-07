@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, Input, Button, Space, Typography, Table } from 'antd';
+import { Card, Input, Button, Space, Table } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import { DraftTable } from './types';
+import type { DraftTable } from './types';
 import { TipoDatoCampo } from '../types/TipoDatoCampo';
 
 interface TableEditorProps {
@@ -94,10 +94,10 @@ export const TableEditor: React.FC<TableEditorProps> = ({
     >
       <Space direction="vertical" style={{ width: '100%' }}>
         <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-          <Button size="small" dashed icon={<PlusOutlined />} onClick={onAddColumn}>
+          <Button size="small" type="dashed" icon={<PlusOutlined />} onClick={onAddColumn}>
             Agregar Columna
           </Button>
-          <Button size="small" dashed icon={<PlusOutlined />} onClick={onAddRow}>
+          <Button size="small" type="dashed" icon={<PlusOutlined />} onClick={onAddRow}>
             Agregar Fila
           </Button>
         </div>

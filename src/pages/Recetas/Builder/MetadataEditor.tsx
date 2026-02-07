@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Form, Input } from 'antd';
-import { DraftMetadata } from './types';
+import type { DraftMetadata } from './types';
 
 interface MetadataEditorProps {
   metadata: DraftMetadata;
