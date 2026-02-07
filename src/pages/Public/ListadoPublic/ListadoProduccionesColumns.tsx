@@ -54,7 +54,7 @@ export const getPublicProductionColumns = ({
       title: 'Fin',
       dataIndex: 'fechaFin',
       key: 'fechaFin',
-      render: (date) => dayjs(date).format('DD/MM/YYYY HH:mm:ss'),
+      render: (date) => date ? dayjs(date).format('DD/MM/YYYY HH:mm:ss') : '-',
       responsive: ['sm', 'md', 'lg', 'xl'],
     },
     {

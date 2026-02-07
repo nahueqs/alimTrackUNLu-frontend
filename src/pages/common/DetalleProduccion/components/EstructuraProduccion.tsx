@@ -27,7 +27,7 @@ const GrupoDeCampos: React.FC<{ grupo: GrupoCamposResponseDTO; isEditable: boole
             <ManualSaveInput
               value={respuestasCampos[campo.id] || ''}
               onChange={(valor) => onCampoChange(campo.id, valor, campo.tipoDato)}
-              placeholder={`Ingrese ${campo.nombre.toLowerCase()}`}
+              placeholder={isEditable ? `Ingrese ${campo.nombre.toLowerCase()}` : undefined}
               disabled={!isEditable}
               tipoDato={campo.tipoDato}
             />
@@ -75,7 +75,7 @@ const TablaProduccion: React.FC<{ tabla: TablaResponseDTO; isEditable: boolean }
               onChange={(nuevoValor) =>
                 onTablaChange(tabla.id, record.idFila, col.id, nuevoValor, col.tipoDato)
               }
-              placeholder={col.nombre}
+              placeholder={isEditable ? col.nombre : undefined}
               disabled={!isEditable}
               tipoDato={col.tipoDato}
             />
@@ -133,7 +133,7 @@ const SeccionProduccion: React.FC<SeccionProduccionProps> = React.memo(
                 <ManualSaveInput
                   value={respuestasCampos[campo.id] || ''}
                   onChange={(valor) => onCampoChange(campo.id, valor, campo.tipoDato)}
-                  placeholder={`Ingrese ${campo.nombre.toLowerCase()}`}
+                  placeholder={isEditable ? `Ingrese ${campo.nombre.toLowerCase()}` : undefined}
                   disabled={!isEditable}
                   tipoDato={campo.tipoDato}
                 />

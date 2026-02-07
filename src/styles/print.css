@@ -1,0 +1,110 @@
+@media print {
+    /* --- 1. Ocultar elementos innecesarios --- */
+    .header, 
+    .public-dashboard-header,
+    .notification-selector-wrapper,
+    .ant-float-btn,
+    .ant-btn, /* Oculta todos los botones, incluido el de imprimir */
+    .ant-message,
+    .ant-modal-root,
+    .ant-drawer-root {
+        display: none !important;
+    }
+
+    /* --- 2. Configuración de Página --- */
+    @page {
+        size: A4;
+        margin: 1cm;
+    }
+
+    body {
+        background-color: white !important;
+        color: black !important;
+        font-size: 12pt;
+        -webkit-print-color-adjust: exact;
+    }
+
+    /* --- 3. Layout Optimizado --- */
+    .production-detail-container {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+    }
+
+    #production-content {
+        padding: 0 !important;
+    }
+
+    /* Forzar layout de una columna o ajustar grid */
+    .ant-row {
+        display: block !important;
+    }
+
+    .ant-col {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        margin-bottom: 1cm;
+    }
+
+    /* --- 4. Tarjetas y Bordes --- */
+    .info-card, 
+    .progress-card, 
+    .section-card,
+    .group-card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin-bottom: 0.5cm !important;
+        break-inside: avoid; /* Evitar que se corten entre páginas */
+    }
+
+    /* --- 5. Transformar Gráfico de Progreso --- */
+    /* Ocultar el círculo SVG */
+    .progress-card .ant-progress-circle,
+    .progress-card .ant-progress-inner {
+        display: none !important;
+    }
+
+    /* Mostrar solo el texto de porcentaje si es necesario, o reestructurar */
+    .progress-card-title::after {
+        content: " - Resumen de Avance";
+    }
+
+    /* --- 6. Inputs y Formularios --- */
+    .ant-input,
+    .ant-input-number-input,
+    .ant-picker-input > input {
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        color: black !important;
+        font-weight: bold;
+    }
+
+    .ant-form-item-label > label {
+        color: #333 !important;
+        font-weight: normal !important;
+    }
+
+    /* --- 7. Tablas --- */
+    .production-table-container {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+        overflow: visible !important; /* Permitir que se vea todo */
+    }
+
+    .ant-table {
+        font-size: 10pt;
+    }
+
+    .ant-table-thead > tr > th {
+        background-color: #eee !important;
+        color: black !important;
+        border-bottom: 1px solid #000 !important;
+    }
+
+    .ant-table-tbody > tr > td {
+        border-bottom: 1px solid #ccc !important;
+    }
+}
