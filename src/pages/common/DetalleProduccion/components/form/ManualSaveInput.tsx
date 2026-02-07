@@ -101,6 +101,9 @@ export const ManualSaveInput: React.FC<ManualSaveInputProps> = ({
   };
 
   const getPlaceholder = () => {
+    if (rest.disabled) {
+      return '';
+    }
     const basePlaceholder = placeholder || 'Ingrese valor';
     if (
       tipoDato === TipoDatoCampo.FECHA ||
