@@ -51,7 +51,8 @@ export const NuevaProduccionPage: React.FC = () => {
       }
       
       // Navegación robusta: usar replace para evitar volver al formulario con "Atrás"
-      navigate(`/producciones/ver/${newProduction.codigoProduccion}`, { replace: true });
+      // Redirigimos a la ruta de edición
+      navigate(`/producciones/editar/${newProduction.codigoProduccion}`, { replace: true });
       
     } catch (error: any) {
       if (import.meta.env.DEV) {

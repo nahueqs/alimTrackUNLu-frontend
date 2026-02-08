@@ -66,7 +66,7 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: '/producciones/editar/:codigoProduccion',
+    path: '/producciones/editar/:codigoProduccion', // Cambiado de /ver/ a /editar/ para consistencia
     element: (
       <ProtectedRoute>
         <DetalleProduccionProtectedPage />
@@ -103,6 +103,7 @@ export const routes: RouteObject[] = [
       </ProtectedRoute>
     ),
   },
+  // Rutas de Recetas (Ordenadas de más específica a más genérica)
   {
     path: '/recetas/nueva',
     element: (
