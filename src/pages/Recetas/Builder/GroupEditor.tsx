@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Input, Button, Space, Typography } from 'antd';
-import { DeleteOutlined, PlusOutlined, DragOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import type { DraftGroup } from './types';
 import { TipoDatoCampo } from '../types/TipoDatoCampo';
 
@@ -11,6 +11,7 @@ interface GroupEditorProps {
   onAddField: () => void;
   onUpdateField: (fieldId: string, updates: any) => void;
   onRemoveField: (fieldId: string) => void;
+  onMoveField: (fieldId: string, direction: 'up' | 'down') => void;
 }
 
 export const GroupEditor: React.FC<GroupEditorProps> = ({
@@ -19,7 +20,8 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
   onDelete,
   onAddField,
   onUpdateField,
-  onRemoveField
+  onRemoveField,
+  onMoveField
 }) => {
   return (
     <Card
@@ -49,9 +51,12 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
 
         {group.campos.length > 0 ? (
           <div style={{ display: 'grid', gap: '8px' }}>
-            {group.campos.map((campo) => (
+            {group.campos.map((campo, index) => (
               <div key={campo.id} style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '8px', background: '#fff', border: '1px solid #eee', borderRadius: '4px' }}>
-                <DragOutlined style={{ color: '#ccc', cursor: 'move', fontSize: '12px' }} />
+                <Space size={2}>
+                    <Button size="small" type="text" icon={<ArrowUpOutlined />} disabled={index === 0} onClick={() => onMoveField(campo.id, 'up')} />
+                    <Button size="small" type="text" icon={<ArrowDownOutlined />} disabled={index === group.campos.length - 1} onClick={() => onMoveField(campo.id, 'down')} />
+                </Space>
                 <Input
                   addonBefore="Nombre:"
                   size="small"

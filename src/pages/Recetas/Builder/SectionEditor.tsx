@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Input, Button, Space, Typography, Divider } from 'antd';
-import { DeleteOutlined, PlusOutlined, DragOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import type { DraftSection } from './types';
 import { TipoDatoCampo } from '../types/TipoDatoCampo';
 import { GroupEditor } from './GroupEditor';
@@ -10,24 +10,29 @@ interface SectionEditorProps {
   section: DraftSection;
   onUpdate: (updates: Partial<DraftSection>) => void;
   onDelete: () => void;
+  onMove: (direction: 'up' | 'down') => void;
   
   // Fields
   onAddField: () => void;
   onUpdateField: (fieldId: string, updates: any) => void;
   onRemoveField: (fieldId: string) => void;
+  onMoveField: (fieldId: string, direction: 'up' | 'down') => void;
   
   // Groups
   onAddGroup: () => void;
   onUpdateGroup: (groupId: string, updates: any) => void;
   onRemoveGroup: (groupId: string) => void;
+  onMoveGroup: (groupId: string, direction: 'up' | 'down') => void;
   onAddFieldToGroup: (groupId: string) => void;
   onUpdateGroupField: (groupId: string, fieldId: string, updates: any) => void;
   onRemoveGroupField: (groupId: string, fieldId: string) => void;
+  onMoveGroupField: (groupId: string, fieldId: string, direction: 'up' | 'down') => void;
 
   // Tables
   onAddTable: () => void;
   onUpdateTable: (tableId: string, updates: any) => void;
   onRemoveTable: (tableId: string) => void;
+  onMoveTable: (tableId: string, direction: 'up' | 'down') => void;
   onAddColumnToTable: (tableId: string) => void;
   onUpdateColumn: (tableId: string, colId: string, updates: any) => void;
   onRemoveColumn: (tableId: string, colId: string) => void;
@@ -40,18 +45,23 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({
   section,
   onUpdate,
   onDelete,
+  onMove,
   onAddField,
   onUpdateField,
   onRemoveField,
+  onMoveField,
   onAddGroup,
   onUpdateGroup,
   onRemoveGroup,
+  onMoveGroup,
   onAddFieldToGroup,
   onUpdateGroupField,
   onRemoveGroupField,
+  onMoveGroupField,
   onAddTable,
   onUpdateTable,
   onRemoveTable,
+  onMoveTable,
   onAddColumnToTable,
   onUpdateColumn,
   onRemoveColumn,
@@ -74,7 +84,11 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({
         </div>
       }
       extra={
-        <Button danger icon={<DeleteOutlined />} onClick={onDelete}>Eliminar Sección</Button>
+        <Space>
+            <Button icon={<ArrowUpOutlined />} onClick={() => onMove('up')} />
+            <Button icon={<ArrowDownOutlined />} onClick={() => onMove('down')} />
+            <Button danger icon={<DeleteOutlined />} onClick={onDelete}>Eliminar Sección</Button>
+        </Space>
       }
       style={{ marginBottom: '1rem', borderLeft: '4px solid #1890ff' }}
     >
@@ -88,9 +102,12 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({
         
         {section.campos.length > 0 ? (
             <div style={{ display: 'grid', gap: '8px', padding: '8px', border: '1px solid #f0f0f0', borderRadius: '4px' }}>
-                {section.campos.map(campo => (
+                {section.campos.map((campo, index) => (
                     <div key={campo.id} style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '8px', background: '#fff', border: '1px solid #d9d9d9', borderRadius: '4px' }}>
-                        <DragOutlined style={{ color: '#999', cursor: 'move' }} />
+                        <Space size={2}>
+                            <Button size="small" type="text" icon={<ArrowUpOutlined />} disabled={index === 0} onClick={() => onMoveField(campo.id, 'up')} />
+                            <Button size="small" type="text" icon={<ArrowDownOutlined />} disabled={index === section.campos.length - 1} onClick={() => onMoveField(campo.id, 'down')} />
+                        </Space>
                         <Input 
                             addonBefore="Nombre:"
                             value={campo.nombre} 
@@ -130,16 +147,24 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({
         
         {section.grupos.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {section.grupos.map(group => (
-                    <GroupEditor 
-                        key={group.id}
-                        group={group}
-                        onUpdate={(updates) => onUpdateGroup(group.id, updates)}
-                        onDelete={() => onRemoveGroup(group.id)}
-                        onAddField={() => onAddFieldToGroup(group.id)}
-                        onUpdateField={(fieldId, updates) => onUpdateGroupField(group.id, fieldId, updates)}
-                        onRemoveField={(fieldId) => onRemoveGroupField(group.id, fieldId)}
-                    />
+                {section.grupos.map((group, index) => (
+                    <div key={group.id} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingTop: '8px' }}>
+                            <Button size="small" icon={<ArrowUpOutlined />} disabled={index === 0} onClick={() => onMoveGroup(group.id, 'up')} />
+                            <Button size="small" icon={<ArrowDownOutlined />} disabled={index === section.grupos.length - 1} onClick={() => onMoveGroup(group.id, 'down')} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <GroupEditor 
+                                group={group}
+                                onUpdate={(updates) => onUpdateGroup(group.id, updates)}
+                                onDelete={() => onRemoveGroup(group.id)}
+                                onAddField={() => onAddFieldToGroup(group.id)}
+                                onUpdateField={(fieldId, updates) => onUpdateGroupField(group.id, fieldId, updates)}
+                                onRemoveField={(fieldId) => onRemoveGroupField(group.id, fieldId)}
+                                onMoveField={(fieldId, direction) => onMoveGroupField(group.id, fieldId, direction)}
+                            />
+                        </div>
+                    </div>
                 ))}
             </div>
         ) : (
@@ -158,19 +183,26 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({
 
         {section.tablas.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {section.tablas.map(table => (
-                    <TableEditor
-                        key={table.id}
-                        table={table}
-                        onUpdate={(updates) => onUpdateTable(table.id, updates)}
-                        onDelete={() => onRemoveTable(table.id)}
-                        onAddColumn={() => onAddColumnToTable(table.id)}
-                        onUpdateColumn={(colId, updates) => onUpdateColumn(table.id, colId, updates)}
-                        onRemoveColumn={(colId) => onRemoveColumn(table.id, colId)}
-                        onAddRow={() => onAddRowToTable(table.id)}
-                        onUpdateRow={(rowId, updates) => onUpdateRow(table.id, rowId, updates)}
-                        onRemoveRow={(rowId) => onRemoveRow(table.id, rowId)}
-                    />
+                {section.tablas.map((table, index) => (
+                    <div key={table.id} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingTop: '8px' }}>
+                            <Button size="small" icon={<ArrowUpOutlined />} disabled={index === 0} onClick={() => onMoveTable(table.id, 'up')} />
+                            <Button size="small" icon={<ArrowDownOutlined />} disabled={index === section.tablas.length - 1} onClick={() => onMoveTable(table.id, 'down')} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <TableEditor
+                                table={table}
+                                onUpdate={(updates) => onUpdateTable(table.id, updates)}
+                                onDelete={() => onRemoveTable(table.id)}
+                                onAddColumn={() => onAddColumnToTable(table.id)}
+                                onUpdateColumn={(colId, updates) => onUpdateColumn(table.id, colId, updates)}
+                                onRemoveColumn={(colId) => onRemoveColumn(table.id, colId)}
+                                onAddRow={() => onAddRowToTable(table.id)}
+                                onUpdateRow={(rowId, updates) => onUpdateRow(table.id, rowId, updates)}
+                                onRemoveRow={(rowId) => onRemoveRow(table.id, rowId)}
+                            />
+                        </div>
+                    </div>
                 ))}
             </div>
         ) : (

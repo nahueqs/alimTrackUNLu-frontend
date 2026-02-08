@@ -37,6 +37,17 @@ export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => 
     }));
   }, []);
 
+  // --- Helper para mover elementos en un array ---
+  const moveItem = <T>(array: T[], index: number, direction: 'up' | 'down'): T[] => {
+    if (direction === 'up' && index === 0) return array;
+    if (direction === 'down' && index === array.length - 1) return array;
+    
+    const newArray = [...array];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    [newArray[index], newArray[targetIndex]] = [newArray[targetIndex], newArray[index]];
+    return newArray;
+  };
+
   // --- Section Actions ---
   const addSection = useCallback(() => {
     const newSection: DraftSection = {
@@ -62,6 +73,14 @@ export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => 
       ...prev,
       sections: prev.sections.filter(s => s.id !== sectionId)
     }));
+  }, []);
+
+  const moveSection = useCallback((sectionId: string, direction: 'up' | 'down') => {
+    setRecipe(prev => {
+      const index = prev.sections.findIndex(s => s.id === sectionId);
+      if (index === -1) return prev;
+      return { ...prev, sections: moveItem(prev.sections, index, direction) };
+    });
   }, []);
 
   // --- Field Actions (Top Level) ---
@@ -104,6 +123,18 @@ export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => 
     }));
   }, []);
 
+  const moveField = useCallback((sectionId: string, fieldId: string, direction: 'up' | 'down') => {
+    setRecipe(prev => ({
+      ...prev,
+      sections: prev.sections.map(s => {
+        if (s.id !== sectionId) return s;
+        const index = s.campos.findIndex(f => f.id === fieldId);
+        if (index === -1) return s;
+        return { ...s, campos: moveItem(s.campos, index, direction) };
+      })
+    }));
+  }, []);
+
   // --- Group Actions ---
   const addGroupToSection = useCallback((sectionId: string) => {
     setRecipe(prev => ({
@@ -140,6 +171,18 @@ export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => 
       sections: prev.sections.map(s => {
         if (s.id !== sectionId) return s;
         return { ...s, grupos: s.grupos.filter(g => g.id !== groupId) };
+      })
+    }));
+  }, []);
+
+  const moveGroup = useCallback((sectionId: string, groupId: string, direction: 'up' | 'down') => {
+    setRecipe(prev => ({
+      ...prev,
+      sections: prev.sections.map(s => {
+        if (s.id !== sectionId) return s;
+        const index = s.grupos.findIndex(g => g.id === groupId);
+        if (index === -1) return s;
+        return { ...s, grupos: moveItem(s.grupos, index, direction) };
       })
     }));
   }, []);
@@ -202,6 +245,24 @@ export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => 
     }));
   }, []);
 
+  const moveGroupField = useCallback((sectionId: string, groupId: string, fieldId: string, direction: 'up' | 'down') => {
+    setRecipe(prev => ({
+      ...prev,
+      sections: prev.sections.map(s => {
+        if (s.id !== sectionId) return s;
+        return {
+          ...s,
+          grupos: s.grupos.map(g => {
+            if (g.id !== groupId) return g;
+            const index = g.campos.findIndex(f => f.id === fieldId);
+            if (index === -1) return g;
+            return { ...g, campos: moveItem(g.campos, index, direction) };
+          })
+        };
+      })
+    }));
+  }, []);
+
   // --- Table Actions ---
   const addTableToSection = useCallback((sectionId: string) => {
     setRecipe(prev => ({
@@ -240,6 +301,18 @@ export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => 
       sections: prev.sections.map(s => {
         if (s.id !== sectionId) return s;
         return { ...s, tablas: s.tablas.filter(t => t.id !== tableId) };
+      })
+    }));
+  }, []);
+
+  const moveTable = useCallback((sectionId: string, tableId: string, direction: 'up' | 'down') => {
+    setRecipe(prev => ({
+      ...prev,
+      sections: prev.sections.map(s => {
+        if (s.id !== sectionId) return s;
+        const index = s.tablas.findIndex(t => t.id === tableId);
+        if (index === -1) return s;
+        return { ...s, tablas: moveItem(s.tablas, index, direction) };
       })
     }));
   }, []);
@@ -366,18 +439,23 @@ export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => 
       addSection,
       updateSection,
       removeSection,
+      moveSection,
       addFieldToSection,
       updateField,
       removeField,
+      moveField,
       addGroupToSection,
       updateGroup,
       removeGroup,
+      moveGroup,
       addFieldToGroup,
       updateGroupField,
       removeGroupField,
+      moveGroupField,
       addTableToSection,
       updateTable,
       removeTable,
+      moveTable,
       addColumnToTable,
       updateColumn,
       removeColumn,
