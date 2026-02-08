@@ -11,6 +11,7 @@ import { useAuth } from '@/context/auth/AuthProvider';
 import { mapDraftToDTO } from './mapper';
 import { useVersionRecetaService } from '@/services/recetas/useVersionRecetaService';
 import { useRecetaPadreService } from '@/services/recetas/useRecetaPadreService';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -22,6 +23,7 @@ export const RecipeBuilderPage: React.FC = () => {
   const { recipe, actions, validateRecipe } = useRecipeBuilder();
   const { createVersion, loading: loadingSave } = useVersionRecetaService();
   const { recetas, loading: loadingRecetas, getAllRecetas, createReceta } = useRecetaPadreService();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     getAllRecetas();
@@ -81,13 +83,22 @@ export const RecipeBuilderPage: React.FC = () => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <AppHeader title="AlimTrack" />
-      <Content style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Space>
+      <Content style={{ padding: isMobile ? '16px' : '24px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+        <div style={{ 
+            marginBottom: '16px', 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: isMobile ? 'flex-start' : 'center',
+            flexDirection: isMobile ? 'column' : 'row',
+            gap: isMobile ? '12px' : '0'
+        }}>
+          <Space align="center" wrap>
             <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/recetas/versiones')}>
               Volver
             </Button>
-            <Title level={2} style={{ margin: 0 }}>Nueva Versión de Receta</Title>
+            <Title level={isMobile ? 4 : 2} style={{ margin: 0 }}>
+              Nueva Versión de Receta
+            </Title>
           </Space>
           <Button 
             type="primary" 
@@ -95,6 +106,7 @@ export const RecipeBuilderPage: React.FC = () => {
             onClick={handleSave} 
             size="large"
             loading={loadingSave}
+            style={{ width: isMobile ? '100%' : 'auto' }}
           >
             Guardar Versión
           </Button>
@@ -109,7 +121,7 @@ export const RecipeBuilderPage: React.FC = () => {
         />
 
         <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Title level={3} style={{ margin: 0 }}>Secciones</Title>
+          <Title level={3} style={{ margin: 0, fontSize: isMobile ? '1.25rem' : '1.75rem' }}>Secciones</Title>
           <Button type="dashed" icon={<PlusOutlined />} onClick={actions.addSection}>
             Agregar Sección
           </Button>
@@ -137,7 +149,7 @@ export const RecipeBuilderPage: React.FC = () => {
                         onClick={() => actions.moveSection(section.id, 'down')} 
                       />
                   </div>
-                  <div style={{ flex: 1 }}>
+                  <div style={{ flex: 1, minWidth: 0 }}> {/* minWidth: 0 evita overflow en flex items */}
                       <SectionEditor
                         section={section}
                         onUpdate={(updates) => actions.updateSection(section.id, updates)}
