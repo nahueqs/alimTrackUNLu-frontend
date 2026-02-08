@@ -28,7 +28,10 @@ class ApiClient {
   }
 
   async get<T>(endpoint: string, params?: Record<string, any>, options?: RequestInit): Promise<T> {
-    return this.request<T>(endpoint, { method: 'GET', params, ...options });
+    // Agregamos un timestamp para evitar caché del navegador en peticiones GET
+    const cacheBuster = { _t: new Date().getTime() };
+    const finalParams = { ...params, ...cacheBuster };
+    return this.request<T>(endpoint, { method: 'GET', params: finalParams, ...options });
   }
 
   async post<T>(endpoint: string, data?: any, options?: RequestInit): Promise<T> {
@@ -75,6 +78,10 @@ class ApiClient {
 
     const headers: HeadersInit = new Headers({
       'Content-Type': 'application/json',
+      // Headers para evitar caché explícitamente
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
       ...(options.headers as Record<string, string>),
     });
 
