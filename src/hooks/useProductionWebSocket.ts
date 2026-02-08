@@ -34,7 +34,6 @@ interface UseProductionWebSocketProps {
 
 export const useProductionWebSocket = ({
   codigoProduccion,
-  estadoActual,
   estructura,
   getUltimasRespuestas,
   updateFieldResponse,
