@@ -78,10 +78,7 @@ class ApiClient {
 
     const headers: HeadersInit = new Headers({
       'Content-Type': 'application/json',
-      // Headers para evitar caché explícitamente
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0',
+      // Eliminamos headers de caché que causan problemas de CORS
       ...(options.headers as Record<string, string>),
     });
 
