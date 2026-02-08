@@ -57,6 +57,10 @@ interface UseProductionServiceReturn {
     update: ProductionMetadataUpdatedPayload & { timestamp: string }
   ) => void;
   setEstructura: (estructura: EstructuraProduccionDTO) => void;
+  updateProductionStateInList: (
+    codigoProduccion: string,
+    update: ProductionStateUpdatePayload & { timestamp: string }
+  ) => void;
 }
 
 export const useProductionService = (): UseProductionServiceReturn => {
@@ -282,6 +286,26 @@ export const useProductionService = (): UseProductionServiceReturn => {
     [setEstadoActual, recalculateProgreso]
   );
 
+  // Nueva función para actualizar el estado en la lista
+  const updateProductionStateInList = useCallback(
+    (codigoProduccion: string, update: ProductionStateUpdatePayload & { timestamp: string }) => {
+      setProducciones((prev) =>
+        prev.map((prod) => {
+          if (prod.codigoProduccion === codigoProduccion) {
+            return {
+              ...prod,
+              estado: update.estado,
+              // Si hay fechaFin en el update, la actualizamos, si no, mantenemos la que tenía
+              fechaFin: update.fechaFin !== undefined ? update.fechaFin : prod.fechaFin,
+            };
+          }
+          return prod;
+        })
+      );
+    },
+    []
+  );
+
   return {
     loading,
     isSaving,
@@ -302,5 +326,6 @@ export const useProductionService = (): UseProductionServiceReturn => {
     updateProductionState,
     updateProductionMetadata,
     setEstructura,
+    updateProductionStateInList,
   };
 };

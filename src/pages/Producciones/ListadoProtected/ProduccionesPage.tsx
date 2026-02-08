@@ -27,7 +27,14 @@ interface ProductionsResultPageProps {
 
 const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFilters = {} }) => {
   usePageTitle('Producciones');
-  const { producciones, loading, error, getProducciones, deleteProduction } = useProductionService();
+  const { 
+    producciones, 
+    loading, 
+    error, 
+    getProducciones, 
+    deleteProduction,
+    updateProductionStateInList 
+  } = useProductionService();
   const navigate = useNavigate();
   
   // Estado para los filtros locales
@@ -43,14 +50,34 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
   // Suscripción a WebSockets para actualizaciones en tiempo real
   useEffect(() => {
     let unsubscribeDeleted: (() => void) | undefined;
+    let unsubscribeCreated: (() => void) | undefined;
+    let unsubscribeState: (() => void) | undefined;
 
     const connectAndSubscribe = () => {
       notificationService.connect(() => {
-        // Suscribirse a producciones eliminadas
+        // 1. Suscribirse a producciones eliminadas
         unsubscribeDeleted = notificationService.subscribeToProduccionEliminada((message) => {
           if (message.type === 'PRODUCTION_DELETED') {
             // Recargar la lista cuando se elimina una producción
             getProducciones({});
+          }
+        });
+
+        // 2. Suscribirse a nuevas producciones creadas
+        unsubscribeCreated = notificationService.subscribeToProductionCreated((message) => {
+          if (message.type === 'PRODUCTION_METADATA_CREATED') {
+            // Recargar la lista para incluir la nueva producción
+            getProducciones({});
+          }
+        });
+
+        // 3. Suscribirse a cambios de estado
+        unsubscribeState = notificationService.subscribeToProductionStateChanges((message) => {
+          if (message.type === 'STATE_CHANGED') {
+            updateProductionStateInList(message.codigoProduccion, {
+              ...message.payload,
+              timestamp: message.timestamp,
+            });
           }
         });
       });
@@ -60,10 +87,12 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
 
     return () => {
       if (unsubscribeDeleted) unsubscribeDeleted();
+      if (unsubscribeCreated) unsubscribeCreated();
+      if (unsubscribeState) unsubscribeState();
       // No desconectamos aquí porque otros componentes podrían estar usando el servicio
       // notificationService.disconnect(); 
     };
-  }, [getProducciones]);
+  }, [getProducciones, updateProductionStateInList]);
 
   // Lógica de filtrado en el cliente
   const filteredProducciones = useMemo(() => {

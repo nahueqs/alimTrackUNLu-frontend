@@ -104,6 +104,14 @@ export const routes: RouteObject[] = [
     ),
   },
   {
+    path: '/recetas/nueva',
+    element: (
+      <ProtectedRoute>
+        <RecipeBuilderPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: '/recetas/versiones',
     element: (
       <ProtectedRoute>
@@ -116,14 +124,6 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <VisualizarRecetaPage />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: '/recetas/nueva',
-    element: (
-      <ProtectedRoute>
-        <RecipeBuilderPage />
       </ProtectedRoute>
     ),
   },
