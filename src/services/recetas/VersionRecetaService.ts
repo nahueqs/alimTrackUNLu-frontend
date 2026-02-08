@@ -3,6 +3,7 @@ import type {
   EstructuraProduccionDTO,
   VersionRecetaMetadataResponseDTO,
 } from '@/types/production';
+import type { VersionRecetaLlenaCreateDTO } from '@/types/production/RecipeDTOs';
 
 class VersionRecetaService {
   /**
@@ -36,7 +37,12 @@ class VersionRecetaService {
     );
   }
 
-  // Aquí puedes añadir en el futuro los métodos para POST, PUT, DELETE si los necesitas.
+  /**
+   * Crea una nueva versión de receta completa.
+   */
+  async createVersion(data: VersionRecetaLlenaCreateDTO): Promise<VersionRecetaMetadataResponseDTO> {
+    return apiClient.post<VersionRecetaMetadataResponseDTO>('/versiones-receta', data);
+  }
 }
 
 export const versionRecetaService = new VersionRecetaService();

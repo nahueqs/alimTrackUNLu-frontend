@@ -4,6 +4,7 @@ import type {
   EstructuraProduccionDTO,
   VersionRecetaMetadataResponseDTO,
 } from '@/types/production';
+import type { VersionRecetaLlenaCreateDTO } from '@/types/production/RecipeDTOs';
 
 interface UseVersionRecetaReturn {
   loading: boolean;
@@ -14,6 +15,7 @@ interface UseVersionRecetaReturn {
   getAllVersiones: () => Promise<void>;
   getByCodigoVersion: (codigoVersion: string) => Promise<void>;
   getEstructuraCompleta: (codigoVersion: string) => Promise<void>;
+  createVersion: (data: VersionRecetaLlenaCreateDTO) => Promise<VersionRecetaMetadataResponseDTO>;
 }
 
 export const useVersionRecetaService = (): UseVersionRecetaReturn => {
@@ -65,6 +67,21 @@ export const useVersionRecetaService = (): UseVersionRecetaReturn => {
     }
   }, []);
 
+  const createVersion = useCallback(async (data: VersionRecetaLlenaCreateDTO) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await versionRecetaService.createVersion(data);
+      return response;
+    } catch (err: any) {
+      const errorMessage = err.message || 'Error al crear la versión de receta.';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     loading,
     error,
@@ -74,5 +91,6 @@ export const useVersionRecetaService = (): UseVersionRecetaReturn => {
     getAllVersiones,
     getByCodigoVersion,
     getEstructuraCompleta,
+    createVersion,
   };
 };

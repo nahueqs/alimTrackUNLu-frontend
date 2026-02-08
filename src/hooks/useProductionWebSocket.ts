@@ -251,7 +251,6 @@ export const useProductionWebSocket = ({
   }, [
     codigoProduccion,
     isConnected,
-    // Eliminamos estadoActual?.produccion.estado de las dependencias para evitar resuscripciones innecesarias
     getUltimasRespuestas,
     updateProductionState,
     updateProductionMetadata,

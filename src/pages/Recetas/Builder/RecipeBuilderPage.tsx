@@ -9,6 +9,7 @@ import { AppHeader } from '@/components/AppHeader/AppHeader';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useAuth } from '@/context/auth/AuthProvider';
 import { mapDraftToDTO } from './mapper';
+import { useVersionRecetaService } from '@/services/recetas/useVersionRecetaService';
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -18,6 +19,7 @@ export const RecipeBuilderPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { recipe, actions, validateRecipe } = useRecipeBuilder();
+  const { createVersion, loading } = useVersionRecetaService();
 
   const handleSave = async () => {
     // 1. Validaciones básicas de metadatos
@@ -41,11 +43,18 @@ export const RecipeBuilderPage: React.FC = () => {
 
     const dto = mapDraftToDTO(recipe, user.email);
 
-    // 4. Envío (Simulado por ahora)
-    console.log('DTO Generado para Backend:', JSON.stringify(dto, null, 2));
-    message.success('Receta validada y transformada correctamente (ver consola)');
-    // Aquí llamaríamos al servicio para guardar: await recipeService.createVersion(dto);
-    // navigate('/recetas/versiones');
+    // 4. Envío al backend
+    try {
+      if (import.meta.env.DEV) {
+        console.log('Enviando DTO:', dto);
+      }
+      await createVersion(dto);
+      message.success('Receta creada exitosamente');
+      navigate('/recetas/versiones');
+    } catch (error: any) {
+      console.error('Error al crear receta:', error);
+      message.error(error.message || 'Error al crear la receta');
+    }
   };
 
   return (
@@ -59,7 +68,13 @@ export const RecipeBuilderPage: React.FC = () => {
             </Button>
             <Title level={2} style={{ margin: 0 }}>Nueva Receta</Title>
           </Space>
-          <Button type="primary" icon={<SaveOutlined />} onClick={handleSave} size="large">
+          <Button 
+            type="primary" 
+            icon={<SaveOutlined />} 
+            onClick={handleSave} 
+            size="large"
+            loading={loading}
+          >
             Guardar Receta
           </Button>
         </div>

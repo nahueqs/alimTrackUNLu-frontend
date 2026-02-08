@@ -26,56 +26,64 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({
       size="small"
       type="inner"
       title={
-        <Input
-          value={group.subtitulo}
-          onChange={(e) => onUpdate({ subtitulo: e.target.value })}
-          placeholder="Subtítulo del Grupo"
-          bordered={false}
-          style={{ fontWeight: 500 }}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Typography.Text>Grupo:</Typography.Text>
+          <Input
+            value={group.subtitulo}
+            onChange={(e) => onUpdate({ subtitulo: e.target.value })}
+            placeholder="Ingrese el nombre del grupo"
+            style={{ fontWeight: 500, width: '250px' }}
+          />
+        </div>
       }
-      extra={<Button type="text" danger icon={<DeleteOutlined />} onClick={onDelete} />}
-      style={{ marginBottom: '8px', background: '#f9f9f9' }}
+      extra={<Button danger icon={<DeleteOutlined />} onClick={onDelete}>Eliminar Grupo</Button>}
+      style={{ marginBottom: '8px', background: '#f9f9f9', border: '1px solid #d9d9d9' }}
     >
       <Space direction="vertical" style={{ width: '100%' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography.Text type="secondary" style={{ fontSize: '12px' }}>Campos del Grupo</Typography.Text>
-          <Button size="small" type="dashed" icon={<PlusOutlined />} onClick={onAddField}>
-            Campo
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+          <Typography.Text strong style={{ fontSize: '13px' }}>Campos del Grupo</Typography.Text>
+          <Button size="small" type="primary" ghost icon={<PlusOutlined />} onClick={onAddField}>
+            Agregar Campo al Grupo
           </Button>
         </div>
 
         {group.campos.length > 0 ? (
           <div style={{ display: 'grid', gap: '8px' }}>
             {group.campos.map((campo) => (
-              <div key={campo.id} style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '4px', background: '#fff', border: '1px solid #eee', borderRadius: '4px' }}>
+              <div key={campo.id} style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '8px', background: '#fff', border: '1px solid #eee', borderRadius: '4px' }}>
                 <DragOutlined style={{ color: '#ccc', cursor: 'move', fontSize: '12px' }} />
                 <Input
+                  addonBefore="Nombre:"
                   size="small"
                   value={campo.nombre}
                   onChange={(e) => onUpdateField(campo.id, { nombre: e.target.value })}
                   placeholder="Nombre campo"
                   style={{ flex: 2 }}
                 />
-                <select
-                  value={campo.tipoDato}
-                  onChange={(e) => onUpdateField(campo.id, { tipoDato: e.target.value as TipoDatoCampo })}
-                  style={{ padding: '2px', borderRadius: '4px', border: '1px solid #d9d9d9', flex: 1, fontSize: '12px' }}
-                >
-                  {Object.values(TipoDatoCampo).map((tipo) => (
-                    <option key={tipo} value={tipo}>
-                      {tipo}
-                    </option>
-                  ))}
-                </select>
-                <Button size="small" type="text" danger icon={<DeleteOutlined />} onClick={() => onRemoveField(campo.id)} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Typography.Text type="secondary" style={{ fontSize: '11px' }}>Tipo:</Typography.Text>
+                    <select
+                      value={campo.tipoDato}
+                      onChange={(e) => onUpdateField(campo.id, { tipoDato: e.target.value as TipoDatoCampo })}
+                      style={{ padding: '2px', borderRadius: '4px', border: '1px solid #d9d9d9', fontSize: '12px', height: '24px' }}
+                    >
+                      {Object.values(TipoDatoCampo).map((tipo) => (
+                        <option key={tipo} value={tipo}>
+                          {tipo}
+                        </option>
+                      ))}
+                    </select>
+                </div>
+                <Button size="small" danger icon={<DeleteOutlined />} onClick={() => onRemoveField(campo.id)} />
               </div>
             ))}
           </div>
         ) : (
-          <Typography.Text type="secondary" style={{ fontSize: '12px', fontStyle: 'italic' }}>
-            Sin campos en este grupo.
-          </Typography.Text>
+          <div style={{ padding: '12px', textAlign: 'center', background: '#fff', border: '1px dashed #eee', borderRadius: '4px' }}>
+            <Typography.Text type="secondary" style={{ fontSize: '12px', fontStyle: 'italic' }}>
+              Sin campos en este grupo. Agregue uno para comenzar.
+            </Typography.Text>
+          </div>
         )}
       </Space>
     </Card>

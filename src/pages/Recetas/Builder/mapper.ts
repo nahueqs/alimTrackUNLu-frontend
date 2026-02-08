@@ -1,56 +1,11 @@
 import type { DraftRecipe, DraftSection, DraftGroup, DraftTable, DraftField } from './types';
-
-// Interfaces para el DTO de salida (basadas en el JSON proporcionado)
-interface VersionRecetaLlenaCreateDTO {
-  codigoRecetaPadre: string;
-  codigoVersionReceta: string;
-  nombre: string;
-  descripcion: string;
-  emailCreador: string;
-  secciones: SeccionCreateDTO[];
-}
-
-interface SeccionCreateDTO {
-  codigoVersionRecetaPadre: string;
-  emailCreador: string;
-  titulo: string;
-  tipo: string;
-  orden: number;
-  camposSimples: CampoSimpleCreateDTO[];
-  gruposCampos: GrupoCamposCreateDTO[];
-  tablas: TablaCreateDTO[];
-}
-
-interface CampoSimpleCreateDTO {
-  nombre: string;
-  tipoDato: string;
-  idGrupo: number | null; // Puede ser null si no pertenece a un grupo o si es jerárquico
-  orden: number;
-}
-
-interface GrupoCamposCreateDTO {
-  subtitulo: string;
-  camposSimples: CampoSimpleCreateDTO[];
-}
-
-interface TablaCreateDTO {
-  nombre: string;
-  descripcion: string;
-  orden: number;
-  filas: FilaTablaCreateDTO[];
-  columnas: ColumnaTablaCreateDTO[];
-}
-
-interface FilaTablaCreateDTO {
-  nombre: string;
-  orden: number;
-}
-
-interface ColumnaTablaCreateDTO {
-  nombre: string;
-  tipoDato: string;
-  orden: number;
-}
+import type {
+  VersionRecetaLlenaCreateDTO,
+  SeccionCreateDTO,
+  CampoSimpleCreateDTO,
+  GrupoCamposCreateDTO,
+  TablaCreateDTO
+} from '@/types/production/RecipeDTOs';
 
 export const mapDraftToDTO = (draft: DraftRecipe, emailCreador: string): VersionRecetaLlenaCreateDTO => {
   return {
@@ -74,7 +29,7 @@ const mapSectionToDTO = (
     emailCreador: emailCreador,
     titulo: section.titulo,
     tipo: "GENERICA", // Valor por defecto, ajustar según lógica de negocio
-    orden: orden + 1, // Backend suele usar 1-based index, o mantener 0-based según preferencia
+    orden: orden + 1, // Backend suele usar 1-based index
     camposSimples: section.campos.map((field, idx) => mapFieldToDTO(field, idx, null)),
     gruposCampos: section.grupos.map((group) => mapGroupToDTO(group)),
     tablas: section.tablas.map((table, idx) => mapTableToDTO(table, idx)),
