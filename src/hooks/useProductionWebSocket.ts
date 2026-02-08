@@ -144,103 +144,100 @@ export const useProductionWebSocket = ({
     let unsubscribe: (() => void) | undefined;
 
     if (codigoProduccion && isConnected) {
-      const isFinalState =
-        estadoActual?.produccion.estado === 'FINALIZADA' ||
-        estadoActual?.produccion.estado === 'CANCELADA';
+      // Eliminamos la condición de estado final para permitir actualizaciones incluso si está finalizada
+      // (por ejemplo, si se reabre o si llegan mensajes tardíos)
+      
+      unsubscribe = notificationService.subscribeToAutoSave(codigoProduccion, (message: any) => {
+        const tryShowNotification = (title: string, body: string, type: string) => {
+          // Filtrado de notificaciones según preferencia del usuario
+          if (notificationLevel === 'NONE') return;
+          if (notificationLevel === 'STATE_ONLY' && type !== 'STATE_CHANGED') return;
 
-      if (!isFinalState) {
-        unsubscribe = notificationService.subscribeToAutoSave(codigoProduccion, (message: any) => {
-          const tryShowNotification = (title: string, body: string, type: string) => {
-            // Filtrado de notificaciones según preferencia del usuario
-            if (notificationLevel === 'NONE') return;
-            if (notificationLevel === 'STATE_ONLY' && type !== 'STATE_CHANGED') return;
-
-            if (import.meta.env.DEV) {
-              console.log('[WebSocket] Intentando mostrar notificación:', {
-                visible: isPageVisible.current,
-                permission: Notification.permission,
-                title,
-              });
-            }
-
-            if (!isPageVisible.current && Notification.permission === 'granted') {
-              try {
-                const notif = new Notification(title, {
-                  body,
-                  tag: 'alimtrack-update',
-                  icon: '/vite.svg', // Opcional: icono de la app
-                });
-                notif.onclick = () => {
-                  window.focus();
-                  notif.close();
-                };
-              } catch (e) {
-                console.error('[WebSocket] Error al crear notificación:', e);
-              }
-            }
-          };
-
-          switch (message.type) {
-            case 'FIELD_UPDATED': {
-              queueUpdate('FIELD', message.payload);
-
-              const { sectionTitle, itemTitle } = findItemInStructure(
-                estructura,
-                message.payload.idCampo,
-                'campo'
-              );
-              const body =
-                itemTitle && sectionTitle
-                  ? `Cambio en campo "${itemTitle}" de sección "${sectionTitle}".`
-                  : `Cambio en un campo de la producción ${codigoProduccion}.`;
-              tryShowNotification(`Producción Actualizada`, body, 'FIELD_UPDATED');
-              break;
-            }
-            case 'TABLE_CELL_UPDATED': {
-              queueUpdate('TABLE', message.payload);
-
-              const { sectionTitle, itemTitle } = findItemInStructure(
-                estructura,
-                message.payload.idTabla,
-                'tabla'
-              );
-              const body =
-                itemTitle && sectionTitle
-                  ? `Cambio en tabla "${itemTitle}" de sección "${sectionTitle}".`
-                  : `Cambio en una celda de tabla de la producción ${codigoProduccion}.`;
-              tryShowNotification(`Producción Actualizada`, body, 'TABLE_CELL_UPDATED');
-              break;
-            }
-            case 'STATE_CHANGED':
-              updateProductionState(message.payload);
-              tryShowNotification(
-                `Estado Actualizado`,
-                `El estado ha cambiado a: ${message.payload.estado}`,
-                'STATE_CHANGED'
-              );
-              break;
-            case 'PRODUCTION_METADATA_UPDATED':
-              // Aseguramos que haya un timestamp
-              const payloadWithTimestamp = {
-                ...message.payload,
-                timestamp: message.payload.timestamp || new Date().toISOString(),
-              };
-              updateProductionMetadata(payloadWithTimestamp);
-              tryShowNotification(
-                `Metadatos Actualizados`,
-                `Se han actualizado los metadatos de la producción.`,
-                'PRODUCTION_METADATA_UPDATED'
-              );
-              break;
-            default:
-              console.warn(
-                `[useProductionWebSocket] Unknown update type '${message.type}'. Re-fetching all data.`
-              );
-              getUltimasRespuestas(codigoProduccion);
-              break;
+          if (import.meta.env.DEV) {
+            console.log('[WebSocket] Intentando mostrar notificación:', {
+              visible: isPageVisible.current,
+              permission: Notification.permission,
+              title,
+            });
           }
-        });
-      }
+
+          if (!isPageVisible.current && Notification.permission === 'granted') {
+            try {
+              const notif = new Notification(title, {
+                body,
+                tag: 'alimtrack-update',
+                icon: '/vite.svg', // Opcional: icono de la app
+              });
+              notif.onclick = () => {
+                window.focus();
+                notif.close();
+              };
+            } catch (e) {
+              console.error('[WebSocket] Error al crear notificación:', e);
+            }
+          }
+        };
+
+        switch (message.type) {
+          case 'FIELD_UPDATED': {
+            queueUpdate('FIELD', message.payload);
+
+            const { sectionTitle, itemTitle } = findItemInStructure(
+              estructura,
+              message.payload.idCampo,
+              'campo'
+            );
+            const body =
+              itemTitle && sectionTitle
+                ? `Cambio en campo "${itemTitle}" de sección "${sectionTitle}".`
+                : `Cambio en un campo de la producción ${codigoProduccion}.`;
+            tryShowNotification(`Producción Actualizada`, body, 'FIELD_UPDATED');
+            break;
+          }
+          case 'TABLE_CELL_UPDATED': {
+            queueUpdate('TABLE', message.payload);
+
+            const { sectionTitle, itemTitle } = findItemInStructure(
+              estructura,
+              message.payload.idTabla,
+              'tabla'
+            );
+            const body =
+              itemTitle && sectionTitle
+                ? `Cambio en tabla "${itemTitle}" de sección "${sectionTitle}".`
+                : `Cambio en una celda de tabla de la producción ${codigoProduccion}.`;
+            tryShowNotification(`Producción Actualizada`, body, 'TABLE_CELL_UPDATED');
+            break;
+          }
+          case 'STATE_CHANGED':
+            updateProductionState(message.payload);
+            tryShowNotification(
+              `Estado Actualizado`,
+              `El estado ha cambiado a: ${message.payload.estado}`,
+              'STATE_CHANGED'
+            );
+            break;
+          case 'PRODUCTION_METADATA_UPDATED':
+            // Aseguramos que haya un timestamp
+            const payloadWithTimestamp = {
+              ...message.payload,
+              timestamp: message.payload.timestamp || new Date().toISOString(),
+            };
+            updateProductionMetadata(payloadWithTimestamp);
+            tryShowNotification(
+              `Metadatos Actualizados`,
+              `Se han actualizado los metadatos de la producción.`,
+              'PRODUCTION_METADATA_UPDATED'
+            );
+            break;
+          default:
+            console.warn(
+              `[useProductionWebSocket] Unknown update type '${message.type}'. Re-fetching all data.`
+            );
+            getUltimasRespuestas(codigoProduccion);
+            break;
+        }
+      });
     }
 
     return () => {
@@ -254,13 +251,13 @@ export const useProductionWebSocket = ({
   }, [
     codigoProduccion,
     isConnected,
-    estadoActual?.produccion.estado,
+    // Eliminamos estadoActual?.produccion.estado de las dependencias para evitar resuscripciones innecesarias
     getUltimasRespuestas,
     updateProductionState,
     updateProductionMetadata,
     estructura,
     queueUpdate,
-    notificationLevel, // Agregado a dependencias
+    notificationLevel,
   ]);
 
   return { isConnected };
