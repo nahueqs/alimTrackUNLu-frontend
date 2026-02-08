@@ -66,7 +66,7 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: '/producciones/ver/:codigoProduccion', // Nueva ruta protegida
+    path: '/producciones/editar/:codigoProduccion',
     element: (
       <ProtectedRoute>
         <DetalleProduccionProtectedPage />
