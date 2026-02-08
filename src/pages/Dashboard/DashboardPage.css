@@ -10,8 +10,8 @@
 }
 
 .dashboard__main {
-    /* Aumentamos significativamente el padding superior para compensar el header sticky */
-    padding: 2rem 1rem; 
+    /* Padding reducido en móvil para aprovechar el ancho */
+    padding: 1.5rem 0.5rem; 
     max-width: 1200px;
     margin: 0 auto;
     width: 100%; /* Asegura que ocupe el ancho disponible */
@@ -22,24 +22,25 @@
    SECCIÓN DE BIENVENIDA (Welcome)
    ========================================================================== */
 .dashboard__welcome {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     text-align: center;
     /* Añadimos un margen superior extra al contenido interno por si acaso */
-    margin-top: 1rem;
+    margin-top: 0.5rem;
+    padding: 0 0.5rem; /* Padding interno para el texto */
 }
 
 .dashboard__welcome-title {
-    font-size: 1.75rem; /* Fuente más pequeña para móvil por defecto */
+    font-size: 1.5rem; /* Fuente más pequeña para móvil por defecto */
     font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     line-height: 1.2;
 }
 
 .dashboard__welcome-subtitle {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: var(--text-secondary);
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     max-width: 600px;
     margin-left: auto;
     margin-right: auto;
@@ -50,10 +51,11 @@
    ========================================================================== */
 .dashboard__grid {
     display: grid;
-    /* En móvil, 1 columna. En escritorio, se adapta. */
+    /* En móvil, 1 columna que ocupa todo el ancho */
     grid-template-columns: 1fr; 
-    gap: 1.5rem;
+    gap: 1rem;
     align-items: stretch;
+    width: 100%;
 }
 
 /* Ajustes específicos para las tarjetas dentro del dashboard */
@@ -61,6 +63,8 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    /* Asegurar que la tarjeta ocupe el ancho */
+    width: 100%;
 }
 
 .dashboard__grid .card--dashboard .dashboard-card__content {
@@ -81,13 +85,14 @@
    ========================================================================== */
 @media (min-width: 768px) {
     .dashboard__main {
-        /* Aumentamos aún más el padding en desktop */
+        /* Aumentamos el padding en desktop */
         padding: 4rem 1.5rem; 
     }
 
     .dashboard__welcome {
         margin-bottom: 3rem;
         margin-top: 1.5rem;
+        padding: 0;
     }
 
     .dashboard__welcome-title {
