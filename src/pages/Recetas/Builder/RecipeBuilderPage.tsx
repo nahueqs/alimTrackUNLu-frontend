@@ -7,6 +7,8 @@ import { MetadataEditor } from './MetadataEditor';
 import { SectionEditor } from './SectionEditor';
 import { AppHeader } from '@/components/AppHeader/AppHeader';
 import { usePageTitle } from '@/hooks/usePageTitle';
+import { useAuth } from '@/context/auth/AuthProvider';
+import { mapDraftToDTO } from './mapper';
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -14,6 +16,7 @@ const { Title } = Typography;
 export const RecipeBuilderPage: React.FC = () => {
   usePageTitle('Nueva Receta');
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { recipe, actions, validateRecipe } = useRecipeBuilder();
 
   const handleSave = async () => {
@@ -30,10 +33,18 @@ export const RecipeBuilderPage: React.FC = () => {
       return;
     }
 
-    // 3. Transformación a DTO y envío (Simulado por ahora)
-    // Usamos JSON.stringify con indentación de 2 espacios para mostrarlo bonito en consola
-    console.log('Guardando receta (JSON):', JSON.stringify(recipe, null, 2));
-    message.success('Receta validada y lista para guardar (simulado)');
+    // 3. Transformación a DTO
+    if (!user?.email) {
+        message.error('No se pudo identificar al usuario creador.');
+        return;
+    }
+
+    const dto = mapDraftToDTO(recipe, user.email);
+
+    // 4. Envío (Simulado por ahora)
+    console.log('DTO Generado para Backend:', JSON.stringify(dto, null, 2));
+    message.success('Receta validada y transformada correctamente (ver consola)');
+    // Aquí llamaríamos al servicio para guardar: await recipeService.createVersion(dto);
     // navigate('/recetas/versiones');
   };
 
