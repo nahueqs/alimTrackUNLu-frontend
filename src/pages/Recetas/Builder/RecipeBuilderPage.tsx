@@ -14,16 +14,26 @@ const { Title } = Typography;
 export const RecipeBuilderPage: React.FC = () => {
   usePageTitle('Nueva Receta');
   const navigate = useNavigate();
-  const { recipe, actions } = useRecipeBuilder();
+  const { recipe, actions, validateRecipe } = useRecipeBuilder();
 
   const handleSave = async () => {
-    // Aquí iría la lógica de validación y transformación a DTO para enviar al backend
-    console.log('Guardando receta:', recipe);
+    // 1. Validaciones básicas de metadatos
     if (!recipe.metadata.nombre || !recipe.metadata.codigoVersion) {
       message.error('Por favor complete el nombre y el código de versión');
       return;
     }
-    message.success('Receta guardada (simulado)');
+
+    // 2. Validaciones de estructura (unicidad, etc.)
+    const validationError = validateRecipe();
+    if (validationError) {
+      message.error(validationError);
+      return;
+    }
+
+    // 3. Transformación a DTO y envío (Simulado por ahora)
+    // Usamos JSON.stringify con indentación de 2 espacios para mostrarlo bonito en consola
+    console.log('Guardando receta (JSON):', JSON.stringify(recipe, null, 2));
+    message.success('Receta validada y lista para guardar (simulado)');
     // navigate('/recetas/versiones');
   };
 

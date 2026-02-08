@@ -42,6 +42,7 @@ export interface DraftField {
 export interface DraftTable {
   id: string;
   nombre: string;
+  descripcion?: string; // Agregado según DTO
   orden: number;
   columnas: DraftColumn[];
   filas: DraftRow[];

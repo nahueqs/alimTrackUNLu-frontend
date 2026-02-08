@@ -81,13 +81,23 @@ export const TableEditor: React.FC<TableEditorProps> = ({
       size="small"
       type="inner"
       title={
-        <Input
-          value={table.nombre}
-          onChange={(e) => onUpdate({ nombre: e.target.value })}
-          placeholder="Nombre de la Tabla"
-          bordered={false}
-          style={{ fontWeight: 500 }}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <Input
+            value={table.nombre}
+            onChange={(e) => onUpdate({ nombre: e.target.value })}
+            placeholder="Nombre de la Tabla"
+            bordered={false}
+            style={{ fontWeight: 500 }}
+          />
+          <Input
+            size="small"
+            value={table.descripcion}
+            onChange={(e) => onUpdate({ descripcion: e.target.value })}
+            placeholder="Descripción de la tabla (opcional)"
+            bordered={false}
+            style={{ fontSize: '12px', color: '#666' }}
+          />
+        </div>
       }
       extra={<Button type="text" danger icon={<DeleteOutlined />} onClick={onDelete} />}
       style={{ marginBottom: '8px', background: '#fff', border: '1px solid #d9d9d9' }}
