@@ -39,6 +39,7 @@ export interface CampoSimpleResponseDTO {
   idSeccion: number;
   idGrupo: number | null;
   nombre: string;
+  descripcion?: string | null; // Agregado campo descripcion
   tipoDato: TipoDatoCampo;
   orden: number;
 }
