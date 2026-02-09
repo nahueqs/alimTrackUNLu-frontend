@@ -15,7 +15,7 @@ import isBetween from 'dayjs/plugin/isBetween';
 import { Button as UiButton } from '@/components/ui';
 import { ArrowLeftIcon } from 'lucide-react';
 import { PrintButton } from '@/components/common/PrintButton';
-import { notificationService } from '@/services/notificaciones/notificationService';
+import { useProductionListSockets } from '@/hooks/useProductionListSockets';
 
 // Extendemos dayjs con el plugin isBetween
 dayjs.extend(isBetween);
@@ -47,52 +47,12 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
     getProducciones({}); 
   }, [getProducciones]);
 
-  // Suscripción a WebSockets para actualizaciones en tiempo real
-  useEffect(() => {
-    let unsubscribeDeleted: (() => void) | undefined;
-    let unsubscribeCreated: (() => void) | undefined;
-    let unsubscribeState: (() => void) | undefined;
-
-    const connectAndSubscribe = () => {
-      notificationService.connect(() => {
-        // 1. Suscribirse a producciones eliminadas
-        unsubscribeDeleted = notificationService.subscribeToProduccionEliminada((message) => {
-          if (message.type === 'PRODUCTION_DELETED') {
-            // Recargar la lista cuando se elimina una producción
-            getProducciones({});
-          }
-        });
-
-        // 2. Suscribirse a nuevas producciones creadas
-        unsubscribeCreated = notificationService.subscribeToProductionCreated((message) => {
-          if (message.type === 'PRODUCTION_METADATA_CREATED') {
-            // Recargar la lista para incluir la nueva producción
-            getProducciones({});
-          }
-        });
-
-        // 3. Suscribirse a cambios de estado
-        unsubscribeState = notificationService.subscribeToProductionStateChanges((message) => {
-          if (message.type === 'STATE_CHANGED') {
-            updateProductionStateInList(message.codigoProduccion, {
-              ...message.payload,
-              timestamp: message.timestamp,
-            });
-          }
-        });
-      });
-    };
-
-    connectAndSubscribe();
-
-    return () => {
-      if (unsubscribeDeleted) unsubscribeDeleted();
-      if (unsubscribeCreated) unsubscribeCreated();
-      if (unsubscribeState) unsubscribeState();
-      // No desconectamos aquí porque otros componentes podrían estar usando el servicio
-      // notificationService.disconnect(); 
-    };
-  }, [getProducciones, updateProductionStateInList]);
+  // Usar el nuevo hook para WebSockets
+  useProductionListSockets({
+    onStateChange: updateProductionStateInList,
+    onCreated: () => getProducciones({}),
+    onDeleted: () => getProducciones({}),
+  });
 
   // Lógica de filtrado en el cliente
   const filteredProducciones = useMemo(() => {

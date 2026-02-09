@@ -6,10 +6,10 @@ import { getPublicProductionColumns } from './ListadoProduccionesColumns.tsx';
 import { usePublicService } from '@/services/public/usePublicService.ts';
 import { useIsMobile } from '@/hooks/useIsMobile.ts';
 import './ListadoProducciones.css';
-import { notificationService } from '@/services/notificaciones/notificationService.ts';
 import { usePageTitle } from '@/hooks/usePageTitle.ts';
 import { Button } from '@/components/ui';
 import { ArrowLeftIcon } from 'lucide-react';
+import { useProductionListSockets } from '@/hooks/useProductionListSockets';
 
 export const ListadoProducciones: React.FC = () => {
   usePageTitle('Producciones');
@@ -28,59 +28,19 @@ export const ListadoProducciones: React.FC = () => {
     getProduccionesPublicas();
   }, [getProduccionesPublicas]);
 
-  // Suscripción a WebSockets para actualizaciones en tiempo real
-  useEffect(() => {
-    let unsubscribeState: (() => void) | undefined;
-    let unsubscribeCreated: (() => void) | undefined;
-    let unsubscribeDeleted: (() => void) | undefined;
-
-    const connectAndSubscribe = () => {
-      notificationService.connect(() => {
-        // Suscribirse a cambios de estado globales
-        unsubscribeState = notificationService.subscribeToProductionStateChanges((message) => {
-          if (message.type === 'STATE_CHANGED') {
-            updateProductionStateInList(message.codigoProduccion, {
-              ...message.payload,
-              timestamp: message.timestamp,
-            });
-          }
-        });
-
-        // Suscribirse a nuevas producciones creadas
-        unsubscribeCreated = notificationService.subscribeToProductionCreated((message) => {
-          // Cuando se crea una producción, recargamos la lista completa para simplificar
-          // Podríamos optimizar agregando solo la nueva, pero requeriría mapear el payload al DTO completo
-          if (message.type === 'PRODUCTION_METADATA_CREATED') {
-            getProduccionesPublicas();
-          }
-        });
-
-        // Suscribirse a producciones eliminadas
-        unsubscribeDeleted = notificationService.subscribeToProduccionEliminada((message) => {
-          if (message.type === 'PRODUCTION_DELETED') {
-            // Recargar la lista cuando se elimina una producción
-            getProduccionesPublicas();
-          }
-        });
-      });
-    };
-
-    connectAndSubscribe();
-
-    return () => {
-      if (unsubscribeState) unsubscribeState();
-      if (unsubscribeCreated) unsubscribeCreated();
-      if (unsubscribeDeleted) unsubscribeDeleted();
-      notificationService.disconnect();
-    };
-  }, [updateProductionStateInList, getProduccionesPublicas]);
+  // Usar el nuevo hook para WebSockets
+  useProductionListSockets({
+    onStateChange: updateProductionStateInList,
+    onCreated: getProduccionesPublicas,
+    onDeleted: getProduccionesPublicas,
+  });
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 
   const handleBack = () => {
-    navigate('/'); // O a donde corresponda volver desde la vista pública
+    navigate('/');
   };
 
   const filteredProducciones = producciones
