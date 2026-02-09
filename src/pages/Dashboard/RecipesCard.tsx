@@ -14,12 +14,18 @@ export const RecetasCard: React.FC = () => {
       icon={<FileTextOutlined style={{ fontSize: '24px', color: 'var(--primary-500)' }} />}
     >
       <Link to="/recetas/nueva" style={{ textDecoration: 'none', width: '100%' }}>
-        <Button style={{ width: '100%' }}>Crear Receta</Button>
+        <Button style={{ width: '100%' }}>Crear Versión de Receta</Button>
       </Link>
 
       <Link to="/recetas" style={{ textDecoration: 'none', width: '100%' }}>
         <Button variant={'secondary'} style={{ width: '100%' }}>
-          Ver Listado de recetas
+          Ver Recetas Base
+        </Button>
+      </Link>
+
+      <Link to="/recetas/versiones" style={{ textDecoration: 'none', width: '100%' }}>
+        <Button variant={'secondary'} style={{ width: '100%' }}>
+          Ver Versiones de Recetas
         </Button>
       </Link>
     </DashboardCard>
