@@ -17,7 +17,7 @@ export const PublicRoute: React.FC<PublicRouteProps> = ({ children }) => {
 
   // Si la carga inicial terminó y el usuario ya está autenticado, redirige al dashboard.
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/inicio" replace />;
   }
 
   // Si la carga inicial terminó y el usuario no está autenticado, muestra la página pública (ej. Login).

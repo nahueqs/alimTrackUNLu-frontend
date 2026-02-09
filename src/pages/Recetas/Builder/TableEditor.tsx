@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Input, Button, Space, Table, Typography } from 'antd';
-import { DeleteOutlined, PlusOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined, ArrowUpOutlined, ArrowDownOutlined, CopyOutlined } from '@ant-design/icons';
 import type { DraftTable } from './types';
 import { TipoDatoCampo } from '../types/TipoDatoCampo';
 import { useIsMobile } from '@/hooks/useIsMobile';
@@ -107,7 +107,12 @@ export const TableEditor: React.FC<TableEditorProps> = ({ table, sectionId }) =>
                   </div>
                 </div>
               }
-              extra={<Button danger icon={<DeleteOutlined />} onClick={() => actions.removeTable(sectionId, table.id)}>{!isMobile && 'Eliminar Tabla'}</Button>}
+              extra={
+                <Space>
+                    <Button icon={<CopyOutlined />} onClick={() => actions.duplicateTable(sectionId, table.id)}>{!isMobile && 'Duplicar'}</Button>
+                    <Button danger icon={<DeleteOutlined />} onClick={() => actions.removeTable(sectionId, table.id)}>{!isMobile && 'Eliminar Tabla'}</Button>
+                </Space>
+              }
               style={{ marginBottom: '8px', background: '#fff', border: '1px solid #d9d9d9' }}
               bodyStyle={{ padding: isMobile ? '8px' : '24px' }}
             >

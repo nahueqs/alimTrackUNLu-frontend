@@ -7,7 +7,7 @@ import { usePageTitle } from '@/hooks/usePageTitle.ts';
 import './DashboardPage.css';
 
 export const DashboardPage: React.FC = () => {
-  usePageTitle('Dashboard');
+  usePageTitle('Inicio');
   const { user } = useAuth();
 
   return (

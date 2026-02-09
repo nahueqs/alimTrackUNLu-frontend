@@ -105,7 +105,7 @@ const DetalleProduccionProtectedPage: React.FC = () => {
           <NotificationSelector
             value={notificationLevel}
             onChange={setNotificationLevel}
-            className=""
+            className="notification-selector-wrapper"
           />
         </div>
 

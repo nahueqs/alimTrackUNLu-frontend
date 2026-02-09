@@ -17,7 +17,7 @@ const LoginPage: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated && user && !loading) {
-      navigate('/dashboard', { replace: true });
+      navigate('/inicio', { replace: true });
     }
   }, [isAuthenticated, user, loading, navigate]);
 

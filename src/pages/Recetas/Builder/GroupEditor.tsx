@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Input, Button, Space, Typography } from 'antd';
-import { DeleteOutlined, PlusOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined, ArrowUpOutlined, ArrowDownOutlined, CopyOutlined } from '@ant-design/icons';
 import type { DraftGroup } from './types';
 import { TipoDatoCampo } from '../types/TipoDatoCampo';
 import { useIsMobile } from '@/hooks/useIsMobile';
@@ -41,7 +41,12 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({ group, sectionId }) =>
                   />
                 </div>
               }
-              extra={<Button danger icon={<DeleteOutlined />} onClick={() => actions.removeGroup(sectionId, group.id)}>{!isMobile && 'Eliminar Grupo'}</Button>}
+              extra={
+                <Space>
+                    <Button icon={<CopyOutlined />} onClick={() => actions.duplicateGroup(sectionId, group.id)}>{!isMobile && 'Duplicar'}</Button>
+                    <Button danger icon={<DeleteOutlined />} onClick={() => actions.removeGroup(sectionId, group.id)}>{!isMobile && 'Eliminar Grupo'}</Button>
+                </Space>
+              }
               style={{ marginBottom: '8px', background: '#f9f9f9', border: '1px solid #d9d9d9' }}
               bodyStyle={{ padding: isMobile ? '8px' : '24px' }}
             >
@@ -63,13 +68,16 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({ group, sectionId }) =>
                                 <Button size="small" type="text" icon={<ArrowDownOutlined />} disabled={idx === group.campos.length - 1} onClick={() => actions.moveGroupField(sectionId, group.id, campo.id, 'down')} />
                             </Space>
                             {isMobile && (
-                                <Button 
-                                    size="small" 
-                                    danger 
-                                    icon={<DeleteOutlined />} 
-                                    onClick={() => actions.removeGroupField(sectionId, group.id, campo.id)} 
-                                    disabled={group.campos.length <= 1} // Deshabilitar si es el último
-                                />
+                                <Space size={2}>
+                                    <Button size="small" icon={<CopyOutlined />} onClick={() => actions.duplicateGroupField(sectionId, group.id, campo.id)} />
+                                    <Button 
+                                        size="small" 
+                                        danger 
+                                        icon={<DeleteOutlined />} 
+                                        onClick={() => actions.removeGroupField(sectionId, group.id, campo.id)} 
+                                        disabled={group.campos.length <= 1} // Deshabilitar si es el último
+                                    />
+                                </Space>
                             )}
                         </div>
                         
@@ -96,13 +104,16 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({ group, sectionId }) =>
                             </select>
                         </div>
                         {!isMobile && (
-                            <Button 
-                                size="small" 
-                                danger 
-                                icon={<DeleteOutlined />} 
-                                onClick={() => actions.removeGroupField(sectionId, group.id, campo.id)} 
-                                disabled={group.campos.length <= 1} // Deshabilitar si es el último
-                            />
+                            <Space size={2}>
+                                <Button size="small" icon={<CopyOutlined />} onClick={() => actions.duplicateGroupField(sectionId, group.id, campo.id)} />
+                                <Button 
+                                    size="small" 
+                                    danger 
+                                    icon={<DeleteOutlined />} 
+                                    onClick={() => actions.removeGroupField(sectionId, group.id, campo.id)} 
+                                    disabled={group.campos.length <= 1} // Deshabilitar si es el último
+                                />
+                            </Space>
                         )}
                       </div>
                     ))}

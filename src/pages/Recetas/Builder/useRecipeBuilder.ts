@@ -77,6 +77,34 @@ export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => 
     setRecipe(prev => ({ ...prev, sections: [...prev.sections, newSection] }));
   }, [recipe.sections.length]);
 
+  const duplicateSection = useCallback((sectionId: string) => {
+    setRecipe(prev => {
+      const sectionToDuplicate = prev.sections.find(s => s.id === sectionId);
+      if (!sectionToDuplicate) return prev;
+
+      const newSection: DraftSection = {
+        ...sectionToDuplicate,
+        id: generateId(),
+        titulo: `${sectionToDuplicate.titulo} (Copia)`,
+        orden: prev.sections.length,
+        campos: sectionToDuplicate.campos.map(c => ({ ...c, id: generateId() })),
+        grupos: sectionToDuplicate.grupos.map(g => ({
+          ...g,
+          id: generateId(),
+          campos: g.campos.map(c => ({ ...c, id: generateId() }))
+        })),
+        tablas: sectionToDuplicate.tablas.map(t => ({
+          ...t,
+          id: generateId(),
+          columnas: t.columnas.map(c => ({ ...c, id: generateId() })),
+          filas: t.filas.map(f => ({ ...f, id: generateId() }))
+        }))
+      };
+
+      return { ...prev, sections: [...prev.sections, newSection] };
+    });
+  }, []);
+
   const updateSection = useCallback((sectionId: string, updates: Partial<DraftSection>) => {
     setRecipe(prev => ({
       ...prev,
@@ -109,6 +137,25 @@ export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => 
           id: generateId(),
           nombre: 'Nuevo Campo',
           tipoDato: TipoDatoCampo.TEXTO,
+          orden: s.campos.length
+        };
+        return { ...s, campos: [...s.campos, newField] };
+      })
+    }));
+  }, []);
+
+  const duplicateField = useCallback((sectionId: string, fieldId: string) => {
+    setRecipe(prev => ({
+      ...prev,
+      sections: prev.sections.map(s => {
+        if (s.id !== sectionId) return s;
+        const fieldToDuplicate = s.campos.find(f => f.id === fieldId);
+        if (!fieldToDuplicate) return s;
+
+        const newField: DraftField = {
+          ...fieldToDuplicate,
+          id: generateId(),
+          nombre: `${fieldToDuplicate.nombre} (Copia)`,
           orden: s.campos.length
         };
         return { ...s, campos: [...s.campos, newField] };
@@ -177,6 +224,26 @@ export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => 
     }));
   }, []);
 
+  const duplicateGroup = useCallback((sectionId: string, groupId: string) => {
+    setRecipe(prev => ({
+      ...prev,
+      sections: prev.sections.map(s => {
+        if (s.id !== sectionId) return s;
+        const groupToDuplicate = s.grupos.find(g => g.id === groupId);
+        if (!groupToDuplicate) return s;
+
+        const newGroup: DraftGroup = {
+          ...groupToDuplicate,
+          id: generateId(),
+          subtitulo: `${groupToDuplicate.subtitulo} (Copia)`,
+          orden: s.grupos.length,
+          campos: groupToDuplicate.campos.map(c => ({ ...c, id: generateId() }))
+        };
+        return { ...s, grupos: [...s.grupos, newGroup] };
+      })
+    }));
+  }, []);
+
   const updateGroup = useCallback((sectionId: string, groupId: string, updates: Partial<DraftGroup>) => {
     setRecipe(prev => ({
       ...prev,
@@ -226,6 +293,31 @@ export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => 
               id: generateId(),
               nombre: 'Campo de Grupo',
               tipoDato: TipoDatoCampo.TEXTO,
+              orden: g.campos.length
+            };
+            return { ...g, campos: [...g.campos, newField] };
+          })
+        };
+      })
+    }));
+  }, []);
+
+  const duplicateGroupField = useCallback((sectionId: string, groupId: string, fieldId: string) => {
+    setRecipe(prev => ({
+      ...prev,
+      sections: prev.sections.map(s => {
+        if (s.id !== sectionId) return s;
+        return {
+          ...s,
+          grupos: s.grupos.map(g => {
+            if (g.id !== groupId) return g;
+            const fieldToDuplicate = g.campos.find(f => f.id === fieldId);
+            if (!fieldToDuplicate) return g;
+
+            const newField: DraftField = {
+              ...fieldToDuplicate,
+              id: generateId(),
+              nombre: `${fieldToDuplicate.nombre} (Copia)`,
               orden: g.campos.length
             };
             return { ...g, campos: [...g.campos, newField] };
@@ -305,6 +397,27 @@ export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => 
           orden: s.tablas.length,
           columnas: [],
           filas: []
+        };
+        return { ...s, tablas: [...s.tablas, newTable] };
+      })
+    }));
+  }, []);
+
+  const duplicateTable = useCallback((sectionId: string, tableId: string) => {
+    setRecipe(prev => ({
+      ...prev,
+      sections: prev.sections.map(s => {
+        if (s.id !== sectionId) return s;
+        const tableToDuplicate = s.tablas.find(t => t.id === tableId);
+        if (!tableToDuplicate) return s;
+
+        const newTable: DraftTable = {
+          ...tableToDuplicate,
+          id: generateId(),
+          nombre: `${tableToDuplicate.nombre} (Copia)`,
+          orden: s.tablas.length,
+          columnas: tableToDuplicate.columnas.map(c => ({ ...c, id: generateId() })),
+          filas: tableToDuplicate.filas.map(f => ({ ...f, id: generateId() }))
         };
         return { ...s, tablas: [...s.tablas, newTable] };
       })
@@ -464,22 +577,27 @@ export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => 
     actions: {
       updateMetadata,
       addSection,
+      duplicateSection,
       updateSection,
       removeSection,
       moveSection,
       addFieldToSection,
+      duplicateField,
       updateField,
       removeField,
       moveField,
       addGroupToSection,
+      duplicateGroup,
       updateGroup,
       removeGroup,
       moveGroup,
       addFieldToGroup,
+      duplicateGroupField,
       updateGroupField,
       removeGroupField,
       moveGroupField,
       addTableToSection,
+      duplicateTable,
       updateTable,
       removeTable,
       moveTable,

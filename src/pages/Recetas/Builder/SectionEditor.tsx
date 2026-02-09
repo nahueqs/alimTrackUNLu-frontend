@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Input, Button, Space, Typography, Divider } from 'antd';
-import { DeleteOutlined, PlusOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined, ArrowUpOutlined, ArrowDownOutlined, CopyOutlined } from '@ant-design/icons';
 import type { DraftSection } from './types';
 import { TipoDatoCampo } from '../types/TipoDatoCampo';
 import { GroupEditor } from './GroupEditor';
@@ -35,6 +35,7 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({ section }) => {
         <Space size={isMobile ? 4 : 8}>
             <Button icon={<ArrowUpOutlined />} onClick={() => actions.moveSection(section.id, 'up')} />
             <Button icon={<ArrowDownOutlined />} onClick={() => actions.moveSection(section.id, 'down')} />
+            <Button icon={<CopyOutlined />} onClick={() => actions.duplicateSection(section.id)}>{!isMobile && 'Duplicar'}</Button>
             <Button danger icon={<DeleteOutlined />} onClick={() => actions.removeSection(section.id)}>{!isMobile && 'Eliminar'}</Button>
         </Space>
       }
@@ -58,7 +59,12 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({ section }) => {
                                 <Button size="small" type="text" icon={<ArrowUpOutlined />} disabled={index === 0} onClick={() => actions.moveField(section.id, campo.id, 'up')} />
                                 <Button size="small" type="text" icon={<ArrowDownOutlined />} disabled={index === section.campos.length - 1} onClick={() => actions.moveField(section.id, campo.id, 'down')} />
                             </Space>
-                            {isMobile && <Button danger icon={<DeleteOutlined />} onClick={() => actions.removeField(section.id, campo.id)} />}
+                            {isMobile && (
+                                <Space size={2}>
+                                    <Button size="small" icon={<CopyOutlined />} onClick={() => actions.duplicateField(section.id, campo.id)} />
+                                    <Button danger icon={<DeleteOutlined />} onClick={() => actions.removeField(section.id, campo.id)} />
+                                </Space>
+                            )}
                         </div>
                         
                         <Input 
@@ -80,7 +86,12 @@ export const SectionEditor: React.FC<SectionEditorProps> = ({ section }) => {
                                 ))}
                             </select>
                         </div>
-                        {!isMobile && <Button danger icon={<DeleteOutlined />} onClick={() => actions.removeField(section.id, campo.id)} />}
+                        {!isMobile && (
+                            <Space size={2}>
+                                <Button icon={<CopyOutlined />} onClick={() => actions.duplicateField(section.id, campo.id)} />
+                                <Button danger icon={<DeleteOutlined />} onClick={() => actions.removeField(section.id, campo.id)} />
+                            </Space>
+                        )}
                     </div>
                 ))}
             </div>

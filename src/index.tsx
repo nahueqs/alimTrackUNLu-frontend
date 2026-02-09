@@ -50,7 +50,7 @@ export const routes: RouteObject[] = [
 
   // --- Rutas Protegidas ---
   {
-    path: '/dashboard',
+    path: '/inicio',
     element: (
       <ProtectedRoute>
         <DashboardPage />
@@ -140,11 +140,11 @@ export const routes: RouteObject[] = [
   // --- Redirecciones ---
   {
     path: '/',
-    element: <Navigate to="/dashboard" replace />,
+    element: <Navigate to="/inicio" replace />,
   },
   {
     path: '*',
-    element: <Navigate to="/dashboard" replace />,
+    element: <Navigate to="/inicio" replace />,
   },
 ];
 

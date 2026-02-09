@@ -123,4 +123,29 @@ describe('RecipeBuilderPage - Integración y Flujos', () => {
       expect(screen.getByDisplayValue('Campo de Plantilla')).toBeInTheDocument();
     });
   });
+
+  it('Permite duplicar una sección', async () => {
+    const user = userEvent.setup();
+    renderWithAuth(<RecipeBuilderPage />);
+    await waitFor(() => expect(screen.queryByText('Verificando sesión...')).not.toBeInTheDocument());
+
+    // Agregar una sección
+    await user.click(screen.getByRole('button', { name: /agregar sección/i }));
+    
+    // Escribir nombre en la sección
+    const sectionInput = screen.getByPlaceholderText('Ingrese el título de la sección');
+    await user.clear(sectionInput);
+    await user.type(sectionInput, 'Sección Original');
+
+    // Duplicar la sección (botón con icono CopyOutlined)
+    // Buscamos el botón dentro del card de la sección
+    const duplicateButtons = screen.getAllByRole('button', { name: /duplicar/i });
+    // El primero debería ser el de la sección (si no hay otros elementos duplicables aún)
+    await user.click(duplicateButtons[0]);
+
+    // Verificar que aparece la copia
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('Sección Original (Copia)')).toBeInTheDocument();
+    });
+  });
 });

@@ -21,7 +21,7 @@ export const AppHeader: React.FC<HeaderProps> = ({
   const headerRef = useRef<HTMLElement>(null);
 
   // Determinar el destino del logo según la variante
-  const logoDestination = variant === 'protected' ? '/dashboard' : '/public/producciones';
+  const logoDestination = variant === 'protected' ? '/inicio' : '/public/producciones';
 
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -42,8 +42,8 @@ export const AppHeader: React.FC<HeaderProps> = ({
 
   const renderProtectedNav = () => (
     <>
-      <Link className="header__nav-link" to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
-        Dashboard
+      <Link className="header__nav-link" to="/inicio" onClick={() => setIsMobileMenuOpen(false)}>
+        Inicio
       </Link>
       <Link className="header__nav-link" to="/producciones" onClick={() => setIsMobileMenuOpen(false)}>
         Producciones
@@ -90,10 +90,10 @@ export const AppHeader: React.FC<HeaderProps> = ({
     <Button 
       type="primary" 
       icon={isAuthenticated ? <LayoutDashboardIcon size={16} /> : <LogInIcon size={16} />}
-      onClick={() => handleNavigation(isAuthenticated ? '/dashboard' : '/login')}
+      onClick={() => handleNavigation(isAuthenticated ? '/inicio' : '/login')}
       className="header__action-btn"
     >
-      {isAuthenticated ? 'Ir al Dashboard' : 'Iniciar Sesión'}
+      {isAuthenticated ? 'Ir al Inicio' : 'Iniciar Sesión'}
     </Button>
   );
 
@@ -141,8 +141,8 @@ export const AppHeader: React.FC<HeaderProps> = ({
         {variant === 'protected' ? (
           // Menú Móvil Protegido
           <>
-            <Link className="header__dropdown-item" to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
-              Dashboard
+            <Link className="header__dropdown-item" to="/inicio" onClick={() => setIsMobileMenuOpen(false)}>
+              Inicio
             </Link>
             <Link className="header__dropdown-item" to="/producciones" onClick={() => setIsMobileMenuOpen(false)}>
               Producciones
@@ -178,11 +178,11 @@ export const AppHeader: React.FC<HeaderProps> = ({
             <hr className="header__separator" />
             <a 
               className="header__dropdown-item" 
-              onClick={() => handleNavigation(isAuthenticated ? '/dashboard' : '/login')}
+              onClick={() => handleNavigation(isAuthenticated ? '/inicio' : '/login')}
               style={{ color: 'var(--primary-500)', fontWeight: 600 }}
             >
               {isAuthenticated ? <LayoutDashboardIcon size={16} style={{ marginRight: 8 }} /> : <LogInIcon size={16} style={{ marginRight: 8 }} />}
-              {isAuthenticated ? 'Ir al Dashboard' : 'Iniciar Sesión'}
+              {isAuthenticated ? 'Ir al Inicio' : 'Iniciar Sesión'}
             </a>
           </>
         )}

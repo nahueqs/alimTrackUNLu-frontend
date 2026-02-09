@@ -161,7 +161,7 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
   };
 
   const handleBack = () => {
-    navigate('/dashboard');
+    navigate('/inicio');
   };
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -185,7 +185,7 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
         <div className="productions-list__header">
           <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <UiButton icon={<ArrowLeftIcon />} onClick={handleBack} variant={'secondary'} style={{ alignSelf: 'flex-start' }}>
-              Volver al Dashboard
+              Volver al Inicio
             </UiButton>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '1rem' }}>
               <h1 className="productions-list__title">Listado de Producciones</h1>

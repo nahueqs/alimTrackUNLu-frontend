@@ -68,7 +68,7 @@ export const RecetasPadrePage: React.FC = () => {
   };
 
   const handleBack = () => {
-    navigate('/dashboard');
+    navigate('/inicio');
   };
 
   const filteredRecetas = recetas.filter(
@@ -88,7 +88,7 @@ export const RecetasPadrePage: React.FC = () => {
       <main className="dashboard__main container">
         <div className="productions-list__header" style={{ marginTop: '1.5rem', flexDirection: 'column', alignItems: 'flex-start', gap: '1rem' }}>
           <Button icon={<ArrowLeftIcon />} onClick={handleBack} variant={'secondary'}>
-            Volver al Dashboard
+            Volver al Inicio
           </Button>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '1rem' }}>
             <h1 className="productions-list__title">Recetas Base</h1>

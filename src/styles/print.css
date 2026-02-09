@@ -7,7 +7,12 @@
     .ant-btn, /* Oculta todos los botones, incluido el de imprimir */
     .ant-message,
     .ant-modal-root,
-    .ant-drawer-root {
+    .ant-drawer-root,
+    /* Ocultar elementos específicos del dashboard o navegación */
+    .dashboard__main > *:not(.production-detail-container),
+    .productions-list__header,
+    .dashboard__welcome,
+    .app-header {
         display: none !important;
     }
 
@@ -25,10 +30,22 @@
     }
 
     /* --- 3. Layout Optimizado --- */
+    .dashboard {
+        background-color: white !important;
+        min-height: auto !important;
+    }
+
+    .dashboard__main {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+    }
+
     .production-detail-container {
         padding: 0 !important;
         margin: 0 !important;
         max-width: 100% !important;
+        display: block !important; /* Asegurar que se muestre */
     }
 
     #production-content {
