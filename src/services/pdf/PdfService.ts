@@ -145,8 +145,8 @@ export const pdfService = {
   },
 
   buildFieldsGrid(campos: CampoSimpleResponseDTO[], respuestasMap: Record<number, string>) {
-    const columns: any[] = [];
-    let currentRow: any[] = [];
+    const rows: any[] = [];
+    let currentRowFields: { campo: CampoSimpleResponseDTO, displayValue: string }[] = [];
 
     campos.forEach((campo, i) => {
       const valor = respuestasMap[campo.id] || '-';
@@ -180,22 +180,41 @@ export const pdfService = {
           }
       }
 
-      currentRow.push({
-        stack: [
-          { text: campo.nombre, style: 'label', fontSize: 9 },
-          { text: displayValue, style: 'value', fontSize: 10 }
-        ],
-        margin: [0, 0, 10, 5]
-      });
+      currentRowFields.push({ campo, displayValue });
 
       // Cada 3 campos, nueva fila (o si es el último)
-      if (currentRow.length === 3 || i === campos.length - 1) {
-        columns.push({ columns: currentRow, columnGap: 10 });
-        currentRow = [];
+      if (currentRowFields.length === 3 || i === campos.length - 1) {
+        // Determinar si hay campos de texto en esta fila
+        const hasText = currentRowFields.some(f => f.campo.tipoDato === TipoDatoCampo.TEXTO);
+        
+        const columns = currentRowFields.map(f => {
+            let width: any = '*'; // Por defecto, ancho igual
+            
+            // Si hay campos de texto, priorizarlos
+            if (hasText) {
+                if (f.campo.tipoDato === TipoDatoCampo.TEXTO) {
+                    width = '*'; // Texto ocupa espacio disponible
+                } else {
+                    width = 'auto'; // Otros se ajustan al contenido
+                }
+            }
+            
+            return {
+                width: width,
+                stack: [
+                    { text: f.campo.nombre, style: 'label', fontSize: 9 },
+                    { text: f.displayValue, style: 'value', fontSize: 10 }
+                ],
+                margin: [0, 0, 10, 5]
+            };
+        });
+
+        rows.push({ columns: columns, columnGap: 10 });
+        currentRowFields = [];
       }
     });
 
-    return { stack: columns, margin: [0, 5, 0, 5] };
+    return { stack: rows, margin: [0, 5, 0, 5] };
   },
 
   buildTable(tabla: TablaResponseDTO, respuestasTablas: any[]) {
