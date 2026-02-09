@@ -35,12 +35,6 @@ export const getRecetasPadreColumns = ({
       responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {
-      title: 'Creador',
-      dataIndex: 'emailCreador',
-      key: 'emailCreador',
-      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
-    },
-    {
       title: 'Fecha Creación',
       dataIndex: 'fechaCreacion',
       key: 'fechaCreacion',
