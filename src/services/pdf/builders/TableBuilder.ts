@@ -3,7 +3,6 @@ import { TipoDatoCampo } from '@/pages/Recetas/types/TipoDatoCampo';
 import { PDF_CONFIG } from '../config';
 import { TableWidthCalculator } from '../calculators/TableWidthCalculator';
 import { ValueFormatter } from '../formatters';
-import dayjs from 'dayjs';
 
 export class TableBuilder {
   constructor(
@@ -13,7 +12,13 @@ export class TableBuilder {
 
   build(tabla: TablaResponseDTO, respuestasTablas: any[]) {
     const numColumnas = (tabla.columnas?.length || 0) + 1;
-    const fontSize = this.calculateFontSize(numColumnas);
+    
+    // Detectar si hay columnas de texto para ajustar el tamaño de fuente
+    const hasLongText = tabla.columnas?.some(col => 
+      col.tipoDato === TipoDatoCampo.TEXTO
+    ) ?? false;
+
+    const fontSize = this.calculateFontSize(numColumnas, hasLongText);
     
     return {
       table: {
@@ -27,9 +32,12 @@ export class TableBuilder {
     };
   }
 
-  private calculateFontSize(numColumnas: number): number {
+  private calculateFontSize(numColumnas: number, hasLongText: boolean): number {
+    if (numColumnas > 6) {
+        // Si hay muchas columnas y texto largo, reducir más la fuente
+        return hasLongText ? 6 : 8;
+    }
     if (numColumnas > 10) return 7;
-    if (numColumnas > 6) return 8;
     return this.config.fonts.tableCell;
   }
 

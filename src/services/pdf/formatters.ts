@@ -3,41 +3,43 @@ import dayjs from 'dayjs';
 import { PDF_CONFIG } from './config';
 
 /**
- * Inserta oportunidades de wrapping en texto continuo sin espacios
- * Agrega zero-width space (U+200B) cada N caracteres para permitir line breaks
+ * Envuelve texto largo insertando saltos de línea cada N caracteres.
+ * Prioriza cortar en espacios cuando existen, evitando partir palabras.
+ * 
+ * @param text - Texto a envolver
+ * @param maxCharsPerLine - Máximo de caracteres por línea antes de insertar salto
+ * @returns Texto con saltos de línea insertados
  */
-function insertSoftBreaks(text: string, maxCharsBeforeBreak: number = PDF_CONFIG.layout.maxCharsBeforeBreak): string {
-  if (!text || text.length <= maxCharsBeforeBreak) return text;
+function wrapLongText(text: string, maxCharsPerLine: number = PDF_CONFIG.layout.maxCharsBeforeBreak): string {
+  if (!text || text.length <= maxCharsPerLine) return text;
   
-  // Si ya tiene espacios frecuentes, no es necesario
-  const avgWordLength = text.split(/\s+/).reduce((acc, word) => acc + word.length, 0) / Math.max(1, text.split(/\s+/).length);
-  if (avgWordLength < maxCharsBeforeBreak) return text;
+  const result: string[] = [];
+  let remaining = text;
   
-  // Insertar zero-width space cada maxCharsBeforeBreak caracteres
-  const ZERO_WIDTH_SPACE = '\u200B';
-  let result = '';
-  let charCount = 0;
-  
-  for (let i = 0; i < text.length; i++) {
-    result += text[i];
-    charCount++;
-    
-    // Insertar break point si:
-    // 1. Hemos alcanzado el límite de caracteres
-    // 2. No es el último carácter
-    // 3. El siguiente carácter no es un espacio (para evitar duplicados)
-    if (charCount >= maxCharsBeforeBreak && i < text.length - 1 && text[i + 1] !== ' ') {
-      result += ZERO_WIDTH_SPACE;
-      charCount = 0;
+  while (remaining.length > 0) {
+    // Si lo que queda es menor al límite, agregarlo y terminar
+    if (remaining.length <= maxCharsPerLine) {
+      result.push(remaining);
+      break;
     }
     
-    // Resetear contador en espacios naturales
-    if (text[i] === ' ') {
-      charCount = 0;
+    // Tomar un chunk del tamaño máximo
+    const chunk = remaining.substring(0, maxCharsPerLine);
+    const lastSpaceIndex = chunk.lastIndexOf(' ');
+    
+    // Si hay un espacio en la segunda mitad del chunk, cortar ahí para no partir palabras
+    if (lastSpaceIndex > maxCharsPerLine * 0.5) {
+      result.push(remaining.substring(0, lastSpaceIndex));
+      remaining = remaining.substring(lastSpaceIndex + 1);
+    } else {
+      // Si no hay espacios cercanos, cortar forzosamente en el límite
+      result.push(chunk);
+      remaining = remaining.substring(maxCharsPerLine);
     }
   }
   
-  return result;
+  // Unir con saltos de línea reales que pdfmake respeta
+  return result.join('\n');
 }
 
 export class ValueFormatter {
@@ -82,6 +84,7 @@ export class ValueFormatter {
   }
 
   private static formatText(valor: string): string {
-    return insertSoftBreaks(valor);
+    // Usar wrapLongText en lugar de insertSoftBreaks
+    return wrapLongText(valor);
   }
 }
