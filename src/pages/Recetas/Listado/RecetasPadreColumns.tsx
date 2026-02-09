@@ -32,20 +32,20 @@ export const getRecetasPadreColumns = ({
       dataIndex: 'descripcion',
       key: 'descripcion',
       render: (text: string | undefined) => text || '-',
-      responsive: ['sm', 'md', 'lg', 'xl'],
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {
       title: 'Creador',
       dataIndex: 'emailCreador',
       key: 'emailCreador',
-      responsive: ['md', 'lg', 'xl'],
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {
       title: 'Fecha Creación',
       dataIndex: 'fechaCreacion',
       key: 'fechaCreacion',
       render: (date: string | undefined) => formatDate(date),
-      responsive: ['lg', 'xl'],
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {
       title: <span className="actions-title-text">Acciones</span>,
@@ -56,8 +56,6 @@ export const getRecetasPadreColumns = ({
       render: (_, record) => (
         <CustomTableRowActions<RecetaMetadataResponseDTO>
           record={record}
-          // Por ahora no hay vista de detalle de receta padre, solo listado de versiones
-          // viewPath={(r) => `/recetas/${r.codigoReceta}/versiones`} 
           onDelete={onDelete}
           getRecordId={(r) => r.codigoReceta}
           isMobile={isMobile}
