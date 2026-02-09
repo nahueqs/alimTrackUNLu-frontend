@@ -81,7 +81,7 @@ export const RecetasPadrePage: React.FC = () => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '1rem' }}>
             <h1 className="productions-list__title">Recetas Base</h1>
             <Button icon={<PlusIcon />} onClick={() => setIsModalOpen(true)}>
-              Nueva Receta
+              Nueva Receta Base
             </Button>
           </div>
         </div>
