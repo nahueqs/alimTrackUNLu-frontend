@@ -1,6 +1,11 @@
 import type { DraftRecipe } from './types';
 
 export const validateRecipeStructure = (recipe: DraftRecipe): string | null => {
+  // 0. Validar que haya al menos una sección
+  if (recipe.sections.length === 0) {
+    return "La receta debe tener al menos una sección.";
+  }
+
   // 1. Validar unicidad de nombres de secciones y longitud
   const sectionTitles = recipe.sections.map(s => s.titulo.trim());
   const uniqueSectionTitles = new Set(sectionTitles.map(t => t.toLowerCase()));
@@ -16,6 +21,16 @@ export const validateRecipeStructure = (recipe: DraftRecipe): string | null => {
   }
 
   for (const section of recipe.sections) {
+    // Validar que la sección tenga contenido (al menos un campo, grupo o tabla)
+    const hasContent = 
+        section.campos.length > 0 || 
+        section.grupos.length > 0 || 
+        section.tablas.length > 0;
+
+    if (!hasContent) {
+        return `La sección "${section.titulo}" está vacía. Debe agregar al menos un campo, grupo o tabla.`;
+    }
+
     // 2. Validar campos simples
     const fieldNames = section.campos.map(f => f.nombre.trim());
     const uniqueFieldNames = new Set(fieldNames.map(n => n.toLowerCase()));
@@ -57,6 +72,11 @@ export const validateRecipeStructure = (recipe: DraftRecipe): string | null => {
 
     // 5. Validar campos dentro de grupos
     for (const group of section.grupos) {
+      // Validar que el grupo tenga al menos un campo
+      if (group.campos.length === 0) {
+          return `En el grupo "${group.subtitulo}" (Sección "${section.titulo}"), debe haber al menos un campo.`;
+      }
+
       const groupFieldNames = group.campos.map(f => f.nombre.trim());
       const uniqueGroupFieldNames = new Set(groupFieldNames.map(n => n.toLowerCase()));
       
@@ -72,6 +92,14 @@ export const validateRecipeStructure = (recipe: DraftRecipe): string | null => {
 
     // 6. Validar filas y columnas en tablas
     for (const table of section.tablas) {
+      // Validar estructura mínima de tabla
+      if (table.columnas.length === 0) {
+          return `La tabla "${table.nombre}" (Sección "${section.titulo}") debe tener al menos una columna.`;
+      }
+      if (table.filas.length === 0) {
+          return `La tabla "${table.nombre}" (Sección "${section.titulo}") debe tener al menos una fila.`;
+      }
+
       // Columnas
       const colNames = table.columnas.map(c => c.nombre.trim());
       const uniqueColNames = new Set(colNames.map(n => n.toLowerCase()));
