@@ -9,6 +9,7 @@ import DetalleProduccionPublicPage from '@/pages/Public/Detalle/DetalleProduccio
 import DetalleProduccionProtectedPage from '@/pages/Producciones/Detalle/DetalleProduccionProtectedPage.tsx';
 import { ListadoProducciones } from '@/pages/Public/ListadoPublic/ListadoProducciones.tsx';
 import { VersionRecetasPage } from '@/pages/Recetas/Listado/VersionRecetasPage.tsx';
+import { RecetasPadrePage } from '@/pages/Recetas/Listado/RecetasPadrePage.tsx';
 import { VisualizarRecetaPage } from '@/pages/Recetas/Detalle/VisualizarRecetaPage.tsx';
 import { RecipeBuilderPage } from '@/pages/Recetas/Builder/RecipeBuilderPage.tsx';
 import { ProductionState } from '@/constants/ProductionStates';
@@ -104,6 +105,14 @@ export const routes: RouteObject[] = [
     ),
   },
   // Rutas de Recetas (Ordenadas de más específica a más genérica)
+  {
+    path: '/recetas',
+    element: (
+      <ProtectedRoute>
+        <RecetasPadrePage />
+      </ProtectedRoute>
+    ),
+  },
   {
     path: '/recetas/nueva',
     element: (

@@ -17,7 +17,7 @@ export const RecetasCard: React.FC = () => {
         <Button style={{ width: '100%' }}>Crear Receta</Button>
       </Link>
 
-      <Link to="/recetas/versiones" style={{ textDecoration: 'none', width: '100%' }}>
+      <Link to="/recetas" style={{ textDecoration: 'none', width: '100%' }}>
         <Button variant={'secondary'} style={{ width: '100%' }}>
           Ver Listado de recetas
         </Button>
