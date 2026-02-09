@@ -62,7 +62,15 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({ group, sectionId }) =>
                                 <Button size="small" type="text" icon={<ArrowUpOutlined />} disabled={idx === 0} onClick={() => actions.moveGroupField(sectionId, group.id, campo.id, 'up')} />
                                 <Button size="small" type="text" icon={<ArrowDownOutlined />} disabled={idx === group.campos.length - 1} onClick={() => actions.moveGroupField(sectionId, group.id, campo.id, 'down')} />
                             </Space>
-                            {isMobile && <Button size="small" danger icon={<DeleteOutlined />} onClick={() => actions.removeGroupField(sectionId, group.id, campo.id)} />}
+                            {isMobile && (
+                                <Button 
+                                    size="small" 
+                                    danger 
+                                    icon={<DeleteOutlined />} 
+                                    onClick={() => actions.removeGroupField(sectionId, group.id, campo.id)} 
+                                    disabled={group.campos.length <= 1} // Deshabilitar si es el último
+                                />
+                            )}
                         </div>
                         
                         <Input
@@ -87,7 +95,15 @@ export const GroupEditor: React.FC<GroupEditorProps> = ({ group, sectionId }) =>
                               ))}
                             </select>
                         </div>
-                        {!isMobile && <Button size="small" danger icon={<DeleteOutlined />} onClick={() => actions.removeGroupField(sectionId, group.id, campo.id)} />}
+                        {!isMobile && (
+                            <Button 
+                                size="small" 
+                                danger 
+                                icon={<DeleteOutlined />} 
+                                onClick={() => actions.removeGroupField(sectionId, group.id, campo.id)} 
+                                disabled={group.campos.length <= 1} // Deshabilitar si es el último
+                            />
+                        )}
                       </div>
                     ))}
                   </div>

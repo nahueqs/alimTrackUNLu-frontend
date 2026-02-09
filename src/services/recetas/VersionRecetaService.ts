@@ -50,6 +50,16 @@ class VersionRecetaService {
         data
     );
   }
+
+  /**
+   * Elimina una versión de receta por su código.
+   */
+  async deleteVersion(codigoVersion: string): Promise<void> {
+    if (!codigoVersion) {
+      throw new Error('El código de versión es requerido.');
+    }
+    return apiClient.delete<void>(`/versiones-receta/${encodeURIComponent(codigoVersion)}`);
+  }
 }
 
 export const versionRecetaService = new VersionRecetaService();

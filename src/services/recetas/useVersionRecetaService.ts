@@ -16,6 +16,7 @@ interface UseVersionRecetaReturn {
   getByCodigoVersion: (codigoVersion: string) => Promise<void>;
   getEstructuraCompleta: (codigoVersion: string) => Promise<void>;
   createVersion: (data: VersionRecetaLlenaCreateDTO) => Promise<VersionRecetaMetadataResponseDTO>;
+  deleteVersion: (codigoVersion: string) => Promise<void>;
 }
 
 export const useVersionRecetaService = (): UseVersionRecetaReturn => {
@@ -82,6 +83,22 @@ export const useVersionRecetaService = (): UseVersionRecetaReturn => {
     }
   }, []);
 
+  const deleteVersion = useCallback(async (codigoVersion: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await versionRecetaService.deleteVersion(codigoVersion);
+      // Actualizamos el estado local eliminando la versión
+      setVersiones((prev) => prev.filter((v) => v.codigoVersionReceta !== codigoVersion));
+    } catch (err: any) {
+      const errorMessage = err.message || 'Error al eliminar la versión de receta.';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     loading,
     error,
@@ -92,5 +109,6 @@ export const useVersionRecetaService = (): UseVersionRecetaReturn => {
     getByCodigoVersion,
     getEstructuraCompleta,
     createVersion,
+    deleteVersion,
   };
 };

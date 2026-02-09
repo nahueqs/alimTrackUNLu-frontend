@@ -26,6 +26,14 @@ export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => 
 
   // --- Validation Logic ---
   const validateRecipe = useCallback((): string | null => {
+    // Validación adicional para grupos vacíos
+    for (const section of recipe.sections) {
+      for (const group of section.grupos) {
+        if (group.campos.length === 0) {
+          return `El grupo "${group.subtitulo}" en la sección "${section.titulo}" debe tener al menos un campo.`;
+        }
+      }
+    }
     return validateRecipeStructure(recipe);
   }, [recipe]);
 
@@ -141,11 +149,20 @@ export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => 
       ...prev,
       sections: prev.sections.map(s => {
         if (s.id !== sectionId) return s;
+        
+        // Crear campo por defecto
+        const defaultField: DraftField = {
+          id: generateId(),
+          nombre: 'Campo 1',
+          tipoDato: TipoDatoCampo.TEXTO,
+          orden: 0
+        };
+
         const newGroup: DraftGroup = {
           id: generateId(),
           subtitulo: 'Nuevo Grupo',
           orden: s.grupos.length,
-          campos: []
+          campos: [defaultField] // Inicializar con un campo
         };
         return { ...s, grupos: [...s.grupos, newGroup] };
       })
@@ -238,6 +255,10 @@ export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => 
           ...s,
           grupos: s.grupos.map(g => {
             if (g.id !== groupId) return g;
+            // Validar que no sea el último campo
+            if (g.campos.length <= 1) {
+              return g; // No hacer nada si es el último
+            }
             return { ...g, campos: g.campos.filter(f => f.id !== fieldId) };
           })
         };

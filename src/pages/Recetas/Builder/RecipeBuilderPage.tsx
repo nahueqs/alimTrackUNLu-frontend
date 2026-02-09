@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Button, Layout, Space, Typography, message, Spin } from 'antd';
+import { Button, Layout, Space, Typography, message, Spin, Modal } from 'antd';
 import { SaveOutlined, ArrowLeftOutlined, PlusOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useRecipeBuilder } from './useRecipeBuilder';
@@ -68,6 +68,40 @@ export const RecipeBuilderPage: React.FC = () => {
       navigate('/recetas/versiones');
     } catch (error: any) {
       console.error('Error al crear receta:', error);
+      
+      // Manejo mejorado de errores
+      if (error.response && error.response.data) {
+          const { data, status } = error.response;
+          
+          // Caso 1: Errores de validación (400) con lista de errores
+          if (status === 400 && data.errors && Array.isArray(data.errors)) {
+              Modal.error({
+                  title: 'Error de Validación',
+                  content: (
+                      <ul>
+                          {data.errors.map((err: string, i: number) => (
+                              <li key={i}>{err}</li>
+                          ))}
+                      </ul>
+                  ),
+              });
+              return;
+          }
+          
+          // Caso 2: Conflicto (409) - Mensaje específico
+          if (status === 409) {
+              message.error(data.message || 'Ya existe una versión con ese código.');
+              return;
+          }
+
+          // Caso 3: Mensaje directo del backend
+          if (data.message) {
+              message.error(data.message);
+              return;
+          }
+      }
+
+      // Fallback genérico
       message.error(error.message || 'Error al crear la receta');
     }
   };

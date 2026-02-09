@@ -7,11 +7,12 @@ import { useVersionRecetaService } from '@/services/recetas/useVersionRecetaServ
 import { useIsMobile } from '@/hooks/useIsMobile.ts';
 import { usePageTitle } from '@/hooks/usePageTitle.ts';
 import { Button } from '@/components/ui';
-import { ArrowLeftIcon } from 'lucide-react';
+import { ArrowLeftIcon, PlusIcon } from 'lucide-react';
+import { message, Modal } from 'antd';
 
 export const VersionRecetasPage: React.FC = () => {
   usePageTitle('Versiones de Recetas');
-  const { versiones, loading, error, getAllVersiones } = useVersionRecetaService();
+  const { versiones, loading, error, getAllVersiones, deleteVersion } = useVersionRecetaService();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,9 +21,23 @@ export const VersionRecetasPage: React.FC = () => {
     getAllVersiones();
   }, [getAllVersiones]);
 
-  const handleDelete = (id: string) => {
-    console.log('Eliminar versión', id);
-    // Implementar lógica de eliminación
+  const handleDelete = (codigoVersion: string) => {
+    Modal.confirm({
+      title: '¿Estás seguro de eliminar esta versión?',
+      content: `Se eliminará la versión con código: ${codigoVersion}. Esta acción no se puede deshacer.`,
+      okText: 'Sí, eliminar',
+      okType: 'danger',
+      cancelText: 'Cancelar',
+      onOk: async () => {
+        try {
+          await deleteVersion(codigoVersion);
+          message.success(`Versión ${codigoVersion} eliminada exitosamente`);
+        } catch (err: any) {
+          console.error('Error al eliminar versión:', err);
+          message.error(err.message || 'Error al eliminar la versión');
+        }
+      },
+    });
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,6 +46,10 @@ export const VersionRecetasPage: React.FC = () => {
 
   const handleBack = () => {
     navigate('/dashboard');
+  };
+
+  const handleCreate = () => {
+    navigate('/recetas/nueva');
   };
 
   const filteredVersiones = versiones.filter(
@@ -53,8 +72,12 @@ export const VersionRecetasPage: React.FC = () => {
           <Button icon={<ArrowLeftIcon />} onClick={handleBack} variant={'secondary'}>
             Volver al Dashboard
           </Button>
-          <h1 className="productions-list__title">Versiones de Recetas</h1>
-          {/* Aquí podrías agregar un botón de "Nueva Versión" si fuera necesario */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '1rem' }}>
+            <h1 className="productions-list__title">Versiones de Recetas</h1>
+            <Button icon={<PlusIcon />} onClick={handleCreate}>
+              Crear Receta
+            </Button>
+          </div>
         </div>
 
         {/* Barra de búsqueda simple */}
