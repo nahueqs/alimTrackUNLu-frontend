@@ -9,7 +9,7 @@ import { useAuth } from '@/context/auth/AuthProvider';
 import { useRecetaPadreService } from '@/services/recetas/useRecetaPadreService';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { RecipeBuilderProvider } from './RecipeBuilderContext';
-import { useRecipeSave } from './hooks/useRecipeSave.tsx'; // Importación explícita
+import { useRecipeSave } from './hooks/useRecipeSave.tsx';
 import { RecipeBuilderHeader } from './components/RecipeBuilderHeader';
 import { SectionList } from './components/SectionList';
 
@@ -20,7 +20,7 @@ export const RecipeBuilderPage: React.FC = () => {
   usePageTitle('Nueva Receta');
   const { user } = useAuth();
   const recipeBuilder = useRecipeBuilder();
-  const { recipe, actions } = recipeBuilder;
+  const { recipe, actions, loadDraft } = recipeBuilder; // Obtenemos loadDraft
   
   const { handleSave, loading: loadingSave } = useRecipeSave(recipeBuilder);
   const { recetas, loading: loadingRecetas, getAllRecetas, createReceta } = useRecetaPadreService();
@@ -47,7 +47,11 @@ export const RecipeBuilderPage: React.FC = () => {
         <AppHeader title="AlimTrack" />
         <Content style={{ padding: isMobile ? '16px' : '24px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
           
-          <RecipeBuilderHeader onSave={handleSave} loading={loadingSave} />
+          <RecipeBuilderHeader 
+            onSave={handleSave} 
+            loading={loadingSave} 
+            onLoadTemplate={loadDraft} // Pasamos la acción
+          />
 
           <MetadataEditor 
             metadata={recipe.metadata} 

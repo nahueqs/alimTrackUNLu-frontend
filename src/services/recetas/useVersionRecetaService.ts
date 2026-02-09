@@ -14,7 +14,7 @@ interface UseVersionRecetaReturn {
   estructura: EstructuraProduccionDTO | null;
   getAllVersiones: () => Promise<void>;
   getByCodigoVersion: (codigoVersion: string) => Promise<void>;
-  getEstructuraCompleta: (codigoVersion: string) => Promise<void>;
+  getEstructuraCompleta: (codigoVersion: string) => Promise<EstructuraProduccionDTO | null>; // Modificado retorno
   createVersion: (data: VersionRecetaLlenaCreateDTO) => Promise<VersionRecetaMetadataResponseDTO>;
   deleteVersion: (codigoVersion: string) => Promise<void>;
 }
@@ -60,9 +60,11 @@ export const useVersionRecetaService = (): UseVersionRecetaReturn => {
     try {
       const response = await versionRecetaService.getEstructuraCompleta(codigoVersion);
       setEstructura(response);
+      return response; // Devolvemos la respuesta
     } catch (err: any) {
       setError(err.message || 'Error al obtener la estructura de la receta.');
       setEstructura(null);
+      return null;
     } finally {
       setLoading(false);
     }

@@ -27,6 +27,11 @@ export type UseRecipeBuilderReturn = ReturnType<typeof useRecipeBuilder>;
 export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => {
   const [recipe, setRecipe] = useState<DraftRecipe>(initialState);
 
+  // Nueva acción para cargar un borrador completo
+  const loadDraft = useCallback((newDraft: DraftRecipe) => {
+    setRecipe(newDraft);
+  }, []);
+
   // --- Validation Logic ---
   const validateRecipe = useCallback((): string | null => {
     // Validación adicional para grupos vacíos
@@ -322,10 +327,7 @@ export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => 
   const removeTable = useCallback((sectionId: string, tableId: string) => {
     setRecipe(prev => ({
       ...prev,
-      sections: prev.sections.map(s => {
-        if (s.id !== sectionId) return s;
-        return { ...s, tablas: s.tablas.filter(t => t.id !== tableId) };
-      })
+      sections: prev.sections.filter(s => s.id !== sectionId)
     }));
   }, []);
 
@@ -458,6 +460,7 @@ export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => 
   return {
     recipe,
     validateRecipe,
+    loadDraft, // Añadimos la nueva acción
     actions: {
       updateMetadata,
       addSection,
