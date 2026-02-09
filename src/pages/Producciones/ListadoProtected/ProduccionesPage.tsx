@@ -44,18 +44,31 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
 
   // Cargar TODAS las producciones al montar el componente (sin filtros de backend)
   useEffect(() => {
-    getProducciones({}); 
+    // Llamamos sin argumentos para indicar que queremos todo
+    // El servicio podría aceptar filtros, pero aquí decidimos filtrar en cliente
+    getProducciones(); 
   }, [getProducciones]);
 
   // Usar el nuevo hook para WebSockets
   useProductionListSockets({
     onStateChange: updateProductionStateInList,
-    onCreated: () => getProducciones({}),
-    onDeleted: () => getProducciones({}),
+    onCreated: () => getProducciones(),
+    onDeleted: () => getProducciones(),
   });
 
   // Lógica de filtrado en el cliente
   const filteredProducciones = useMemo(() => {
+    // Si no hay filtros activos, devolvemos todo (optimización)
+    const hasActiveFilters = 
+        filters.codigoProduccion || 
+        filters.lote || 
+        filters.estado || 
+        (filters.fechaRange && filters.fechaRange[0] && filters.fechaRange[1]);
+
+    if (!hasActiveFilters) {
+        return [...producciones].sort((a, b) => new Date(b.fechaInicio).getTime() - new Date(a.fechaInicio).getTime());
+    }
+
     return producciones.filter((prod) => {
       // 1. Filtro por Código de Producción (case insensitive, partial match)
       if (filters.codigoProduccion) {
@@ -137,7 +150,7 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
           console.error('Error al eliminar producciones:', err);
           message.error('Ocurrió un error al eliminar algunas producciones. Por favor recarga la página.');
           // Recargar para asegurar consistencia
-          getProducciones({});
+          getProducciones();
         }
       },
     });
