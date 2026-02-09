@@ -1,5 +1,12 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+// Configurar dayjs con los plugins usados en la app
+dayjs.extend(isBetween);
+dayjs.extend(customParseFormat);
 
 // Mock para matchMedia
 Object.defineProperty(window, 'matchMedia', {
@@ -30,8 +37,15 @@ window.getComputedStyle = (elt, pseudoElt) => {
 };
 
 // Mock para scrollTo (usado por componentes con scroll)
-// Casteamos a any para evitar conflictos de sobrecarga de tipos en TS
 window.scrollTo = vi.fn() as any;
+
+// Mock para Notification API (usado en WebSockets)
+global.Notification = {
+  permission: 'granted',
+  requestPermission: vi.fn().mockResolvedValue('granted'),
+  // @ts-ignore
+  prototype: {},
+} as any;
 
 // Silenciar warnings específicos de Ant Design/React que no afectan la lógica
 const originalConsoleError = console.error;
