@@ -67,8 +67,16 @@ function insertSoftBreaks(text: string, maxCharsBeforeBreak: number = 20): strin
 
 export const pdfService = {
   generateProductionPdf(estructura: EstructuraProduccionDTO, respuestas: RespuestasProduccion) {
+    // Detectar si hay tablas con muchas columnas para determinar orientación del documento
+    const tieneTablaAnchas = estructura.estructura.some(seccion => 
+      seccion.tablas.some(tabla => (tabla.columnas?.length || 0) + 1 > 6)
+    );
+    
+    const pageOrientation = tieneTablaAnchas ? 'landscape' : 'portrait';
+    
     const docDefinition: any = {
       pageSize: 'A4',
+      pageOrientation: pageOrientation,
       pageMargins: [40, 40, 40, 40],
       content: [
         this.buildHeader(estructura),
@@ -240,14 +248,49 @@ export const pdfService = {
   },
 
   buildTable(tabla: TablaResponseDTO, respuestasTablas: any[]) {
+    const numColumnas = (tabla.columnas?.length || 0) + 1; // +1 por columna "Concepto"
+    
+    // Determinar espacio disponible y tamaño de fuente según número de columnas
+    // La orientación ya fue determinada a nivel documento en generateProductionPdf
+    let fontSize = 9;
+    let espacioDisponible = 515; // Portrait por defecto
+    
+    // Si hay muchas columnas, asumimos que el documento está en landscape
+    if (numColumnas > 6) {
+        espacioDisponible = 755; // Landscape A4 con márgenes 40
+        if (numColumnas > 10) {
+            fontSize = 7; // Reducir fuente para muchas columnas
+        } else {
+            fontSize = 8;
+        }
+    }
+    
+    // Calcular ancho óptimo de columna "Concepto" basado en el texto más largo
+    const calcularAnchoConcepto = (): number => {
+        if (!tabla.filas || tabla.filas.length === 0) return 80;
+        
+        // Encontrar el nombre de fila más largo
+        const maxLength = Math.max(...tabla.filas.map(f => f.nombre.length));
+        
+        // Estimación: ~5.5 puntos por carácter para fontSize 9
+        // Ajustar según el fontSize actual
+        const puntosPerChar = fontSize * 0.6;
+        const anchoEstimado = Math.ceil(maxLength * puntosPerChar);
+        
+        // Limitar entre 60 y 150 puntos
+        return Math.min(Math.max(anchoEstimado, 60), 150);
+    };
+    
+    const ANCHO_CONCEPTO = calcularAnchoConcepto();
+
     const headers = [
-      { text: 'Concepto', style: 'tableHeader' },
-      ...(tabla.columnas?.map(c => ({ text: c.nombre, style: 'tableHeader' })) || [])
+      { text: 'Concepto', style: 'tableHeader', fontSize: fontSize },
+      ...(tabla.columnas?.map(c => ({ text: c.nombre, style: 'tableHeader', fontSize: fontSize })) || [])
     ];
 
     const body = tabla.filas?.map(fila => {
       const row: any[] = [
-        { text: insertSoftBreaks(fila.nombre), style: 'tableCell', bold: true }
+        { text: insertSoftBreaks(fila.nombre), style: 'tableCell', bold: true, fontSize: fontSize }
       ];
 
       tabla.columnas?.forEach(col => {
@@ -277,46 +320,44 @@ export const pdfService = {
             }
         }
 
-        row.push({ text: val, style: 'tableCell' });
+        row.push({ text: val, style: 'tableCell', fontSize: fontSize });
       });
 
       return row;
     }) || [];
 
     // Calcular anchos de columna basados en el tipo de dato
-    // Ancho disponible en A4 con márgenes de 40: ~515 puntos
     const widths: any[] = [];
     
     // Anchos fijos para tipos de datos específicos (en puntos)
-    const ANCHO_ENTERO = 50;
-    const ANCHO_DECIMAL = 60;
-    const ANCHO_FECHA = 70;
-    const ANCHO_HORA = 60;
-    const ANCHO_BOOLEANO = 40;
-    const ANCHO_CONCEPTO = 100; // Ancho fijo para columna "Concepto"
+    // Ajustar según fontSize
+    const factorEscala = fontSize / 9;
+    const ANCHO_ENTERO = Math.ceil(50 * factorEscala);
+    const ANCHO_DECIMAL = Math.ceil(60 * factorEscala);
+    const ANCHO_FECHA = Math.ceil(70 * factorEscala);
+    const ANCHO_HORA = Math.ceil(60 * factorEscala);
+    const ANCHO_BOOLEANO = Math.ceil(40 * factorEscala);
     
-    // Primera columna (Concepto)
+    // Primera columna (Concepto) - ancho calculado dinámicamente
     widths.push(ANCHO_CONCEPTO);
     let espacioUsado = ANCHO_CONCEPTO;
     
     // Calcular espacio usado por columnas de ancho fijo
     const columnasTexto: number[] = [];
     tabla.columnas?.forEach((col, index) => {
-        const tipo = col.tipoDato;
-
-        if (tipo === TipoDatoCampo.ENTERO) {
+        if (col.tipoDato === TipoDatoCampo.ENTERO) {
             widths.push(ANCHO_ENTERO);
             espacioUsado += ANCHO_ENTERO;
-        } else if (tipo === TipoDatoCampo.DECIMAL) {
+        } else if (col.tipoDato === TipoDatoCampo.DECIMAL) {
             widths.push(ANCHO_DECIMAL);
             espacioUsado += ANCHO_DECIMAL;
-        } else if (tipo === TipoDatoCampo.FECHA) {
+        } else if (col.tipoDato === TipoDatoCampo.FECHA) {
             widths.push(ANCHO_FECHA);
             espacioUsado += ANCHO_FECHA;
-        } else if (tipo === TipoDatoCampo.HORA) {
+        } else if (col.tipoDato === TipoDatoCampo.HORA) {
             widths.push(ANCHO_HORA);
             espacioUsado += ANCHO_HORA;
-        } else if (tipo === TipoDatoCampo.BOOLEANO) {
+        } else if (col.tipoDato === TipoDatoCampo.BOOLEANO) {
             widths.push(ANCHO_BOOLEANO);
             espacioUsado += ANCHO_BOOLEANO;
         } else {
@@ -327,14 +368,14 @@ export const pdfService = {
     });
     
     // Distribuir espacio restante entre columnas de texto
-    const espacioDisponible = 515; // Ancho de página A4 con márgenes de 40px
     const espacioRestante = espacioDisponible - espacioUsado;
     const numColumnasTexto = columnasTexto.length;
     
     if (numColumnasTexto > 0) {
         // Distribuir equitativamente entre columnas de texto
-        // Si no hay espacio restante (tabla muy ancha), usar ancho mínimo de 80
-        const anchoPorColumnaTexto = Math.max(80, Math.floor(espacioRestante / numColumnasTexto));
+        // Ajustar ancho mínimo según fontSize
+        const anchoMinimo = fontSize === 7 ? 60 : (fontSize === 8 ? 70 : 80);
+        const anchoPorColumnaTexto = Math.max(anchoMinimo, Math.floor(espacioRestante / numColumnasTexto));
         columnasTexto.forEach(colIndex => {
             widths[colIndex] = anchoPorColumnaTexto;
         });
@@ -345,7 +386,7 @@ export const pdfService = {
         headerRows: 1,
         widths: widths,
         body: [headers, ...body],
-        dontBreakRows: false // Permitir romper filas si es necesario para evitar overflow
+        dontBreakRows: false
       },
       layout: 'lightHorizontalLines',
       margin: [0, 5, 0, 10]
