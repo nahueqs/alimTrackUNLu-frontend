@@ -239,27 +239,71 @@ export const pdfService = {
       return row;
     }) || [];
 
-    // Definir anchos de columna basados en el tipo de dato
-    // 'auto' ajusta al contenido (bueno para números, fechas, cortos)
-    // '*' ocupa el espacio restante (bueno para texto largo)
-    const widths: any[] = ['auto']; // Primera columna (Concepto) siempre auto
+    // Calcular anchos de columna basados en el tipo de dato
+    // Ancho disponible en A4 con márgenes de 40: ~515 puntos
+    const widths: any[] = [];
+    
+    // Anchos fijos para tipos de datos específicos (en puntos)
+    const ANCHO_ENTERO = 50;
+    const ANCHO_DECIMAL = 60;
+    const ANCHO_FECHA = 70;
+    const ANCHO_HORA = 60;
+    const ANCHO_BOOLEANO = 40;
+    const ANCHO_CONCEPTO = 100; // Ancho fijo para columna "Concepto"
+    
+    // Primera columna (Concepto)
+    widths.push(ANCHO_CONCEPTO);
+    let espacioUsado = ANCHO_CONCEPTO;
+    
+    // Calcular espacio usado por columnas de ancho fijo
+    const columnasTexto: number[] = [];
+    tabla.columnas?.forEach((col, index) => {
+        const tipo = col.tipoDato;
 
-    tabla.columnas?.forEach(col => {
-        if (col.tipoDato === TipoDatoCampo.TEXTO) {
-            widths.push('*');
+        if (tipo === TipoDatoCampo.ENTERO) {
+            widths.push(ANCHO_ENTERO);
+            espacioUsado += ANCHO_ENTERO;
+        } else if (tipo === TipoDatoCampo.DECIMAL) {
+            widths.push(ANCHO_DECIMAL);
+            espacioUsado += ANCHO_DECIMAL;
+        } else if (tipo === TipoDatoCampo.FECHA) {
+            widths.push(ANCHO_FECHA);
+            espacioUsado += ANCHO_FECHA;
+        } else if (tipo === TipoDatoCampo.HORA) {
+            widths.push(ANCHO_HORA);
+            espacioUsado += ANCHO_HORA;
+        } else if (tipo === TipoDatoCampo.BOOLEANO) {
+            widths.push(ANCHO_BOOLEANO);
+            espacioUsado += ANCHO_BOOLEANO;
         } else {
-            widths.push('auto');
+            // TipoDatoCampo.TEXTO - calcular después
+            columnasTexto.push(index + 1); // +1 porque la primera es "Concepto"
+            widths.push(null); // Placeholder
         }
     });
+    
+    // Distribuir espacio restante entre columnas de texto
+    const espacioDisponible = 515; // Ancho de página A4 con márgenes de 40px
+    const espacioRestante = espacioDisponible - espacioUsado;
+    const numColumnasTexto = columnasTexto.length;
+    
+    if (numColumnasTexto > 0) {
+        // Distribuir equitativamente entre columnas de texto
+        // Si no hay espacio restante (tabla muy ancha), usar ancho mínimo de 80
+        const anchoPorColumnaTexto = Math.max(80, Math.floor(espacioRestante / numColumnasTexto));
+        columnasTexto.forEach(colIndex => {
+            widths[colIndex] = anchoPorColumnaTexto;
+        });
+    }
 
     return {
       table: {
         headerRows: 1,
         widths: widths,
         body: [headers, ...body],
-        dontBreakRows: true // Evita que una fila se rompa entre páginas si es posible
+        dontBreakRows: false // Permitir romper filas si es necesario para evitar overflow
       },
-      layout: 'lightHorizontalLines', // Estilo limpio
+      layout: 'lightHorizontalLines',
       margin: [0, 5, 0, 10]
     };
   }

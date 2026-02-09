@@ -39,6 +39,11 @@ vi.mock('@/services/auth/AuthService', () => ({
   },
 }));
 
+// Mock de useIsMobile para asegurar que estamos en desktop
+vi.mock('@/hooks/useIsMobile', () => ({
+  useIsMobile: () => false,
+}));
+
 // Mock de useNavigate
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -138,9 +143,8 @@ describe('RecipeBuilderPage - Integración y Flujos', () => {
     await user.type(sectionInput, 'Sección Original');
 
     // Duplicar la sección (botón con icono CopyOutlined)
-    // Buscamos el botón dentro del card de la sección
-    const duplicateButtons = screen.getAllByRole('button', { name: /duplicar/i });
-    // El primero debería ser el de la sección (si no hay otros elementos duplicables aún)
+    // Al mockear useIsMobile => false, el texto 'Duplicar' debería estar visible
+    const duplicateButtons = await screen.findAllByRole('button', { name: /duplicar/i });
     await user.click(duplicateButtons[0]);
 
     // Verificar que aparece la copia
