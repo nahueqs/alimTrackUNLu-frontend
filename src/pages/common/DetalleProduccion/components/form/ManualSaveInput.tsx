@@ -209,66 +209,74 @@ export const ManualSaveInput: React.FC<ManualSaveInputProps> = ({
       case TipoDatoCampo.TEXTO:
       default:
         return (
-          <Input
+          <Input.TextArea
             value={state.localValue}
             onChange={(e) => {
               dispatch({ type: 'VALUE_CHANGED', payload: e.target.value });
             }}
             placeholder={finalPlaceholder}
+            autoSize={{ minRows: 1, maxRows: 6 }}
             {...commonProps}
-            {...rest}
+            {...(rest as any)}
           />
         );
     }
   };
 
-  // Si está deshabilitado (modo lectura), renderizamos solo el input sin el botón de guardar
-  if (rest.disabled) {
-    return (
-      <div style={{ width: '100%' }}>
-        {renderInput()}
-      </div>
-    );
-  }
+  // Renderizado para impresión (texto plano)
+  const renderPrintValue = () => {
+    if (tipoDato === TipoDatoCampo.BOOLEANO) {
+      return state.localValue === 'true' ? 'Sí' : (state.localValue === 'false' ? 'No' : '-');
+    }
+    return state.localValue || '-';
+  };
 
   return (
     <div style={{ width: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
-        <div style={{ flex: 1 }}>
-          {state.error ? (
-            <Tooltip title={state.error} color="red" placement="topLeft" open={state.isFocused || !!state.error}>
-              {renderInput()}
-            </Tooltip>
-          ) : (
-            renderInput()
+      {/* Vista de Impresión: Solo texto, visible solo al imprimir */}
+      <div className="print-only-text" style={{ display: 'none' }}>
+        {renderPrintValue()}
+      </div>
+
+      {/* Vista de Pantalla: Input normal, oculto al imprimir */}
+      <div className="screen-only-input" style={{ width: '100%' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
+          <div style={{ flex: 1 }}>
+            {state.error ? (
+              <Tooltip title={state.error} color="red" placement="topLeft" open={state.isFocused || !!state.error}>
+                {renderInput()}
+              </Tooltip>
+            ) : (
+              renderInput()
+            )}
+          </div>
+          {(state.isFocused || state.hasChanged || state.isSaving) && !rest.disabled && (
+            <Button
+              type={state.error ? 'primary' : 'primary'}
+              danger={!!state.error}
+              icon={state.error ? <ExclamationCircleOutlined /> : <SaveOutlined />}
+              onClick={handleSave}
+              loading={state.isSaving}
+              disabled={!state.hasChanged && !state.error}
+              size={isMobile ? 'small' : 'middle'}
+              style={{ flexShrink: 0 }}
+              onMouseDown={(e) => e.preventDefault()}
+              aria-label={state.error ? 'Reintentar guardar' : 'Guardar cambios'}
+            >
+              {!isMobile && (state.error ? 'Reintentar' : 'Guardar')}
+            </Button>
           )}
         </div>
-        {(state.isFocused || state.hasChanged || state.isSaving) && (
-          <Button
-            type={state.error ? 'primary' : 'primary'}
-            danger={!!state.error}
-            icon={state.error ? <ExclamationCircleOutlined /> : <SaveOutlined />}
-            onClick={handleSave}
-            loading={state.isSaving}
-            disabled={!state.hasChanged && !state.error}
-            size={isMobile ? 'small' : 'middle'}
-            style={{ flexShrink: 0 }}
-            onMouseDown={(e) => e.preventDefault()}
-            aria-label={state.error ? 'Reintentar guardar' : 'Guardar cambios'}
+        {state.error && (
+          <div 
+            id="input-error-message" 
+            style={{ color: '#ff4d4f', fontSize: '12px', marginTop: '4px' }}
+            role="alert"
           >
-            {!isMobile && (state.error ? 'Reintentar' : 'Guardar')}
-          </Button>
+            {state.error}
+          </div>
         )}
       </div>
-      {state.error && (
-        <div 
-          id="input-error-message" 
-          style={{ color: '#ff4d4f', fontSize: '12px', marginTop: '4px' }}
-          role="alert"
-        >
-          {state.error}
-        </div>
-      )}
     </div>
   );
 };

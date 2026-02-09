@@ -239,11 +239,25 @@ export const pdfService = {
       return row;
     }) || [];
 
+    // Definir anchos de columna basados en el tipo de dato
+    // 'auto' ajusta al contenido (bueno para números, fechas, cortos)
+    // '*' ocupa el espacio restante (bueno para texto largo)
+    const widths: any[] = ['auto']; // Primera columna (Concepto) siempre auto
+
+    tabla.columnas?.forEach(col => {
+        if (col.tipoDato === TipoDatoCampo.TEXTO) {
+            widths.push('*');
+        } else {
+            widths.push('auto');
+        }
+    });
+
     return {
       table: {
         headerRows: 1,
-        widths: ['auto', ...Array(headers.length - 1).fill('*')], // Primera col auto, resto expandidas
-        body: [headers, ...body]
+        widths: widths,
+        body: [headers, ...body],
+        dontBreakRows: true // Evita que una fila se rompa entre páginas si es posible
       },
       layout: 'lightHorizontalLines', // Estilo limpio
       margin: [0, 5, 0, 10]

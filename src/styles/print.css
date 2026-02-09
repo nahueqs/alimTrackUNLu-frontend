@@ -12,7 +12,13 @@
     .dashboard__main > *:not(.production-detail-container),
     .productions-list__header,
     .dashboard__welcome,
-    .app-header {
+    .app-header,
+    /* Ocultar inputs de pantalla */
+    .screen-only-input,
+    .ant-input,
+    .ant-input-number,
+    .ant-picker,
+    .ant-checkbox-wrapper {
         display: none !important;
     }
 
@@ -88,20 +94,24 @@
         content: " - Resumen de Avance";
     }
 
-    /* --- 6. Inputs y Formularios --- */
-    .ant-input,
-    .ant-input-number-input,
-    .ant-picker-input > input {
-        border: none !important;
-        background: transparent !important;
-        padding: 0 !important;
-        color: black !important;
+    /* --- 6. Inputs y Formularios (Texto Plano) --- */
+    .print-only-text {
+        display: block !important;
+        white-space: pre-wrap; /* Mantiene saltos de línea */
+        word-wrap: break-word; /* Rompe palabras largas */
         font-weight: bold;
+        color: black !important;
+        padding: 2px 0;
     }
 
     .ant-form-item-label > label {
         color: #333 !important;
         font-weight: normal !important;
+    }
+    
+    /* Asegurar que el contenido no se corte */
+    .ant-form-item-control-input-content {
+        overflow: visible !important;
     }
 
     /* --- 7. Tablas --- */
@@ -109,19 +119,31 @@
         border: 1px solid #000 !important;
         box-shadow: none !important;
         overflow: visible !important; /* Permitir que se vea todo */
+        margin-bottom: 1cm;
     }
 
     .ant-table {
         font-size: 10pt;
+    }
+    
+    .ant-table-wrapper {
+        overflow: visible !important;
+    }
+    
+    .ant-table-container {
+        overflow: visible !important;
     }
 
     .ant-table-thead > tr > th {
         background-color: #eee !important;
         color: black !important;
         border-bottom: 1px solid #000 !important;
+        font-weight: bold;
     }
 
     .ant-table-tbody > tr > td {
         border-bottom: 1px solid #ccc !important;
+        padding: 8px !important;
+        vertical-align: top; /* Alinear texto arriba */
     }
 }
