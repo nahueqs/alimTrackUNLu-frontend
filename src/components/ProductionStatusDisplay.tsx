@@ -29,21 +29,7 @@ export const ProductionStatusDisplay: React.FC<ProductionStatusDisplayProps> = (
 }) => {
   const navigate = useNavigate();
 
-  if (loading) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-      >
-        <Spin size="large" tip="Cargando datos..." />
-      </div>
-    );
-  }
-
+  // Si hay error, mostramos el error inmediatamente
   if (error) {
     const errorMessage = typeof error === 'string' ? error : 'No se pudieron cargar los datos de la producción.';
     const isNotFound = errorMessage.includes('404') || errorMessage.toLowerCase().includes('no encontrado');
@@ -64,22 +50,23 @@ export const ProductionStatusDisplay: React.FC<ProductionStatusDisplayProps> = (
     );
   }
 
-  if (!estructura || !estadoActual) {
+  // Si está cargando O faltan datos críticos (y no hay error), seguimos mostrando el spinner.
+  // Esto evita el parpadeo de "Sin datos" durante transiciones de estado rápidas.
+  if (loading || !estructura || !estadoActual) {
     return (
-      <div style={{ padding: '50px', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <Result
-          status="warning"
-          title="Sin datos"
-          subTitle="No hay datos de estructura o respuestas disponibles para mostrar."
-          extra={
-            <Button type="primary" onClick={() => navigate(redirectPath)}>
-              {redirectLabel}
-            </Button>
-          }
-        />
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <Spin size="large" tip="Cargando datos..." />
       </div>
     );
   }
 
+  // Si llegamos aquí, tenemos estructura y estadoActual, y no hay error.
   return <>{children}</>;
 };
