@@ -36,11 +36,26 @@ export const useRecetaPadreService = () => {
     }
   }, []);
 
+  const deleteReceta = useCallback(async (codigoReceta: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await recetaService.deleteReceta(codigoReceta);
+      setRecetas(prev => prev.filter(r => r.codigoReceta !== codigoReceta));
+    } catch (err: any) {
+      setError(err.message || 'Error al eliminar la receta.');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     loading,
     error,
     recetas,
     getAllRecetas,
-    createReceta
+    createReceta,
+    deleteReceta
   };
 };

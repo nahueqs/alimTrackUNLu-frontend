@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { LoginForm } from './components/LoginForm.tsx';
-import { RegisterForm } from './components/RegisterForm.tsx';
 import { useNavigate } from 'react-router-dom';
 import logoUnlu from '@/assets/logoUnlu.png';
 import logoCideta from '@/assets/logoCideta.png';
@@ -9,12 +8,11 @@ import { Card, Button } from '@/components/ui';
 import { usePageTitle } from '@/hooks/usePageTitle.ts';
 import './LoginPage.css';
 import { ScheduleOutlined } from '@ant-design/icons';
-import type { LoginRequest, RegisterRequest } from '@/services/auth/Auth.ts';
+import type { LoginRequest } from '@/services/auth/Auth.ts';
 
 const LoginPage: React.FC = () => {
   usePageTitle('Iniciar Sesión');
-  const [isLogin, setIsLogin] = useState(true);
-  const { login, register, loading, error, clearError, isAuthenticated, user } = useAuth();
+  const { login, loading, error, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,19 +27,6 @@ const LoginPage: React.FC = () => {
     } catch (err) {
       throw err;
     }
-  };
-
-  const handleRegister = async (userData: RegisterRequest) => {
-    try {
-      await register(userData);
-    } catch (err) {
-      throw err;
-    }
-  };
-
-  const handleSwitchForm = () => {
-    clearError();
-    setIsLogin(!isLogin);
   };
 
   return (
@@ -67,29 +52,23 @@ const LoginPage: React.FC = () => {
           hoverEffect={true}
           style={{ width: '100%', maxWidth: '450px' }}
         >
-          {isLogin ? (
-            <LoginForm
-              onLogin={handleLogin}
-              onSwitchToRegister={handleSwitchForm}
-              loading={loading}
-              error={error}
-            />
-          ) : (
-            <RegisterForm
-              onRegister={handleRegister}
-              onSwitchToLogin={handleSwitchForm}
-              loading={loading}
-              error={error}
-            />
-          )}
-          <Button
-            variant="link"
-            icon={<ScheduleOutlined />}
-            href="/public/producciones"
-            style={{ marginTop: '1rem' }}
-          >
-            Ver producciones públicas
-          </Button>
+          <LoginForm
+            onLogin={handleLogin}
+            onSwitchToRegister={() => {}} // Deshabilitado temporalmente
+            loading={loading}
+            error={error}
+          />
+          
+          <div style={{ marginTop: '1.5rem', borderTop: '1px solid #eee', paddingTop: '1.5rem' }}>
+            <Button
+              variant="secondary"
+              icon={<ScheduleOutlined />}
+              onClick={() => navigate('/public/producciones')}
+              style={{ width: '100%', height: '50px', fontSize: '1.1rem' }}
+            >
+              Ver Listado de Producciones
+            </Button>
+          </div>
         </Card>
 
         <div className="login-page__info">

@@ -13,7 +13,7 @@ import { useAuth } from '@/context/auth/AuthProvider';
 
 export const RecetasPadrePage: React.FC = () => {
   usePageTitle('Recetas');
-  const { recetas, loading, error, getAllRecetas, createReceta } = useRecetaPadreService();
+  const { recetas, loading, error, getAllRecetas, createReceta, deleteReceta } = useRecetaPadreService();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { user } = useAuth();
@@ -26,10 +26,23 @@ export const RecetasPadrePage: React.FC = () => {
     getAllRecetas();
   }, [getAllRecetas]);
 
-  const handleDelete = (id: string) => {
-    // TODO: Implementar delete en servicio si el backend lo soporta
-    console.log('Eliminar receta padre', id);
-    message.info('Funcionalidad de eliminar receta padre pendiente de implementación en backend/servicio');
+  const handleDelete = (codigoReceta: string) => {
+    Modal.confirm({
+      title: '¿Estás seguro de eliminar esta receta base?',
+      content: `Se eliminará la receta con código: ${codigoReceta}. Esta acción no se puede deshacer y podría afectar a versiones existentes.`,
+      okText: 'Sí, eliminar',
+      okType: 'danger',
+      cancelText: 'Cancelar',
+      onOk: async () => {
+        try {
+          await deleteReceta(codigoReceta);
+          message.success(`Receta ${codigoReceta} eliminada exitosamente`);
+        } catch (err: any) {
+          console.error('Error al eliminar receta:', err);
+          // El hook ya maneja el error en el estado, pero mostramos mensaje si es necesario
+        }
+      },
+    });
   };
 
   const handleCreate = async () => {
@@ -45,7 +58,6 @@ export const RecetasPadrePage: React.FC = () => {
       form.resetFields();
     } catch (error: any) {
       console.error('Error al crear receta:', error);
-      // El servicio ya maneja el error, pero podemos mostrar algo específico si es necesario
     } finally {
       setCreating(false);
     }
