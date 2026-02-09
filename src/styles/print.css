@@ -99,9 +99,11 @@
         display: block !important;
         white-space: pre-wrap; /* Mantiene saltos de línea */
         word-wrap: break-word; /* Rompe palabras largas */
+        overflow-wrap: break-word; /* Estándar moderno */
         font-weight: bold;
         color: black !important;
         padding: 2px 0;
+        max-width: 100%; /* Asegurar que no desborde */
     }
 
     .ant-form-item-label > label {
@@ -124,6 +126,8 @@
 
     .ant-table {
         font-size: 10pt;
+        width: 100% !important;
+        table-layout: fixed !important; /* Forzar respeto de anchos */
     }
     
     .ant-table-wrapper {
@@ -139,11 +143,23 @@
         color: black !important;
         border-bottom: 1px solid #000 !important;
         font-weight: bold;
+        white-space: normal !important; /* Permitir wrap en headers */
     }
 
     .ant-table-tbody > tr > td {
         border-bottom: 1px solid #ccc !important;
         padding: 8px !important;
         vertical-align: top; /* Alinear texto arriba */
+        
+        /* Forzar ajuste de texto */
+        white-space: normal !important; 
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        word-break: break-word !important;
+    }
+    
+    /* Asegurar que la celda de concepto no sea demasiado ancha si no es necesario */
+    .ant-table-cell {
+        max-width: 300px; /* Límite de seguridad */
     }
 }
