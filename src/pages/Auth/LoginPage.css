@@ -127,13 +127,13 @@
 .login-page__image {
     width: 80px;
     height: 80px;
-    border-radius: var(--radius-lg);
-    object-fit: cover;
-    border: 2px solid var(--border-light);
+    border-radius: 50%; /* Circular */
+    object-fit: contain; /* Ajustar sin recortar */
+    border: none; /* Sin borde */
     box-shadow: var(--shadow-sm);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     flex-shrink: 0;
-    background-color: white;
+    background-color: transparent; /* Fondo transparente */
 }
 
     .login-page__image:hover {
