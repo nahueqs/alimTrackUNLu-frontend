@@ -17,7 +17,7 @@ export class BodyBuilder {
     this.tableBuilder = new TableBuilder(config, widthCalculator);
   }
 
-  build(estructura: EstructuraProduccionDTO, respuestas: RespuestasProduccion) {
+  build(estructura: EstructuraProduccionDTO, respuestas: RespuestasProduccion, pageOrientation: 'portrait' | 'landscape') {
     const content: any[] = [];
     const respuestasCamposMap = respuestas.respuestasCampos.reduce((acc, r) => ({ ...acc, [r.idCampo]: r.valor }), {} as Record<number, string>);
 
@@ -26,7 +26,8 @@ export class BodyBuilder {
       content.push({ 
         text: `${index + 1}. ${seccion.titulo}`, 
         style: 'sectionTitle',
-        margin: [0, 15, 0, 5]
+        margin: [0, 15, 0, 5],
+        pageBreak: index > 0 ? 'before' : undefined
       });
 
       // Campos Simples
@@ -36,18 +37,44 @@ export class BodyBuilder {
 
       // Grupos de Campos
       seccion.gruposCampos.forEach(grupo => {
-        content.push({ text: grupo.subtitulo, fontSize: 11, bold: true, margin: [0, 5, 0, 2] });
+        content.push({ text: grupo.subtitulo, fontSize: 11, bold: true, margin: [0, 8, 0, 3] });
         content.push(this.buildFieldsGrid(grupo.campos, respuestasCamposMap));
       });
 
       // Tablas
-      seccion.tablas.forEach(tabla => {
-        content.push({ text: tabla.nombre, fontSize: 11, bold: true, margin: [0, 10, 0, 2] });
-        content.push(this.tableBuilder.build(tabla, respuestas.respuestasTablas));
+      seccion.tablas.forEach((tabla, tablaIndex) => {
+        const numColumnas = (tabla.columnas?.length || 0) + 1;
+        
+        if (numColumnas > this.config.layout.maxColumnasLandscape) {
+            content.push({ 
+                text: tabla.nombre, 
+                fontSize: 11, 
+                bold: true, 
+                margin: [0, 10, 0, 2],
+                pageBreak: tablaIndex > 0 ? 'before' : undefined
+            });
+            content.push(...this.tableBuilder.buildSplit(tabla, respuestas.respuestasTablas, pageOrientation));
+        } else {
+            content.push({ text: tabla.nombre, fontSize: 11, bold: true, margin: [0, 10, 0, 2] });
+            content.push(this.tableBuilder.build(tabla, respuestas.respuestasTablas, pageOrientation));
+        }
       });
 
       // Línea separadora
-      content.push({ canvas: [{ type: 'line', x1: 0, y1: 5, x2: 515, y2: 5, lineWidth: 0.5, lineColor: '#ccc' }] });
+      if (index < estructura.estructura.length - 1) {
+        content.push({ 
+            canvas: [{ 
+                type: 'line', 
+                x1: 0, 
+                y1: 5, 
+                x2: pageOrientation === 'landscape' ? this.config.table.pageWidths.landscape : this.config.table.pageWidths.portrait, 
+                y2: 5, 
+                lineWidth: 0.5, 
+                lineColor: '#ccc' 
+            }],
+            margin: [0, 10, 0, 0]
+        });
+      }
     });
 
     return content;

@@ -27,15 +27,17 @@ export class ProductionPdfService {
   }
 
   generate(estructura: EstructuraProduccionDTO, respuestas: RespuestasProduccion) {
+    const pageOrientation = this.determineOrientation(estructura);
+    
     const docDefinition: any = {
       pageSize: PDF_CONFIG.pageSize,
-      pageOrientation: this.determineOrientation(estructura),
+      pageOrientation: pageOrientation,
       pageMargins: PDF_CONFIG.margins,
       content: [
         this.headerBuilder.build(estructura),
         this.metadataBuilder.build(respuestas),
         { text: '', margin: [0, 10] },
-        this.bodyBuilder.build(estructura, respuestas),
+        this.bodyBuilder.build(estructura, respuestas, pageOrientation),
       ],
       styles: this.getStyles(),
       defaultStyle: { font: 'Roboto' },
@@ -47,7 +49,7 @@ export class ProductionPdfService {
   private determineOrientation(estructura: EstructuraProduccionDTO) {
     const hasWideTables = estructura.estructura.some(seccion => 
       seccion.tablas.some(tabla => 
-        (tabla.columnas?.length || 0) + 1 > PDF_CONFIG.layout.columnsThreshold
+        (tabla.columnas?.length || 0) + 1 > PDF_CONFIG.layout.maxColumnasPortrait
       )
     );
     

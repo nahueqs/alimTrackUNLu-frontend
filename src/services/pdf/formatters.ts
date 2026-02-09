@@ -43,7 +43,7 @@ function wrapLongText(text: string, maxCharsPerLine: number = PDF_CONFIG.layout.
 }
 
 export class ValueFormatter {
-  static format(valor: string, tipoDato: TipoDatoCampo): string {
+  static format(valor: string, tipoDato: TipoDatoCampo, maxChars?: number): string {
     if (valor === '-' || !valor) return '-';
 
     const formatters: Record<TipoDatoCampo, (v: string) => string> = {
@@ -52,7 +52,7 @@ export class ValueFormatter {
       [TipoDatoCampo.ENTERO]: this.formatInteger,
       [TipoDatoCampo.FECHA]: this.formatDate,
       [TipoDatoCampo.HORA]: this.formatTime,
-      [TipoDatoCampo.TEXTO]: this.formatText,
+      [TipoDatoCampo.TEXTO]: (v) => this.formatText(v, maxChars),
     };
 
     return formatters[tipoDato]?.(valor) ?? valor;
@@ -83,8 +83,7 @@ export class ValueFormatter {
     return valor;
   }
 
-  private static formatText(valor: string): string {
-    // Usar wrapLongText en lugar de insertSoftBreaks
-    return wrapLongText(valor);
+  private static formatText(valor: string, maxChars?: number): string {
+    return wrapLongText(valor, maxChars);
   }
 }

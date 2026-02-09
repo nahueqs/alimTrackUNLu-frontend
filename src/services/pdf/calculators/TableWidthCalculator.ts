@@ -5,27 +5,27 @@ import { PDF_CONFIG } from '../config';
 export class TableWidthCalculator {
   constructor(private config: typeof PDF_CONFIG) {}
 
-  calculate(tabla: TablaResponseDTO, numColumnas: number, fontSize: number): any[] {
-    const espacioDisponible = this.getAvailableSpace(numColumnas);
+  calculate(tabla: TablaResponseDTO, numColumnas: number, fontSize: number, pageOrientation: 'portrait' | 'landscape'): any[] {
+    const espacioDisponible = this.getAvailableSpace(pageOrientation);
     const conceptWidth = this.calculateConceptWidth(tabla, fontSize);
     
     return this.distributeWidths(tabla, conceptWidth, espacioDisponible, fontSize);
   }
 
-  private getAvailableSpace(numColumnas: number): number {
-    return numColumnas > this.config.layout.columnsThreshold 
+  private getAvailableSpace(pageOrientation: 'portrait' | 'landscape'): number {
+    return pageOrientation === 'landscape' 
       ? this.config.table.pageWidths.landscape 
       : this.config.table.pageWidths.portrait;
   }
 
   private calculateConceptWidth(tabla: TablaResponseDTO, fontSize: number): number {
-    if (!tabla.filas || tabla.filas.length === 0) return 80;
+    if (!tabla.filas || tabla.filas.length === 0) return 60;
     
     const maxLength = Math.max(...tabla.filas.map(f => f.nombre.length));
-    const puntosPerChar = fontSize * 0.6;
+    const puntosPerChar = fontSize * 0.55;
     const estimatedWidth = Math.ceil(maxLength * puntosPerChar);
     
-    return Math.min(Math.max(estimatedWidth, 60), 150);
+    return Math.min(Math.max(estimatedWidth, 50), 120);
   }
 
   private distributeWidths(tabla: TablaResponseDTO, conceptWidth: number, espacioDisponible: number, fontSize: number): any[] {
@@ -78,7 +78,7 @@ export class TableWidthCalculator {
     
     if (numColumnasTexto > 0) {
         // Ajustar ancho mínimo según fontSize
-        const anchoMinimo = fontSize === 7 ? 60 : (fontSize === 8 ? 70 : 80);
+        const anchoMinimo = fontSize === this.config.fontSize.small ? 50 : 60;
         const anchoPorColumnaTexto = Math.max(anchoMinimo, Math.floor(espacioRestante / numColumnasTexto));
         columnasTexto.forEach(colIndex => {
             widths[colIndex] = anchoPorColumnaTexto;

@@ -1,6 +1,6 @@
 export const PDF_CONFIG = {
   pageSize: 'A4' as const,
-  margins: [40, 40, 40, 40] as [number, number, number, number],
+  margins: [30, 40, 30, 40] as [number, number, number, number],
   fonts: {
     header: 18,
     subheader: 14,
@@ -14,17 +14,29 @@ export const PDF_CONFIG = {
     columnsThreshold: 6,
     maxCharsBeforeBreak: 20,
     fieldsPerRow: 3,
+    maxColumnasPortrait: 4,
+    maxColumnasLandscape: 8,
+  },
+  charsPerLine: {
+    small: 30,
+    medium: 40,
+    large: 60,
+  },
+  fontSize: {
+    small: 7,
+    medium: 8,
+    normal: 9,
   },
   table: {
     columnWidths: {
-      entero: 50,
-      decimal: 60,
-      fecha: 70,
-      hora: 60,
-      booleano: 40,
+      entero: 45,
+      decimal: 55,
+      fecha: 65,
+      hora: 55,
+      booleano: 35,
     },
     pageWidths: {
-      portrait: 515,
+      portrait: 535,
       landscape: 755,
     },
   },
