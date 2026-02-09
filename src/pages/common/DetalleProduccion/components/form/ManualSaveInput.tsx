@@ -166,7 +166,7 @@ export const ManualSaveInput: React.FC<ManualSaveInputProps> = ({
               dispatch({ type: 'VALUE_CHANGED', payload: newValue });
             }}
             format="DD/MM/YYYY"
-            placeholder={placeholder || 'DD/MM/AAAA'}
+            placeholder={finalPlaceholder || 'DD/MM/AAAA'}
             {...commonProps}
             {...(rest as any)}
           />
@@ -184,7 +184,7 @@ export const ManualSaveInput: React.FC<ManualSaveInputProps> = ({
               dispatch({ type: 'VALUE_CHANGED', payload: newValue });
             }}
             format="HH:mm:ss"
-            placeholder={placeholder || 'HH:mm:ss'}
+            placeholder={finalPlaceholder || 'HH:mm:ss'}
             showNow={false}
             use12Hours={false}
             allowClear
