@@ -37,7 +37,6 @@ export const TableEditor: React.FC<TableEditorProps> = ({
       dataIndex: 'nombre',
       key: 'nombre',
       width: 150,
-      fixed: 'left' as const,
       render: (text: string, record: any) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Input
