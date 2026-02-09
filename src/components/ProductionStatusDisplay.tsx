@@ -51,7 +51,7 @@ export const ProductionStatusDisplay: React.FC<ProductionStatusDisplayProps> = (
   }
 
   // Si está cargando O faltan datos críticos (y no hay error), seguimos mostrando el spinner.
-  // Esto evita el parpadeo de "Sin datos" durante transiciones de estado rápidas.
+// Esto evita el parpadeo de "Sin datos" durante transiciones de estado rápidas.
   if (loading || !estructura || !estadoActual) {
     return (
       <div

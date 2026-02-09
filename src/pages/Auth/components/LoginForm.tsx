@@ -14,7 +14,7 @@ interface LoginFormProps {
 export const LoginForm: React.FC<LoginFormProps> = ({
   onLogin,
   loading,
-  onSwitchToRegister,
+  // onSwitchToRegister, // Deshabilitado
   error,
 }) => {
   const [form] = Form.useForm();
@@ -74,12 +74,14 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </Form.Item>
       </Form>
 
+      {/* Registro deshabilitado temporalmente
       <div className="login-form__switch">
         <span>¿No tienes cuenta? </span>
         <Button type="link" onClick={onSwitchToRegister} disabled={loading}>
           Regístrate aquí
         </Button>
       </div>
+      */}
     </div>
   );
 };
