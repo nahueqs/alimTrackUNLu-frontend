@@ -27,6 +27,44 @@ if (pdfFonts && (pdfFonts as any).pdfMake && (pdfFonts as any).pdfMake.vfs) {
 
 type RespuestasProduccion = RespuestasProduccionPublicDTO | RespuestasProduccionProtectedDTO;
 
+/**
+ * Inserta oportunidades de wrapping en texto continuo sin espacios
+ * Agrega zero-width space (U+200B) cada N caracteres para permitir line breaks
+ */
+function insertSoftBreaks(text: string, maxCharsBeforeBreak: number = 20): string {
+  if (!text || text.length <= maxCharsBeforeBreak) return text;
+  
+  // Si ya tiene espacios frecuentes, no es necesario
+  const avgWordLength = text.split(/\s+/).reduce((acc, word) => acc + word.length, 0) / Math.max(1, text.split(/\s+/).length);
+  if (avgWordLength < maxCharsBeforeBreak) return text;
+  
+  // Insertar zero-width space cada maxCharsBeforeBreak caracteres
+  const ZERO_WIDTH_SPACE = '\u200B';
+  let result = '';
+  let charCount = 0;
+  
+  for (let i = 0; i < text.length; i++) {
+    result += text[i];
+    charCount++;
+    
+    // Insertar break point si:
+    // 1. Hemos alcanzado el límite de caracteres
+    // 2. No es el último carácter
+    // 3. El siguiente carácter no es un espacio (para evitar duplicados)
+    if (charCount >= maxCharsBeforeBreak && i < text.length - 1 && text[i + 1] !== ' ') {
+      result += ZERO_WIDTH_SPACE;
+      charCount = 0;
+    }
+    
+    // Resetear contador en espacios naturales
+    if (text[i] === ' ') {
+      charCount = 0;
+    }
+  }
+  
+  return result;
+}
+
 export const pdfService = {
   generateProductionPdf(estructura: EstructuraProduccionDTO, respuestas: RespuestasProduccion) {
     const docDefinition: any = {
@@ -145,8 +183,8 @@ export const pdfService = {
   },
 
   buildFieldsGrid(campos: CampoSimpleResponseDTO[], respuestasMap: Record<number, string>) {
-    const rows: any[] = [];
-    let currentRowFields: { campo: CampoSimpleResponseDTO, displayValue: string }[] = [];
+    const columns: any[] = [];
+    let currentRow: any[] = [];
 
     campos.forEach((campo, i) => {
       const valor = respuestasMap[campo.id] || '-';
@@ -178,43 +216,27 @@ export const pdfService = {
              // A veces los inputs time devuelven HH:mm
              displayValue = valor; 
           }
+      } else if (campo.tipoDato === TipoDatoCampo.TEXTO && valor !== '-') {
+          // Insertar soft breaks en texto para permitir wrapping
+          displayValue = insertSoftBreaks(valor);
       }
 
-      currentRowFields.push({ campo, displayValue });
+      currentRow.push({
+        stack: [
+          { text: campo.nombre, style: 'label', fontSize: 9 },
+          { text: displayValue, style: 'value', fontSize: 10 }
+        ],
+        margin: [0, 0, 10, 5]
+      });
 
       // Cada 3 campos, nueva fila (o si es el último)
-      if (currentRowFields.length === 3 || i === campos.length - 1) {
-        // Determinar si hay campos de texto en esta fila
-        const hasText = currentRowFields.some(f => f.campo.tipoDato === TipoDatoCampo.TEXTO);
-        
-        const columns = currentRowFields.map(f => {
-            let width: any = '*'; // Por defecto, ancho igual
-            
-            // Si hay campos de texto, priorizarlos
-            if (hasText) {
-                if (f.campo.tipoDato === TipoDatoCampo.TEXTO) {
-                    width = '*'; // Texto ocupa espacio disponible
-                } else {
-                    width = 'auto'; // Otros se ajustan al contenido
-                }
-            }
-            
-            return {
-                width: width,
-                stack: [
-                    { text: f.campo.nombre, style: 'label', fontSize: 9 },
-                    { text: f.displayValue, style: 'value', fontSize: 10 }
-                ],
-                margin: [0, 0, 10, 5]
-            };
-        });
-
-        rows.push({ columns: columns, columnGap: 10 });
-        currentRowFields = [];
+      if (currentRow.length === 3 || i === campos.length - 1) {
+        columns.push({ columns: currentRow, columnGap: 10 });
+        currentRow = [];
       }
     });
 
-    return { stack: rows, margin: [0, 5, 0, 5] };
+    return { stack: columns, margin: [0, 5, 0, 5] };
   },
 
   buildTable(tabla: TablaResponseDTO, respuestasTablas: any[]) {
@@ -225,7 +247,7 @@ export const pdfService = {
 
     const body = tabla.filas?.map(fila => {
       const row: any[] = [
-        { text: fila.nombre, style: 'tableCell', bold: true }
+        { text: insertSoftBreaks(fila.nombre), style: 'tableCell', bold: true }
       ];
 
       tabla.columnas?.forEach(col => {
@@ -249,6 +271,9 @@ export const pdfService = {
                 if (val.includes('T') || val.includes('-')) {
                     val = dayjs(val).format('HH:mm:ss');
                 }
+            } else if (col.tipoDato === TipoDatoCampo.TEXTO) {
+                // Insertar soft breaks en texto para permitir wrapping
+                val = insertSoftBreaks(val);
             }
         }
 
