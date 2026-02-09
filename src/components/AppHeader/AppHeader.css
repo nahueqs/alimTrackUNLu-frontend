@@ -32,6 +32,9 @@
 .header__brand-logo {
     height: 36px;
     width: 36px;
+    border-radius: 50%; /* Circular */
+    object-fit: contain; /* Ajustar sin recortar */
+    background-color: transparent; /* Fondo transparente */
 }
 
 .header__brand-title {
