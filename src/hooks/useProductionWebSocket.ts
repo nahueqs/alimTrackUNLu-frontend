@@ -76,10 +76,18 @@ export const useProductionWebSocket = ({
       if (import.meta.env.DEV) console.log('[WebSocket] Conectado');
     });
 
+    // Configurar callback de reconexión para resincronizar datos
+    notificationService.setOnReconnectedCallback(() => {
+      if (codigoProduccion) {
+        if (import.meta.env.DEV) console.log('[WebSocket] Reconectado. Resincronizando datos...');
+        getUltimasRespuestas(codigoProduccion);
+      }
+    });
+
     return () => {
       // notificationService.disconnect();
     };
-  }, []);
+  }, [codigoProduccion, getUltimasRespuestas]);
 
   useEffect(() => {
     if (!('Notification' in window)) {

@@ -1,19 +1,22 @@
+import React, { lazy } from 'react';
 import { Navigate, type RouteObject } from 'react-router-dom';
 import { ProtectedRoute } from '@/context/auth/ProtectedRoute.tsx';
 import { PublicRoute } from '@/context/auth/PublicRoute.tsx';
-import { DashboardPage } from '@/pages/Dashboard/DashboardPage.tsx';
-import LoginPage from '@/pages/Auth/LoginPage.tsx';
-import { NuevaProduccionPage } from '@/pages/Producciones/Nueva/NuevaProduccionPage.tsx';
-import ProductionsResultPage from '@/pages/Producciones/ListadoProtected/ProduccionesPage.tsx';
-import DetalleProduccionPublicPage from '@/pages/Public/Detalle/DetalleProduccionPublicPage.tsx';
-import DetalleProduccionProtectedPage from '@/pages/Producciones/Detalle/DetalleProduccionProtectedPage.tsx';
-import { ListadoProducciones } from '@/pages/Public/ListadoPublic/ListadoProducciones.tsx';
-import { VersionRecetasPage } from '@/pages/Recetas/Listado/VersionRecetasPage.tsx';
-import { RecetasPadrePage } from '@/pages/Recetas/Listado/RecetasPadrePage.tsx';
-import { VisualizarRecetaPage } from '@/pages/Recetas/Detalle/VisualizarRecetaPage.tsx';
-import { RecipeBuilderPage } from '@/pages/Recetas/Builder/RecipeBuilderPage.tsx';
 import { ProductionState } from '@/constants/ProductionStates';
 import type { LocalProductionFilters } from '@/pages/Producciones/ListadoProtected/ProduccionFilters.tsx';
+
+// Lazy loading de páginas
+const DashboardPage = lazy(() => import('@/pages/Dashboard/DashboardPage.tsx').then(module => ({ default: module.DashboardPage })));
+const LoginPage = lazy(() => import('@/pages/Auth/LoginPage.tsx'));
+const NuevaProduccionPage = lazy(() => import('@/pages/Producciones/Nueva/NuevaProduccionPage.tsx').then(module => ({ default: module.NuevaProduccionPage })));
+const ProductionsResultPage = lazy(() => import('@/pages/Producciones/ListadoProtected/ProduccionesPage.tsx'));
+const DetalleProduccionPublicPage = lazy(() => import('@/pages/Public/Detalle/DetalleProduccionPublicPage.tsx'));
+const DetalleProduccionProtectedPage = lazy(() => import('@/pages/Producciones/Detalle/DetalleProduccionProtectedPage.tsx'));
+const ListadoProducciones = lazy(() => import('@/pages/Public/ListadoPublic/ListadoProducciones.tsx').then(module => ({ default: module.ListadoProducciones })));
+const VersionRecetasPage = lazy(() => import('@/pages/Recetas/Listado/VersionRecetasPage.tsx').then(module => ({ default: module.VersionRecetasPage })));
+const RecetasPadrePage = lazy(() => import('@/pages/Recetas/Listado/RecetasPadrePage.tsx').then(module => ({ default: module.RecetasPadrePage })));
+const VisualizarRecetaPage = lazy(() => import('@/pages/Recetas/Detalle/VisualizarRecetaPage.tsx').then(module => ({ default: module.VisualizarRecetaPage })));
+const RecipeBuilderPage = lazy(() => import('@/pages/Recetas/Builder/RecipeBuilderPage.tsx').then(module => ({ default: module.RecipeBuilderPage })));
 
 const produccionesActivasFilters: Partial<LocalProductionFilters> = {
   estado: ProductionState.EN_PROCESO,
@@ -28,8 +31,6 @@ export const routes: RouteObject[] = [
     path: '/login',
     element: (
       <PublicRoute>
-        {' '}
-        {/* This PublicRoute is correct for login, redirects if authenticated */}
         <LoginPage />
       </PublicRoute>
     ),
@@ -37,14 +38,12 @@ export const routes: RouteObject[] = [
   {
     path: '/public/producciones',
     element: (
-      // Removed PublicRoute wrapper to allow authenticated users to view this page
       <ListadoProducciones />
     ),
   },
   {
     path: '/public/producciones/ver/:codigoProduccion',
     element: (
-      // Removed PublicRoute wrapper to allow authenticated users to view this page
       <DetalleProduccionPublicPage />
     ),
   },
@@ -67,7 +66,7 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: '/producciones/editar/:codigoProduccion', // Cambiado de /ver/ a /editar/ para consistencia
+    path: '/producciones/editar/:codigoProduccion',
     element: (
       <ProtectedRoute>
         <DetalleProduccionProtectedPage />
@@ -104,7 +103,7 @@ export const routes: RouteObject[] = [
       </ProtectedRoute>
     ),
   },
-  // Rutas de Recetas (Ordenadas de más específica a más genérica)
+  // Rutas de Recetas
   {
     path: '/recetas',
     element: (

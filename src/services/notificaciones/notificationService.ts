@@ -15,6 +15,8 @@ class NotificationService {
   private stompClient: Client | null = null;
   private readonly websocketEndpoint: string;
   private onConnectCallback: (() => void) | null = null;
+  private onReconnectedCallback: (() => void) | null = null;
+  private wasConnected: boolean = false;
 
   constructor() {
     this.websocketEndpoint = getWebSocketUrl();
@@ -30,6 +32,15 @@ class NotificationService {
       // debug: (str) => { if (import.meta.env.DEV) console.log(str); }, 
       onConnect: () => {
         if (import.meta.env.DEV) console.log('[NotificationService] Conectado exitosamente');
+        
+        // Si ya estábamos conectados antes, significa que es una reconexión
+        if (this.wasConnected && this.onReconnectedCallback) {
+          if (import.meta.env.DEV) console.log('[NotificationService] Reconexión detectada, ejecutando callback de resincronización');
+          this.onReconnectedCallback();
+        }
+        
+        this.wasConnected = true;
+
         if (this.onConnectCallback) {
           this.onConnectCallback();
         }
@@ -73,6 +84,11 @@ class NotificationService {
       this.stompClient.deactivate();
     }
     this.onConnectCallback = null;
+    this.wasConnected = false;
+  }
+
+  public setOnReconnectedCallback(callback: () => void) {
+    this.onReconnectedCallback = callback;
   }
 
   // Método genérico para suscripciones con manejo de errores

@@ -21,6 +21,9 @@ const INITIAL_RECIPE: DraftRecipe = {
   sections: [],
 };
 
+// Exportamos el tipo de retorno para usarlo en otros componentes
+export type UseRecipeBuilderReturn = ReturnType<typeof useRecipeBuilder>;
+
 export const useRecipeBuilder = (initialState: DraftRecipe = INITIAL_RECIPE) => {
   const [recipe, setRecipe] = useState<DraftRecipe>(initialState);
 
