@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { LoginForm } from './components/LoginForm.tsx';
 import { useNavigate } from 'react-router-dom';
-import logoUnlu from '@/assets/logoUnlu.png';
+import logoUnlu from '@/assets/logoUnlu.jpg';
 import logoCideta from '@/assets/logoCideta.png';
 import { useAuth } from '@/context/auth/AuthProvider.tsx';
 import { Card, Button } from '@/components/ui';
