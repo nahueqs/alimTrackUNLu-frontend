@@ -11,7 +11,6 @@ export interface SeccionCreateDTO {
   codigoVersionRecetaPadre: string;
   emailCreador: string;
   titulo: string;
-  tipo: string;
   orden: number;
   camposSimples: CampoSimpleCreateDTO[];
   gruposCampos: GrupoCamposCreateDTO[];

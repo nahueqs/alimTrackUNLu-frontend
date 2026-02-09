@@ -28,8 +28,7 @@ const mapSectionToDTO = (
     codigoVersionRecetaPadre: codigoVersionPadre,
     emailCreador: emailCreador,
     titulo: section.titulo,
-    tipo: "GENERICA", // Valor por defecto, ajustar según lógica de negocio
-    orden: orden + 1, // Backend suele usar 1-based index
+    orden: orden, // Backend suele usar 1-based index
     camposSimples: section.campos.map((field, idx) => mapFieldToDTO(field, idx, null)),
     gruposCampos: section.grupos.map((group) => mapGroupToDTO(group)),
     tablas: section.tablas.map((table, idx) => mapTableToDTO(table, idx)),
@@ -59,12 +58,12 @@ const mapTableToDTO = (table: DraftTable, orden: number): TablaCreateDTO => {
     orden: orden + 1,
     filas: table.filas.map((row, idx) => ({
       nombre: row.nombre,
-      orden: idx + 1,
+      orden: idx,
     })),
     columnas: table.columnas.map((col, idx) => ({
       nombre: col.nombre,
       tipoDato: col.tipoDato,
-      orden: idx + 1,
+      orden: idx,
     })),
   };
 };

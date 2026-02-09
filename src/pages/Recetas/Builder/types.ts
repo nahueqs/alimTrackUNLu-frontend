@@ -20,7 +20,7 @@ export interface DraftSection {
   titulo: string;
   orden: number;
   campos: DraftField[];
-  grupos: DraftGroup[];
+  grupos: DraftGroup[];''
   tablas: DraftTable[];
 }
 
