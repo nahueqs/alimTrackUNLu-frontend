@@ -39,9 +39,16 @@ class VersionRecetaService {
 
   /**
    * Crea una nueva versión de receta completa.
+   * Endpoint actualizado: POST /api/v1/recetas/{codigoReceta}/versiones-receta
    */
   async createVersion(data: VersionRecetaLlenaCreateDTO): Promise<VersionRecetaMetadataResponseDTO> {
-    return apiClient.post<VersionRecetaMetadataResponseDTO>('/versiones-receta', data);
+    if (!data.codigoRecetaPadre) {
+        throw new Error('El código de la receta padre es requerido para crear una versión.');
+    }
+    return apiClient.post<VersionRecetaMetadataResponseDTO>(
+        `/recetas/${encodeURIComponent(data.codigoRecetaPadre)}/versiones-receta`, 
+        data
+    );
   }
 }
 

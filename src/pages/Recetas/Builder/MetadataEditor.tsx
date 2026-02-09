@@ -3,6 +3,7 @@ import { Card, Form, Input, Select, Button, Modal, message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import type { DraftMetadata } from './types';
 import type { RecetaMetadataResponseDTO, RecetaCreateDTO } from '@/types/production/RecetaPadreDTOs';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 interface MetadataEditorProps {
   metadata: DraftMetadata;
@@ -22,6 +23,7 @@ export const MetadataEditor: React.FC<MetadataEditorProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
   const [creating, setCreating] = useState(false);
+  const isMobile = useIsMobile();
 
   const handleCreate = async () => {
     try {
@@ -47,12 +49,12 @@ export const MetadataEditor: React.FC<MetadataEditorProps> = ({
     <Card title="Información General" style={{ marginBottom: '1rem' }}>
       <Form layout="vertical">
         <Form.Item label="Receta Padre" required>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '8px', flexDirection: isMobile ? 'column' : 'row' }}>
             <Select
               value={metadata.codigoRecetaPadre || undefined}
               onChange={(value) => onChange('codigoRecetaPadre', value)}
               placeholder="Seleccione una receta padre"
-              style={{ flex: 1 }}
+              style={{ flex: 1, width: '100%' }}
               showSearch
               optionFilterProp="children"
             >
@@ -62,8 +64,12 @@ export const MetadataEditor: React.FC<MetadataEditorProps> = ({
                 </Select.Option>
               ))}
             </Select>
-            <Button icon={<PlusOutlined />} onClick={() => setIsModalOpen(true)}>
-              Nueva
+            <Button 
+                icon={<PlusOutlined />} 
+                onClick={() => setIsModalOpen(true)}
+                style={{ width: isMobile ? '100%' : 'auto' }}
+            >
+              Nueva Receta Padre
             </Button>
           </div>
         </Form.Item>

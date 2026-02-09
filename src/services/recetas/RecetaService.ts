@@ -1,43 +1,36 @@
 import { apiClient } from '../ApiClient';
-import type { RecetaResponseDTO } from '@/pages/Recetas/types/Recipes.ts';
+import type { RecetaCreateDTO, RecetaMetadataResponseDTO } from '@/types/production/RecetaPadreDTOs';
 
-// Asumo que la API puede devolver una lista de recetas dentro de un objeto contenedor.
-interface RecipeListResponse {
-  recetas: RecetaResponseDTO[];
-  total?: number;
-  // Se pueden agregar otros campos de paginación si es necesario.
-}
-
-// Asumo que los filtros para recetas son un objeto genérico.
+// Filtros opcionales para recetas
 type RecipeFilterDTO = Record<string, any>;
 
 class RecetaService {
   /**
-   * Obtiene una lista de recetas, con filtros opcionales.
+   * Obtiene todas las recetas padre.
+   * Soporta filtros opcionales.
    */
-  async getRecetas(filters: RecipeFilterDTO = {}): Promise<RecipeListResponse> {
-    return apiClient.get<RecipeListResponse>('/recetas', filters);
+  async getAllRecetas(filters: RecipeFilterDTO = {}): Promise<RecetaMetadataResponseDTO[]> {
+    return apiClient.get<RecetaMetadataResponseDTO[]>('/recetas', filters);
   }
 
   /**
    * Obtiene una única receta por su código.
    */
-  async getRecetaByCodigo(codigoReceta: string): Promise<RecetaResponseDTO> {
+  async getRecetaByCodigo(codigoReceta: string): Promise<RecetaMetadataResponseDTO> {
     if (!codigoReceta) {
       throw new Error('El código de la receta es requerido.');
     }
-    return apiClient.get<RecetaResponseDTO>(`/recetas/${encodeURIComponent(codigoReceta)}`);
+    return apiClient.get<RecetaMetadataResponseDTO>(`/recetas/${encodeURIComponent(codigoReceta)}`);
   }
 
   /**
-   * Crea una nueva receta.
-   * El cuerpo de la petición puede ser un DTO específico o un objeto parcial.
+   * Crea una nueva receta padre.
    */
-  async createReceta(recetaData: Partial<RecetaResponseDTO>): Promise<RecetaResponseDTO> {
-    if (!recetaData) {
+  async createReceta(data: RecetaCreateDTO): Promise<RecetaMetadataResponseDTO> {
+    if (!data) {
       throw new Error('Los datos de la receta son requeridos.');
     }
-    return apiClient.post<RecetaResponseDTO>('/recetas', recetaData);
+    return apiClient.post<RecetaMetadataResponseDTO>('/recetas', data);
   }
 
   /**
@@ -45,14 +38,14 @@ class RecetaService {
    */
   async updateReceta(
     codigoReceta: string,
-    recetaData: Partial<RecetaResponseDTO>
-  ): Promise<RecetaResponseDTO> {
-    if (!codigoReceta || !recetaData) {
+    data: Partial<RecetaCreateDTO>
+  ): Promise<RecetaMetadataResponseDTO> {
+    if (!codigoReceta || !data) {
       throw new Error('El código de la receta y los datos son requeridos.');
     }
-    return apiClient.put<RecetaResponseDTO>(
+    return apiClient.put<RecetaMetadataResponseDTO>(
       `/recetas/${encodeURIComponent(codigoReceta)}`,
-      recetaData
+      data
     );
   }
 

@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { recetaPadreService } from './RecetaPadreService';
+import { recetaService } from './RecetaService';
 import type { RecetaCreateDTO, RecetaMetadataResponseDTO } from '@/types/production/RecetaPadreDTOs';
 
 export const useRecetaPadreService = () => {
@@ -11,7 +11,7 @@ export const useRecetaPadreService = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await recetaPadreService.getAllRecetas();
+      const response = await recetaService.getAllRecetas();
       setRecetas(response);
     } catch (err: any) {
       setError(err.message || 'Error al obtener las recetas.');
@@ -25,7 +25,7 @@ export const useRecetaPadreService = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await recetaPadreService.createReceta(data);
+      const response = await recetaService.createReceta(data);
       setRecetas(prev => [...prev, response]);
       return response;
     } catch (err: any) {
