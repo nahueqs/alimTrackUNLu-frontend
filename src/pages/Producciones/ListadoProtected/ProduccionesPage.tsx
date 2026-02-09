@@ -190,7 +190,6 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '1rem' }}>
               <h1 className="productions-list__title">Listado de Producciones</h1>
               <div style={{ display: 'flex', gap: '8px' }}>
-                <PrintButton />
                 {selectedRowKeys.length > 0 && (
                   <Button 
                     danger 
