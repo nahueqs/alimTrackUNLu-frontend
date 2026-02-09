@@ -26,6 +26,7 @@ export interface CampoSimpleCreateDTO {
 
 export interface GrupoCamposCreateDTO {
   subtitulo: string;
+  orden: number; // Agregado campo orden
   camposSimples: CampoSimpleCreateDTO[];
 }
 

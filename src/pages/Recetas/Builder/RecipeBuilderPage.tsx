@@ -12,6 +12,7 @@ import { mapDraftToDTO } from './mapper';
 import { useVersionRecetaService } from '@/services/recetas/useVersionRecetaService';
 import { useRecetaPadreService } from '@/services/recetas/useRecetaPadreService';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { RecipeBuilderProvider } from './RecipeBuilderContext';
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -20,7 +21,9 @@ export const RecipeBuilderPage: React.FC = () => {
   usePageTitle('Nueva Receta');
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { recipe, actions, validateRecipe } = useRecipeBuilder();
+  const recipeBuilder = useRecipeBuilder(); // Instanciamos el hook aquí
+  const { recipe, actions, validateRecipe } = recipeBuilder;
+  
   const { createVersion, loading: loadingSave } = useVersionRecetaService();
   const { recetas, loading: loadingRecetas, getAllRecetas, createReceta } = useRecetaPadreService();
   const isMobile = useIsMobile();
@@ -81,116 +84,85 @@ export const RecipeBuilderPage: React.FC = () => {
   }
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <AppHeader title="AlimTrack" />
-      <Content style={{ padding: isMobile ? '16px' : '24px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
-        <div style={{ 
-            marginBottom: '16px', 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: isMobile ? 'flex-start' : 'center',
-            flexDirection: isMobile ? 'column' : 'row',
-            gap: isMobile ? '12px' : '0'
-        }}>
-          <Space align="center" wrap>
-            <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/recetas/versiones')}>
-              Volver
+    <RecipeBuilderProvider value={recipeBuilder}>
+      <Layout style={{ minHeight: '100vh' }}>
+        <AppHeader title="AlimTrack" />
+        <Content style={{ padding: isMobile ? '16px' : '24px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+          <div style={{ 
+              marginBottom: '16px', 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: isMobile ? 'flex-start' : 'center',
+              flexDirection: isMobile ? 'column' : 'row',
+              gap: isMobile ? '12px' : '0'
+          }}>
+            <Space align="center" wrap>
+              <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/recetas/versiones')}>
+                Volver
+              </Button>
+              <Title level={isMobile ? 4 : 2} style={{ margin: 0 }}>
+                Nueva Versión de Receta
+              </Title>
+            </Space>
+            <Button 
+              type="primary" 
+              icon={<SaveOutlined />} 
+              onClick={handleSave} 
+              size="large"
+              loading={loadingSave}
+              style={{ width: isMobile ? '100%' : 'auto' }}
+            >
+              Guardar Versión
             </Button>
-            <Title level={isMobile ? 4 : 2} style={{ margin: 0 }}>
-              Nueva Versión de Receta
-            </Title>
-          </Space>
-          <Button 
-            type="primary" 
-            icon={<SaveOutlined />} 
-            onClick={handleSave} 
-            size="large"
-            loading={loadingSave}
-            style={{ width: isMobile ? '100%' : 'auto' }}
-          >
-            Guardar Versión
-          </Button>
-        </div>
-
-        <MetadataEditor 
-          metadata={recipe.metadata} 
-          onChange={actions.updateMetadata}
-          recetasPadre={recetas}
-          onCreateRecetaPadre={createReceta}
-          currentUserEmail={user?.email || ''}
-        />
-
-        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Title level={3} style={{ margin: 0, fontSize: isMobile ? '1.25rem' : '1.75rem' }}>Secciones</Title>
-          <Button type="dashed" icon={<PlusOutlined />} onClick={actions.addSection}>
-            Agregar Sección
-          </Button>
-        </div>
-
-        {recipe.sections.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px', background: '#fff', borderRadius: '8px', border: '1px dashed #d9d9d9' }}>
-            <Typography.Text type="secondary">No hay secciones definidas. Agregue una para comenzar.</Typography.Text>
           </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {recipe.sections.map((section, index) => (
-              <div key={section.id} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '8px' }}>
-                      <Button 
-                        size="small" 
-                        icon={<ArrowUpOutlined />} 
-                        disabled={index === 0} 
-                        onClick={() => actions.moveSection(section.id, 'up')} 
-                      />
-                      <Button 
-                        size="small" 
-                        icon={<ArrowDownOutlined />} 
-                        disabled={index === recipe.sections.length - 1} 
-                        onClick={() => actions.moveSection(section.id, 'down')} 
-                      />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}> {/* minWidth: 0 evita overflow en flex items */}
-                      <SectionEditor
-                        section={section}
-                        onUpdate={(updates) => actions.updateSection(section.id, updates)}
-                        onDelete={() => actions.removeSection(section.id)}
-                        onMove={(direction) => actions.moveSection(section.id, direction)}
-                        
-                        // Fields
-                        onAddField={() => actions.addFieldToSection(section.id)}
-                        onUpdateField={(fieldId, updates) => actions.updateField(section.id, fieldId, updates)}
-                        onRemoveField={(fieldId) => actions.removeField(section.id, fieldId)}
-                        onMoveField={(fieldId, direction) => actions.moveField(section.id, fieldId, direction)}
-                        
-                        // Groups
-                        onAddGroup={() => actions.addGroupToSection(section.id)}
-                        onUpdateGroup={(groupId, updates) => actions.updateGroup(section.id, groupId, updates)}
-                        onRemoveGroup={(groupId) => actions.removeGroup(section.id, groupId)}
-                        onMoveGroup={(groupId, direction) => actions.moveGroup(section.id, groupId, direction)}
-                        onAddFieldToGroup={(groupId) => actions.addFieldToGroup(section.id, groupId)}
-                        onUpdateGroupField={(groupId, fieldId, updates) => actions.updateGroupField(section.id, groupId, fieldId, updates)}
-                        onRemoveGroupField={(groupId, fieldId) => actions.removeGroupField(section.id, groupId, fieldId)}
-                        onMoveGroupField={(groupId, fieldId, direction) => actions.moveGroupField(section.id, groupId, fieldId, direction)}
 
-                        // Tables
-                        onAddTable={() => actions.addTableToSection(section.id)}
-                        onUpdateTable={(tableId, updates) => actions.updateTable(section.id, tableId, updates)}
-                        onRemoveTable={(tableId) => actions.removeTable(section.id, tableId)}
-                        onMoveTable={(tableId, direction) => actions.moveTable(section.id, tableId, direction)}
-                        onAddColumnToTable={(tableId) => actions.addColumnToTable(section.id, tableId)}
-                        onUpdateColumn={(tableId, colId, updates) => actions.updateColumn(section.id, tableId, colId, updates)}
-                        onRemoveColumn={(tableId, colId) => actions.removeColumn(section.id, tableId, colId)}
-                        onAddRowToTable={(tableId) => actions.addRowToTable(section.id, tableId)}
-                        onUpdateRow={(tableId, rowId, updates) => actions.updateRow(section.id, tableId, rowId, updates)}
-                        onRemoveRow={(tableId, rowId) => actions.removeRow(section.id, tableId, rowId)}
-                      />
-                  </div>
-              </div>
-            ))}
+          <MetadataEditor 
+            metadata={recipe.metadata} 
+            onChange={actions.updateMetadata}
+            recetasPadre={recetas}
+            onCreateRecetaPadre={createReceta}
+            currentUserEmail={user?.email || ''}
+          />
+
+          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Title level={3} style={{ margin: 0, fontSize: isMobile ? '1.25rem' : '1.75rem' }}>Secciones</Title>
+            <Button type="dashed" icon={<PlusOutlined />} onClick={actions.addSection}>
+              Agregar Sección
+            </Button>
           </div>
-        )}
-      </Content>
-    </Layout>
+
+          {recipe.sections.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', background: '#fff', borderRadius: '8px', border: '1px dashed #d9d9d9' }}>
+              <Typography.Text type="secondary">No hay secciones definidas. Agregue una para comenzar.</Typography.Text>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {recipe.sections.map((section, index) => (
+                <div key={section.id} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '8px' }}>
+                        <Button 
+                          size="small" 
+                          icon={<ArrowUpOutlined />} 
+                          disabled={index === 0} 
+                          onClick={() => actions.moveSection(section.id, 'up')} 
+                        />
+                        <Button 
+                          size="small" 
+                          icon={<ArrowDownOutlined />} 
+                          disabled={index === recipe.sections.length - 1} 
+                          onClick={() => actions.moveSection(section.id, 'down')} 
+                        />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        <SectionEditor section={section} />
+                    </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Content>
+      </Layout>
+    </RecipeBuilderProvider>
   );
 };
 
