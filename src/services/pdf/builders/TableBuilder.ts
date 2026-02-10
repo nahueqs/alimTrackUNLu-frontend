@@ -44,6 +44,7 @@ export class TableBuilder {
         paddingBottom: () => 2,
       },
       margin: [0, this.config.layout.tableSpacing, 0, 8],
+
     };
 
     // Si necesita rotación, aplicar pageOrientation a este elemento
