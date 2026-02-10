@@ -18,30 +18,35 @@ export class TableWidthCalculator {
       : this.config.table.pageWidths.portrait;
   }
 
+  // MEJORADO: Comprime al mínimo la columna "Concepto"
   private calculateConceptWidth(tabla: TablaResponseDTO, fontSize: number): number {
-    if (!tabla.filas || tabla.filas.length === 0) return 60;
+    if (!tabla.filas || tabla.filas.length === 0) {
+      return this.config.layout.conceptColumnMinWidth;
+    }
     
+    // Calcular el ancho mínimo necesario basado en el texto más largo
     const maxLength = Math.max(...tabla.filas.map(f => f.nombre.length));
-    const puntosPerChar = fontSize * 0.55;
+    const puntosPerChar = fontSize * 0.5; // Factor más agresivo para comprimir
     const estimatedWidth = Math.ceil(maxLength * puntosPerChar);
     
-    return Math.min(Math.max(estimatedWidth, 50), 120);
+    // Mantener entre el mínimo y máximo configurado (más comprimido que antes)
+    return Math.min(
+      Math.max(estimatedWidth, this.config.layout.conceptColumnMinWidth),
+      this.config.layout.conceptColumnMaxWidth
+    );
   }
 
   private distributeWidths(tabla: TablaResponseDTO, conceptWidth: number, espacioDisponible: number, fontSize: number): any[] {
     const widths: any[] = [];
     
-    // Factor de escala basado en fontSize (base 9)
     const factorEscala = fontSize / 9;
     
-    // Anchos fijos escalados
     const ANCHO_ENTERO = Math.ceil(this.config.table.columnWidths.entero * factorEscala);
     const ANCHO_DECIMAL = Math.ceil(this.config.table.columnWidths.decimal * factorEscala);
     const ANCHO_FECHA = Math.ceil(this.config.table.columnWidths.fecha * factorEscala);
     const ANCHO_HORA = Math.ceil(this.config.table.columnWidths.hora * factorEscala);
     const ANCHO_BOOLEANO = Math.ceil(this.config.table.columnWidths.booleano * factorEscala);
 
-    // Primera columna (Concepto)
     widths.push(conceptWidth);
     let espacioUsado = conceptWidth;
     
@@ -66,18 +71,15 @@ export class TableWidthCalculator {
             widths.push(ANCHO_BOOLEANO);
             espacioUsado += ANCHO_BOOLEANO;
         } else {
-            // TipoDatoCampo.TEXTO - calcular después
-            columnasTexto.push(index + 1); // +1 porque la primera es "Concepto"
-            widths.push(null); // Placeholder
+            columnasTexto.push(index + 1);
+            widths.push(null);
         }
     });
     
-    // Distribuir espacio restante entre columnas de texto
     const espacioRestante = espacioDisponible - espacioUsado;
     const numColumnasTexto = columnasTexto.length;
     
     if (numColumnasTexto > 0) {
-        // Ajustar ancho mínimo según fontSize
         const anchoMinimo = fontSize === this.config.fontSize.small ? 50 : 60;
         const anchoPorColumnaTexto = Math.max(anchoMinimo, Math.floor(espacioRestante / numColumnasTexto));
         columnasTexto.forEach(colIndex => {

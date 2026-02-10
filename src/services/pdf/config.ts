@@ -16,6 +16,11 @@ export const PDF_CONFIG = {
     fieldsPerRow: 3,
     maxColumnasPortrait: 4,
     maxColumnasLandscape: 8,
+    // NUEVO: Configuración para gestión de espacio
+    giantTableThreshold: 5, // Más de 5 filas = tabla gigante
+    minPageSpacePercent: 0.30, // 30% mínimo de espacio libre
+    conceptColumnMinWidth: 40, // Ancho mínimo comprimido para "Concepto"
+    conceptColumnMaxWidth: 80, // Ancho máximo para "Concepto"
   },
   charsPerLine: {
     small: 30,
@@ -38,6 +43,13 @@ export const PDF_CONFIG = {
     pageWidths: {
       portrait: 535,
       landscape: 755,
+    },
+    // NUEVO: Alturas aproximadas para cálculo de espacio
+    headerHeight: 20,
+    rowHeight: 18,
+    pageHeight: {
+      portrait: 800, // Altura útil aproximada en portrait (A4 - margins)
+      landscape: 535, // Altura útil aproximada en landscape (A4 - margins)
     },
   },
 } as const;

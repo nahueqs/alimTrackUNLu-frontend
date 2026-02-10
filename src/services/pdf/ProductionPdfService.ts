@@ -8,6 +8,7 @@ import { HeaderBuilder } from './builders/HeaderBuilder';
 import { MetadataBuilder } from './builders/MetadataBuilder';
 import { BodyBuilder } from './builders/BodyBuilder';
 import { TableWidthCalculator } from './calculators/TableWidthCalculator';
+import { SpaceCalculator } from './calculators/SpaceCalculator';
 
 type RespuestasProduccion = RespuestasProduccionPublicDTO | RespuestasProduccionProtectedDTO;
 
@@ -20,10 +21,11 @@ export class ProductionPdfService {
     initializePdfFonts(pdfMake, pdfFonts);
     
     const widthCalculator = new TableWidthCalculator(PDF_CONFIG);
+    const spaceCalculator = new SpaceCalculator(PDF_CONFIG);
     
     this.headerBuilder = new HeaderBuilder(PDF_CONFIG);
     this.metadataBuilder = new MetadataBuilder(PDF_CONFIG);
-    this.bodyBuilder = new BodyBuilder(PDF_CONFIG, widthCalculator);
+    this.bodyBuilder = new BodyBuilder(PDF_CONFIG, widthCalculator, spaceCalculator);
   }
 
   generate(estructura: EstructuraProduccionDTO, respuestas: RespuestasProduccion) {
