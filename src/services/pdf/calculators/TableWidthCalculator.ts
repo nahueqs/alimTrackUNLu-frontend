@@ -18,18 +18,25 @@ export class TableWidthCalculator {
       : this.config.table.pageWidths.portrait;
   }
 
+  // MEJORADO: Lógica adaptativa para el ancho de concepto
   private calculateConceptWidth(tabla: TablaResponseDTO, fontSize: number): number {
     if (!tabla.filas || tabla.filas.length === 0) {
       return this.config.layout.conceptColumnMinWidth;
     }
     
     const maxLength = Math.max(...tabla.filas.map(f => f.nombre.length));
-    const puntosPerChar = fontSize * 0.42; // Más agresivo
+    const puntosPerChar = fontSize * 0.45;
     const estimatedWidth = Math.ceil(maxLength * puntosPerChar);
     
+    // Si el texto es muy largo, permitimos extender el ancho hasta el límite extendido
+    // para evitar que la fila se haga demasiado alta
+    const maxLimit = maxLength > 40 
+      ? this.config.layout.conceptColumnMaxExtended 
+      : this.config.layout.conceptColumnMaxWidth;
+
     return Math.min(
       Math.max(estimatedWidth, this.config.layout.conceptColumnMinWidth),
-      this.config.layout.conceptColumnMaxWidth
+      maxLimit
     );
   }
 
@@ -75,8 +82,16 @@ export class TableWidthCalculator {
     const numColumnasTexto = columnasTexto.length;
     
     if (numColumnasTexto > 0) {
+        // Si queda poco espacio, forzamos un mínimo para que sea legible
         const anchoMinimo = fontSize === this.config.fontSize.small ? 45 : 55;
-        const anchoPorColumnaTexto = Math.max(anchoMinimo, Math.floor(espacioRestante / numColumnasTexto));
+        
+        // Si el espacio restante es negativo o muy poco, usamos el mínimo
+        // (pdfmake ajustará automáticamente si nos pasamos un poco, o cortará)
+        const anchoPorColumnaTexto = Math.max(
+            anchoMinimo, 
+            Math.floor(Math.max(0, espacioRestante) / numColumnasTexto)
+        );
+        
         columnasTexto.forEach(colIndex => {
             widths[colIndex] = anchoPorColumnaTexto;
         });

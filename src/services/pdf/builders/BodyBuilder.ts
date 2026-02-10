@@ -88,8 +88,9 @@ export class BodyBuilder {
 
       // Campos simples (compactos)
       if (seccion.camposSimples.length > 0) {
-        content.push(this.buildFieldsGrid(seccion.camposSimples, respuestasCamposMap));
-        currentPageHeight += seccion.camposSimples.length * 18;
+        const fieldsGrid = this.buildFieldsGrid(seccion.camposSimples, respuestasCamposMap);
+        content.push(fieldsGrid);
+        currentPageHeight += this.estimateGridHeight(seccion.camposSimples, respuestasCamposMap);
       }
 
       // Grupos de campos (compactos)
@@ -101,7 +102,7 @@ export class BodyBuilder {
           margin: [0, this.config.layout.groupSpacing, 0, this.config.layout.fieldSpacing] 
         });
         content.push(this.buildFieldsGrid(grupo.campos, respuestasCamposMap));
-        currentPageHeight += grupo.campos.length * 18;
+        currentPageHeight += this.estimateGridHeight(grupo.campos, respuestasCamposMap);
       });
 
       // Tablas
@@ -139,11 +140,11 @@ export class BodyBuilder {
 
         if (shouldBreak) {
           content.push({ ...tableTitle, pageBreak: 'before' });
-          currentPageHeight = tableInfo.estimatedHeight;
+          currentPageHeight = 0; // Resetear altura al cambiar de página
         } else {
           content.push(tableTitle);
-          currentPageHeight += tableInfo.estimatedHeight;
         }
+        currentPageHeight += tableInfo.estimatedHeight;
 
         // Tabla con rotación si es necesaria
         if (numColumnas > this.config.layout.maxColumnasLandscape) {
@@ -211,6 +212,31 @@ export class BodyBuilder {
     if (numColumnas > 8) return this.config.fontSize.small;
     if (numColumnas > 6) return this.config.fontSize.medium;
     return this.config.fontSize.normal;
+  }
+
+  // MEJORADO: Estima la altura real de un grid de campos
+  private estimateGridHeight(campos: CampoSimpleResponseDTO[], respuestasMap: Record<number, string>): number {
+    let totalHeight = 0;
+    const numRows = Math.ceil(campos.length / this.config.layout.fieldsPerRow);
+
+    for (let i = 0; i < numRows; i++) {
+      const rowCampos = campos.slice(i * 3, (i * 3) + 3);
+      let maxLinesInRow = 1;
+
+      rowCampos.forEach(campo => {
+        if (campo.tipoDato === TipoDatoCampo.TEXTO) {
+          const valor = respuestasMap[campo.id] || '';
+          const numLines = Math.ceil(valor.length / this.config.charsPerLine.fieldValue);
+          if (numLines > maxLinesInRow) {
+            maxLinesInRow = numLines;
+          }
+        }
+      });
+      
+      totalHeight += maxLinesInRow * this.config.table.lineHeight + 10; // +10 para márgenes
+    }
+    
+    return totalHeight;
   }
 
   private buildFieldsGrid(campos: CampoSimpleResponseDTO[], respuestasMap: Record<number, string>) {
