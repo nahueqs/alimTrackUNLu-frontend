@@ -8,7 +8,6 @@ import { ValueFormatter } from '../formatters';
 
 type RespuestasProduccion = RespuestasProduccionPublicDTO | RespuestasProduccionProtectedDTO;
 
-// NUEVO: Interface para rastrear tablas gigantes
 interface TableInfo {
   seccionIndex: number;
   tablaIndex: number;
@@ -36,17 +35,18 @@ export class BodyBuilder {
     const content: any[] = [];
     const respuestasCamposMap = respuestas.respuestasCampos.reduce((acc, r) => ({ ...acc, [r.idCampo]: r.valor }), {} as Record<number, string>);
 
-    // NUEVO: Recopilar información de todas las tablas
+    // Recopilar información de todas las tablas CON ANÁLISIS DE CONTENIDO
     const allTables: TableInfo[] = [];
-    const regularContent: any[] = [];
     const giantTables: TableInfo[] = [];
 
     estructura.estructura.forEach((seccion: SeccionResponseDTO, seccionIndex: number) => {
       seccion.tablas.forEach((tabla, tablaIndex) => {
-        const isGiant = this.spaceCalculator.isGiantTable(tabla);
         const numColumnas = (tabla.columnas?.length || 0) + 1;
         const hasLongText = tabla.columnas?.some(col => col.tipoDato === TipoDatoCampo.TEXTO) ?? false;
         const fontSize = this.calculateFontSize(numColumnas, hasLongText);
+        
+        // NUEVO: Análisis basado en contenido REAL
+        const isGiant = this.spaceCalculator.isGiantTable(tabla, respuestas.respuestasTablas, fontSize);
         const estimatedHeight = this.spaceCalculator.estimateTableHeight(tabla, fontSize);
 
         const tableInfo: TableInfo = {
@@ -67,35 +67,35 @@ export class BodyBuilder {
       });
     });
 
-    // NUEVO: Construir contenido regular (campos y tablas pequeñas)
+    // Construir contenido regular
     let currentPageHeight = 150; // Altura inicial aproximada (header + metadata)
 
     estructura.estructura.forEach((seccion: SeccionResponseDTO, seccionIndex: number) => {
-      // Título de Sección
+      // Título de Sección (solo pageBreak si no es la primera)
       const seccionTitle = { 
         text: `${seccionIndex + 1}. ${seccion.titulo}`, 
         style: 'sectionTitle',
         margin: [0, 15, 0, 5],
         pageBreak: seccionIndex > 0 ? 'before' : undefined
       };
-      regularContent.push(seccionTitle);
-      currentPageHeight += 30;
+      content.push(seccionTitle);
+      currentPageHeight = seccionIndex > 0 ? 30 : currentPageHeight + 30;
 
       // Campos Simples
       if (seccion.camposSimples.length > 0) {
         const fieldsGrid = this.buildFieldsGrid(seccion.camposSimples, respuestasCamposMap);
-        regularContent.push(fieldsGrid);
+        content.push(fieldsGrid);
         currentPageHeight += seccion.camposSimples.length * 25;
       }
 
       // Grupos de Campos
       seccion.gruposCampos.forEach(grupo => {
-        regularContent.push({ text: grupo.subtitulo, fontSize: 11, bold: true, margin: [0, 8, 0, 3] });
-        regularContent.push(this.buildFieldsGrid(grupo.campos, respuestasCamposMap));
+        content.push({ text: grupo.subtitulo, fontSize: 11, bold: true, margin: [0, 8, 0, 3] });
+        content.push(this.buildFieldsGrid(grupo.campos, respuestasCamposMap));
         currentPageHeight += grupo.campos.length * 25;
       });
 
-      // NUEVO: Procesar tablas con lógica de espacio
+      // Tablas con lógica MEJORADA
       seccion.tablas.forEach((tabla, tablaIndex) => {
         const tableInfo = allTables.find(t => 
           t.seccionIndex === seccionIndex && t.tablaIndex === tablaIndex
@@ -105,7 +105,7 @@ export class BodyBuilder {
 
         // Si es tabla gigante, solo agregar referencia
         if (tableInfo.isGiant) {
-          regularContent.push({
+          content.push({
             text: `📊 ${tabla.nombre} (Ver al final del documento)`,
             fontSize: 10,
             italics: true,
@@ -127,48 +127,40 @@ export class BodyBuilder {
             pageOrientation
           );
 
-          regularContent.push({ 
-            text: tabla.nombre, 
-            fontSize: 11, 
-            bold: true, 
-            margin: [0, 10, 0, 2],
-            pageBreak: (tablaIndex > 0 || shouldBreak) ? 'before' : undefined
-          });
-          regularContent.push(...this.tableBuilder.buildSplit(tabla, respuestas.respuestasTablas, pageOrientation));
-          
-          if (shouldBreak) {
-            currentPageHeight = tableInfo.estimatedHeight;
-          } else {
-            currentPageHeight += tableInfo.estimatedHeight;
-          }
-        } else {
-          // Tablas normales
-          const shouldBreak = this.spaceCalculator.shouldMoveToNewPage(
-            currentPageHeight, 
-            tableInfo.estimatedHeight, 
-            pageOrientation
-          );
-
-          regularContent.push({ 
+          content.push({ 
             text: tabla.nombre, 
             fontSize: 11, 
             bold: true, 
             margin: [0, 10, 0, 2],
             pageBreak: shouldBreak ? 'before' : undefined
           });
-          regularContent.push(this.tableBuilder.build(tabla, respuestas.respuestasTablas, pageOrientation));
+          content.push(...this.tableBuilder.buildSplit(tabla, respuestas.respuestasTablas, pageOrientation));
           
-          if (shouldBreak) {
-            currentPageHeight = tableInfo.estimatedHeight;
-          } else {
-            currentPageHeight += tableInfo.estimatedHeight;
-          }
+          currentPageHeight = shouldBreak ? tableInfo.estimatedHeight : currentPageHeight + tableInfo.estimatedHeight;
+        } else {
+          // Tablas normales - SOLO mover a nueva página si NO cabe
+          const shouldBreak = this.spaceCalculator.shouldMoveToNewPage(
+            currentPageHeight, 
+            tableInfo.estimatedHeight, 
+            pageOrientation
+          );
+
+          content.push({ 
+            text: tabla.nombre, 
+            fontSize: 11, 
+            bold: true, 
+            margin: [0, 10, 0, 2],
+            pageBreak: shouldBreak ? 'before' : undefined
+          });
+          content.push(this.tableBuilder.build(tabla, respuestas.respuestasTablas, pageOrientation));
+          
+          currentPageHeight = shouldBreak ? tableInfo.estimatedHeight : currentPageHeight + tableInfo.estimatedHeight;
         }
       });
 
-      // Línea separadora
+      // Línea separadora (SOLO si no es la última sección Y no viene pageBreak después)
       if (seccionIndex < estructura.estructura.length - 1) {
-        regularContent.push({ 
+        content.push({ 
           canvas: [{ 
             type: 'line', 
             x1: 0, 
@@ -183,10 +175,7 @@ export class BodyBuilder {
       }
     });
 
-    // Agregar contenido regular al documento
-    content.push(...regularContent);
-
-    // NUEVO: Agregar tablas gigantes al final
+    // Agregar tablas gigantes al final
     if (giantTables.length > 0) {
       content.push({
         text: 'TABLAS DETALLADAS',
