@@ -64,7 +64,6 @@ export const getColumns = ({
         <CustomTableRowActions<VersionRecetaMetadataResponseDTO> // Changed type
           record={record}
           viewPath={(r) => `/recetas/ver/${r.codigoVersionReceta}`}
-          editPath={(r) => `/recetas/versiones/editar/${r.codigoVersionReceta}`}
           onDelete={onDelete}
           getRecordId={(r) => r.codigoVersionReceta}
           isMobile={isMobile} // Pass isMobile prop
