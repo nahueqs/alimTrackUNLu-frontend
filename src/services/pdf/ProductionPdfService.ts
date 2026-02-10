@@ -9,6 +9,7 @@ import { MetadataBuilder } from './builders/MetadataBuilder';
 import { BodyBuilder } from './builders/BodyBuilder';
 import { TableWidthCalculator } from './calculators/TableWidthCalculator';
 import { SpaceCalculator } from './calculators/SpaceCalculator';
+import { ContentAnalyzer } from './calculators/ContentAnalyzer';
 
 type RespuestasProduccion = RespuestasProduccionPublicDTO | RespuestasProduccionProtectedDTO;
 
@@ -21,7 +22,8 @@ export class ProductionPdfService {
     initializePdfFonts(pdfMake, pdfFonts);
     
     const widthCalculator = new TableWidthCalculator(PDF_CONFIG);
-    const spaceCalculator = new SpaceCalculator(PDF_CONFIG);
+    const contentAnalyzer = new ContentAnalyzer(PDF_CONFIG);
+    const spaceCalculator = new SpaceCalculator(PDF_CONFIG, contentAnalyzer);
     
     this.headerBuilder = new HeaderBuilder(PDF_CONFIG);
     this.metadataBuilder = new MetadataBuilder(PDF_CONFIG);

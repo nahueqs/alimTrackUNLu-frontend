@@ -18,18 +18,20 @@ export class TableWidthCalculator {
       : this.config.table.pageWidths.portrait;
   }
 
-  // MEJORADO: Comprime al mínimo la columna "Concepto"
+  // MEJORADO: Ultra-compresión de columna "Concepto"
   private calculateConceptWidth(tabla: TablaResponseDTO, fontSize: number): number {
     if (!tabla.filas || tabla.filas.length === 0) {
       return this.config.layout.conceptColumnMinWidth;
     }
     
-    // Calcular el ancho mínimo necesario basado en el texto más largo
+    // Buscar el texto más largo en los nombres de fila
     const maxLength = Math.max(...tabla.filas.map(f => f.nombre.length));
-    const puntosPerChar = fontSize * 0.5; // Factor más agresivo para comprimir
+    
+    // Factor más agresivo para comprimir (0.45 en lugar de 0.5)
+    const puntosPerChar = fontSize * 0.45;
     const estimatedWidth = Math.ceil(maxLength * puntosPerChar);
     
-    // Mantener entre el mínimo y máximo configurado (más comprimido que antes)
+    // Límites ultra-comprimidos
     return Math.min(
       Math.max(estimatedWidth, this.config.layout.conceptColumnMinWidth),
       this.config.layout.conceptColumnMaxWidth

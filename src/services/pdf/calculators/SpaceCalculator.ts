@@ -1,38 +1,67 @@
 import type { TablaResponseDTO } from '@/types/production';
-import { TipoDatoCampo } from '@/pages/Recetas/types/TipoDatoCampo';
 import { PDF_CONFIG } from '../config';
+import { ContentAnalyzer, TableAnalysis } from './ContentAnalyzer';
 
 export class SpaceCalculator {
-  constructor(private config: typeof PDF_CONFIG) {}
+  constructor(
+    private config: typeof PDF_CONFIG,
+    private contentAnalyzer: ContentAnalyzer
+  ) {}
 
   /**
-   * Determina si una tabla es "gigante"
+   * Determina si una tabla es "gigante" basándose en contenido REAL
    */
-  isGiantTable(tabla: TablaResponseDTO): boolean {
-    const numFilas = tabla.filas?.length || 0;
-    const hasTextColumns = tabla.columnas?.some(col => col.tipoDato === TipoDatoCampo.TEXTO) ?? false;
+  isGiantTable(tabla: TablaResponseDTO, respuestasTablas: any[], fontSize: number): boolean {
+    const analysis = this.contentAnalyzer.analyzeTable(tabla, respuestasTablas);
     
-    // Tabla gigante si: >5 filas, especialmente si tiene columnas de texto
-    return numFilas > this.config.layout.giantTableThreshold && hasTextColumns;
+    // REGLA 1: Debe tener más de N filas
+    if (analysis.numFilas <= this.config.layout.giantTableRowThreshold) {
+      return false;
+    }
+    
+    // REGLA 2: Debe tener texto largo
+    if (!analysis.hasLongText) {
+      return false;
+    }
+    
+    // REGLA 3: La altura estimada debe ser significativa
+    const estimatedHeight = this.estimateTableHeight(tabla, fontSize, analysis);
+    if (estimatedHeight < this.config.layout.giantTableMinHeight) {
+      return false;
+    }
+    
+    // REGLA 4: No debe estar mayormente vacía
+    if (analysis.emptyRatio > 0.5) {
+      return false;
+    }
+    
+    return true;
   }
 
   /**
-   * Estima la altura que ocupará una tabla en puntos
+   * Estima la altura que ocupará una tabla (MEJORADO con análisis de contenido)
    */
-  estimateTableHeight(tabla: TablaResponseDTO, fontSize: number): number {
+  estimateTableHeight(tabla: TablaResponseDTO, fontSize: number, analysis?: TableAnalysis): number {
     const numFilas = tabla.filas?.length || 0;
     const headerHeight = this.config.table.headerHeight;
-    const rowHeight = this.config.table.rowHeight;
     
-    // Ajustar altura de fila según fontSize
+    // Si no tenemos análisis, hacerlo ahora (pero sin respuestas, será menos preciso)
+    const hasLongText = analysis?.hasLongText ?? false;
+    
+    // Ajustar altura de fila según fontSize y contenido
+    const baseRowHeight = this.config.table.rowHeightBase;
+    const wrappingRowHeight = this.config.table.rowHeightWithWrapping;
+    
+    const rowHeight = hasLongText ? wrappingRowHeight : baseRowHeight;
     const adjustedRowHeight = rowHeight * (fontSize / this.config.fontSize.normal);
     
-    return headerHeight + (numFilas * adjustedRowHeight) + 20; // +20 para márgenes
+    const padding = this.config.table.paddingPerRow * numFilas;
+    
+    return headerHeight + (numFilas * adjustedRowHeight) + padding + 20;
   }
 
   /**
    * Calcula si hay suficiente espacio disponible en la página actual
-   * Retorna true si hay más del 30% de espacio libre
    */
   hasEnoughSpace(currentHeight: number, tableHeight: number, pageOrientation: 'portrait' | 'landscape'): boolean {
     const totalHeight = pageOrientation === 'landscape'
