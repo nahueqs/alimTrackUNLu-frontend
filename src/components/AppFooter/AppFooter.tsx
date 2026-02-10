@@ -15,7 +15,7 @@ export const AppFooter: React.FC = () => {
         
         <div className="app-footer__links">
           <Link to="/ayuda" className="app-footer__link">
-            <QuestionCircleOutlined /> Centro de Ayuda
+            <QuestionCircleOutlined /> Manual de uso del sistema
           </Link>
           {/* Podrías agregar más enlaces aquí, ej: Soporte, Términos */}
         </div>

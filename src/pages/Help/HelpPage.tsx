@@ -66,7 +66,7 @@ export const HelpPage: React.FC = () => {
           <ul>
             <li>Ve a <strong>Producciones {'>'} Nueva</strong>.</li>
             <li>Selecciona la Versión de Receta que vas a utilizar.</li>
-            <li>Asigna un código de lote único.</li>
+            <li>Asigna un código de producción único.</li>
             <li>El sistema generará un formulario basado en la estructura que diseñaste.</li>
           </ul>
         </div>
@@ -82,10 +82,11 @@ export const HelpPage: React.FC = () => {
             Durante la producción, los operarios completan los campos y tablas.
           </Paragraph>
           <ul>
-            <li>El guardado es <strong>automático</strong>.</li>
-            <li>Puedes ver el progreso en tiempo real.</li>
+            <li>Para que un cambio en un campo se guarde, es necesario tocar el icono verde, luego de editar el valor deseado.</li>
+            <li>Puedes ver el progreso en tiempo real, desde la pagina de edición o vista pública, que no requiere usuario.</li>
             <li>Al terminar, cambia el estado a <strong>Finalizada</strong> para cerrar la edición.</li>
             <li>Exporta el reporte final a PDF con un solo clic.</li>
+            <li>Podes acceder al historial de producciones desde la pagina de inicio <strong>Ver todas las producciones</strong></li>
           </ul>
         </div>
       ),
@@ -95,7 +96,7 @@ export const HelpPage: React.FC = () => {
   const faqs = [
     {
       key: '1',
-      label: '¿Puedo editar una receta que ya tiene producciones?',
+      label: '¿Puedo editar una versión receta que ya tiene producciones?',
       children: 'No directamente. Para mantener la integridad histórica, si necesitas cambiar la estructura, debes crear una nueva Versión de Receta. Las producciones pasadas mantendrán la estructura original.',
     },
     {
@@ -117,7 +118,7 @@ export const HelpPage: React.FC = () => {
     {
       key: '4',
       label: '¿Quién puede ver las producciones?',
-      children: 'Los usuarios autenticados pueden ver y editar producciones. Existe un listado público limitado donde cualquiera puede consultar el estado básico de una producción si tiene el código o lote.',
+      children: 'Los usuarios autenticados pueden ver y editar producciones. Existe un listado público donde cualquiera puede consultar el estado de una producción.',
     },
   ];
 
