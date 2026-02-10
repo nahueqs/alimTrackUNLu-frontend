@@ -8,31 +8,24 @@ export class HeaderBuilder {
   build(estructura: EstructuraProduccionDTO) {
     return {
       columns: [
-        this.buildTitle(estructura),
-        this.buildTimestamp(),
-      ],
-    };
-  }
-
-  private buildTitle(estructura: EstructuraProduccionDTO) {
-    return {
-      width: '*',
-      text: [
-        { text: 'Reporte de Producción\n', style: 'header' },
-        { 
-          text: `Receta: ${estructura.metadata.nombre} (${estructura.metadata.codigoVersionReceta})`, 
-          fontSize: this.config.fonts.label 
+        {
+          width: '*',
+          text: [
+            { text: 'Reporte de Producción\n', style: 'header' },
+            { 
+              text: `Receta: ${estructura.metadata.nombre} (${estructura.metadata.codigoVersionReceta})`, 
+              fontSize: this.config.fonts.label 
+            },
+          ],
+        },
+        {
+          width: 'auto',
+          text: `Generado: ${dayjs().format('DD/MM/YYYY HH:mm')}`,
+          fontSize: 8,
+          alignment: 'right' as const,
         },
       ],
-    };
-  }
-
-  private buildTimestamp() {
-    return {
-      width: 'auto',
-      text: `Generado: ${dayjs().format('DD/MM/YYYY HH:mm')}`,
-      fontSize: 8,
-      alignment: 'right' as const,
+      margin: [0, 0, 0, 8], // Reducido
     };
   }
 }

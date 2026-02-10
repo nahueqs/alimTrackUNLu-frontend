@@ -1,59 +1,63 @@
 export const PDF_CONFIG = {
   pageSize: 'A4' as const,
-  margins: [30, 40, 30, 40] as [number, number, number, number],
+  margins: [25, 30, 25, 40] as [number, number, number, number], // Reducido: left, top, right, bottom
   fonts: {
-    header: 18,
-    subheader: 14,
-    label: 10,
-    value: 10,
-    sectionTitle: 12,
-    tableHeader: 10,
-    tableCell: 9,
+    header: 16,        // Reducido de 18
+    subheader: 12,     // Reducido de 14
+    label: 9,          // Reducido de 10
+    value: 9,          // Reducido de 10
+    sectionTitle: 11,  // Reducido de 12
+    tableHeader: 9,    // Reducido de 10
+    tableCell: 8,      // Reducido de 9
+    footer: 8,         // Para numeración
   },
   layout: {
     columnsThreshold: 6,
-    maxCharsBeforeBreak: 20,
+    maxCharsBeforeBreak: 25,      // Aumentado para menos wrapping
     fieldsPerRow: 3,
-    maxColumnasPortrait: 4,
-    maxColumnasLandscape: 8,
-    // MEJORADO: Configuración más inteligente
-    giantTableRowThreshold: 5,        // Mínimo de filas para considerar
-    giantTableMinHeight: 350,         // Altura mínima en puntos para ser "gigante"
-    avgTextLengthThreshold: 50,       // Longitud promedio de texto para pesar más
-    minPageSpacePercent: 0.30,        // 30% mínimo de espacio libre
-    conceptColumnMinWidth: 35,        // Ultra-comprimido
-    conceptColumnMaxWidth: 75,        // Máximo reducido
+    maxColumnasPortrait: 5,       // Aumentado de 4
+    maxColumnasLandscape: 10,     // Aumentado de 8
+    giantTableRowThreshold: 6,    // Aumentado de 5 para ser más selectivo
+    giantTableMinHeight: 400,     // Aumentado para ser más selectivo
+    avgTextLengthThreshold: 60,   // Aumentado de 50
+    minPageSpacePercent: 0.20,    // Reducido de 0.30 (más agresivo)
+    conceptColumnMinWidth: 30,    // Ultra-comprimido
+    conceptColumnMaxWidth: 70,
+    // NUEVO: Espaciado reducido
+    sectionSpacing: 8,            // Espacio entre secciones
+    groupSpacing: 5,              // Espacio entre grupos
+    fieldSpacing: 3,              // Espacio entre campos
+    tableSpacing: 5,              // Espacio antes de tabla
   },
   charsPerLine: {
-    small: 30,
-    medium: 40,
-    large: 60,
+    small: 25,
+    medium: 35,
+    large: 50,
   },
   fontSize: {
     small: 7,
     medium: 8,
-    normal: 9,
+    normal: 8,     // Reducido de 9
   },
   table: {
     columnWidths: {
-      entero: 45,
-      decimal: 55,
-      fecha: 65,
-      hora: 55,
-      booleano: 35,
+      entero: 40,      // Reducido de 45
+      decimal: 50,     // Reducido de 55
+      fecha: 60,       // Reducido de 65
+      hora: 50,        // Reducido de 55
+      booleano: 30,    // Reducido de 35
     },
     pageWidths: {
-      portrait: 535,
-      landscape: 755,
+      portrait: 545,   // Aumentado por márgenes reducidos
+      landscape: 792,  // A4 landscape width - margins
     },
     pageHeight: {
-      portrait: 800,
-      landscape: 535,
+      portrait: 812,   // Aumentado por márgenes reducidos
+      landscape: 545,  // A4 landscape height - margins
     },
-    // NUEVO: Factores de altura más precisos
-    headerHeight: 22,
-    rowHeightBase: 16,
-    rowHeightWithWrapping: 30,    // Para texto que envuelve
-    paddingPerRow: 6,
+    headerHeight: 18,
+    rowHeightBase: 14,           // Reducido de 16
+    rowHeightWithWrapping: 25,   // Reducido de 30
+    paddingPerRow: 4,            // Reducido de 6
   },
 } as const;

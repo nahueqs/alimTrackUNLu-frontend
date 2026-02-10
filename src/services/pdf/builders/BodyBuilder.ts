@@ -1,4 +1,10 @@
-import type { EstructuraProduccionDTO, RespuestasProduccionProtectedDTO, RespuestasProduccionPublicDTO, SeccionResponseDTO, CampoSimpleResponseDTO } from '@/types/production';
+import type { 
+  EstructuraProduccionDTO, 
+  RespuestasProduccionProtectedDTO, 
+  RespuestasProduccionPublicDTO, 
+  SeccionResponseDTO, 
+  CampoSimpleResponseDTO 
+} from '@/types/production';
 import { TipoDatoCampo } from '@/pages/Recetas/types/TipoDatoCampo';
 import { PDF_CONFIG } from '../config';
 import { TableWidthCalculator } from '../calculators/TableWidthCalculator';
@@ -15,6 +21,7 @@ interface TableInfo {
   seccionTitulo: string;
   tablaNombre: string;
   isGiant: boolean;
+  needsRotation: boolean;
   estimatedHeight: number;
 }
 
@@ -33,19 +40,21 @@ export class BodyBuilder {
 
   build(estructura: EstructuraProduccionDTO, respuestas: RespuestasProduccion, pageOrientation: 'portrait' | 'landscape') {
     const content: any[] = [];
-    const respuestasCamposMap = respuestas.respuestasCampos.reduce((acc, r) => ({ ...acc, [r.idCampo]: r.valor }), {} as Record<number, string>);
+    const respuestasCamposMap = respuestas.respuestasCampos.reduce(
+      (acc, r) => ({ ...acc, [r.idCampo]: r.valor }), 
+      {} as Record<number, string>
+    );
 
-    // Recopilar información de todas las tablas CON ANÁLISIS DE CONTENIDO
     const allTables: TableInfo[] = [];
     const giantTables: TableInfo[] = [];
 
+    // Analizar todas las tablas
     estructura.estructura.forEach((seccion: SeccionResponseDTO, seccionIndex: number) => {
       seccion.tablas.forEach((tabla, tablaIndex) => {
         const numColumnas = (tabla.columnas?.length || 0) + 1;
         const hasLongText = tabla.columnas?.some(col => col.tipoDato === TipoDatoCampo.TEXTO) ?? false;
         const fontSize = this.calculateFontSize(numColumnas, hasLongText);
-        
-        // NUEVO: Análisis basado en contenido REAL
+        const needsRotation = this.spaceCalculator.shouldRotateTable(tabla);
         const isGiant = this.spaceCalculator.isGiantTable(tabla, respuestas.respuestasTablas, fontSize);
         const estimatedHeight = this.spaceCalculator.estimateTableHeight(tabla, fontSize);
 
@@ -56,131 +65,111 @@ export class BodyBuilder {
           seccionTitulo: seccion.titulo,
           tablaNombre: tabla.nombre,
           isGiant,
+          needsRotation,
           estimatedHeight,
         };
 
         allTables.push(tableInfo);
-        
-        if (isGiant) {
-          giantTables.push(tableInfo);
-        }
+        if (isGiant) giantTables.push(tableInfo);
       });
     });
 
-    // Construir contenido regular
-    let currentPageHeight = 150; // Altura inicial aproximada (header + metadata)
+    // Construir contenido
+    let currentPageHeight = 100; // Header + metadata aproximado
 
     estructura.estructura.forEach((seccion: SeccionResponseDTO, seccionIndex: number) => {
-      // Título de Sección (solo pageBreak si no es la primera)
-      const seccionTitle = { 
+      // Título de sección (compacto)
+      content.push({ 
         text: `${seccionIndex + 1}. ${seccion.titulo}`, 
         style: 'sectionTitle',
-        margin: [0, 15, 0, 5],
-        pageBreak: seccionIndex > 0 ? 'before' : undefined
-      };
-      content.push(seccionTitle);
-      currentPageHeight = seccionIndex > 0 ? 30 : currentPageHeight + 30;
+        margin: [0, this.config.layout.sectionSpacing, 0, this.config.layout.groupSpacing],
+      });
+      currentPageHeight += 20;
 
-      // Campos Simples
+      // Campos simples (compactos)
       if (seccion.camposSimples.length > 0) {
-        const fieldsGrid = this.buildFieldsGrid(seccion.camposSimples, respuestasCamposMap);
-        content.push(fieldsGrid);
-        currentPageHeight += seccion.camposSimples.length * 25;
+        content.push(this.buildFieldsGrid(seccion.camposSimples, respuestasCamposMap));
+        currentPageHeight += seccion.camposSimples.length * 18;
       }
 
-      // Grupos de Campos
+      // Grupos de campos (compactos)
       seccion.gruposCampos.forEach(grupo => {
-        content.push({ text: grupo.subtitulo, fontSize: 11, bold: true, margin: [0, 8, 0, 3] });
+        content.push({ 
+          text: grupo.subtitulo, 
+          fontSize: 10, 
+          bold: true, 
+          margin: [0, this.config.layout.groupSpacing, 0, this.config.layout.fieldSpacing] 
+        });
         content.push(this.buildFieldsGrid(grupo.campos, respuestasCamposMap));
-        currentPageHeight += grupo.campos.length * 25;
+        currentPageHeight += grupo.campos.length * 18;
       });
 
-      // Tablas con lógica MEJORADA
+      // Tablas
       seccion.tablas.forEach((tabla, tablaIndex) => {
         const tableInfo = allTables.find(t => 
           t.seccionIndex === seccionIndex && t.tablaIndex === tablaIndex
         );
-
         if (!tableInfo) return;
 
-        // Si es tabla gigante, solo agregar referencia
+        // Si es gigante, solo referencia
         if (tableInfo.isGiant) {
           content.push({
-            text: `📊 ${tabla.nombre} (Ver al final del documento)`,
-            fontSize: 10,
+            text: `→ ${tabla.nombre} (Ver al final del documento)`,
+            fontSize: 9,
             italics: true,
-            color: '#0066cc',
-            margin: [0, 10, 0, 5],
-            decoration: 'underline'
+            margin: [0, 5, 0, 3],
           });
           return;
         }
 
-        // Para tablas normales, verificar espacio disponible
         const numColumnas = (tabla.columnas?.length || 0) + 1;
-        
-        // Tablas con muchas columnas (divididas)
-        if (numColumnas > this.config.layout.maxColumnasLandscape) {
-          const shouldBreak = this.spaceCalculator.shouldMoveToNewPage(
-            currentPageHeight, 
-            tableInfo.estimatedHeight, 
-            pageOrientation
-          );
+        const shouldBreak = this.spaceCalculator.shouldMoveToNewPage(
+          currentPageHeight, 
+          tableInfo.estimatedHeight, 
+          pageOrientation
+        );
 
-          content.push({ 
-            text: tabla.nombre, 
-            fontSize: 11, 
-            bold: true, 
-            margin: [0, 10, 0, 2],
-            pageBreak: shouldBreak ? 'before' : undefined
-          });
-          content.push(...this.tableBuilder.buildSplit(tabla, respuestas.respuestasTablas, pageOrientation));
-          
-          currentPageHeight = shouldBreak ? tableInfo.estimatedHeight : currentPageHeight + tableInfo.estimatedHeight;
+        // Título de tabla (compacto)
+        const tableTitle = { 
+          text: tabla.nombre, 
+          fontSize: 10, 
+          bold: true, 
+          margin: [0, this.config.layout.tableSpacing, 0, 2],
+        };
+
+        if (shouldBreak) {
+          content.push({ ...tableTitle, pageBreak: 'before' });
+          currentPageHeight = tableInfo.estimatedHeight;
         } else {
-          // Tablas normales - SOLO mover a nueva página si NO cabe
-          const shouldBreak = this.spaceCalculator.shouldMoveToNewPage(
-            currentPageHeight, 
-            tableInfo.estimatedHeight, 
-            pageOrientation
-          );
+          content.push(tableTitle);
+          currentPageHeight += tableInfo.estimatedHeight;
+        }
 
-          content.push({ 
-            text: tabla.nombre, 
-            fontSize: 11, 
-            bold: true, 
-            margin: [0, 10, 0, 2],
-            pageBreak: shouldBreak ? 'before' : undefined
-          });
-          content.push(this.tableBuilder.build(tabla, respuestas.respuestasTablas, pageOrientation));
-          
-          currentPageHeight = shouldBreak ? tableInfo.estimatedHeight : currentPageHeight + tableInfo.estimatedHeight;
+        // Tabla con rotación si es necesaria
+        if (numColumnas > this.config.layout.maxColumnasLandscape) {
+          content.push(...this.tableBuilder.buildSplit(
+            tabla, 
+            respuestas.respuestasTablas, 
+            pageOrientation,
+            tableInfo.needsRotation
+          ));
+        } else {
+          content.push(this.tableBuilder.build(
+            tabla, 
+            respuestas.respuestasTablas, 
+            pageOrientation,
+            tableInfo.needsRotation
+          ));
         }
       });
-
-      // Línea separadora (SOLO si no es la última sección Y no viene pageBreak después)
-      if (seccionIndex < estructura.estructura.length - 1) {
-        content.push({ 
-          canvas: [{ 
-            type: 'line', 
-            x1: 0, 
-            y1: 5, 
-            x2: pageOrientation === 'landscape' ? this.config.table.pageWidths.landscape : this.config.table.pageWidths.portrait, 
-            y2: 5, 
-            lineWidth: 0.5, 
-            lineColor: '#ccc' 
-          }],
-          margin: [0, 10, 0, 0]
-        });
-      }
     });
 
-    // Agregar tablas gigantes al final
+    // Tablas gigantes al final
     if (giantTables.length > 0) {
       content.push({
-        text: 'TABLAS DETALLADAS',
+        text: 'ANEXO - TABLAS DETALLADAS',
         style: 'header',
-        margin: [0, 20, 0, 10],
+        margin: [0, 15, 0, 8],
         pageBreak: 'before'
       });
 
@@ -189,18 +178,28 @@ export class BodyBuilder {
         
         content.push({
           text: `${seccionTitulo} - ${tablaNombre}`,
-          fontSize: 12,
+          fontSize: 11,
           bold: true,
-          margin: [0, index > 0 ? 15 : 0, 0, 5],
+          margin: [0, index > 0 ? 12 : 0, 0, 4],
           pageBreak: index > 0 ? 'before' : undefined
         });
 
         const numColumnas = (tabla.columnas?.length || 0) + 1;
         
         if (numColumnas > this.config.layout.maxColumnasLandscape) {
-          content.push(...this.tableBuilder.buildSplit(tabla, respuestas.respuestasTablas, pageOrientation));
+          content.push(...this.tableBuilder.buildSplit(
+            tabla, 
+            respuestas.respuestasTablas, 
+            pageOrientation,
+            tableInfo.needsRotation
+          ));
         } else {
-          content.push(this.tableBuilder.build(tabla, respuestas.respuestasTablas, pageOrientation));
+          content.push(this.tableBuilder.build(
+            tabla, 
+            respuestas.respuestasTablas, 
+            pageOrientation,
+            tableInfo.needsRotation
+          ));
         }
       });
     }
@@ -209,8 +208,8 @@ export class BodyBuilder {
   }
 
   private calculateFontSize(numColumnas: number, hasLongText: boolean): number {
-    if (numColumnas > 7) return this.config.fontSize.small;
-    if (numColumnas > 5) return this.config.fontSize.medium;
+    if (numColumnas > 8) return this.config.fontSize.small;
+    if (numColumnas > 6) return this.config.fontSize.medium;
     return this.config.fontSize.normal;
   }
 
@@ -228,26 +227,23 @@ export class BodyBuilder {
         const hasText = currentRowFields.some(f => f.campo.tipoDato === TipoDatoCampo.TEXTO);
         
         const columns = currentRowFields.map(f => {
-            let width: any = '*';
-            if (hasText) {
-                width = f.campo.tipoDato === TipoDatoCampo.TEXTO ? '*' : 'auto';
-            }
+            const width = hasText ? (f.campo.tipoDato === TipoDatoCampo.TEXTO ? '*' : 'auto') : '*';
             
             return {
-                width: width,
+                width,
                 stack: [
-                    { text: f.campo.nombre, style: 'label', fontSize: this.config.fonts.tableCell },
+                    { text: f.campo.nombre, style: 'label', fontSize: this.config.fonts.label },
                     { text: f.displayValue, style: 'value', fontSize: this.config.fonts.value }
                 ],
-                margin: [0, 0, 10, 5]
+                margin: [0, 0, 8, this.config.layout.fieldSpacing]
             };
         });
 
-        rows.push({ columns: columns, columnGap: 10 });
+        rows.push({ columns, columnGap: 8 });
         currentRowFields = [];
       }
     });
 
-    return { stack: rows, margin: [0, 5, 0, 5] };
+    return { stack: rows, margin: [0, 3, 0, 3] };
   }
 }

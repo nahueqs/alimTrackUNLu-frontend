@@ -2,14 +2,6 @@ import { TipoDatoCampo } from '@/pages/Recetas/types/TipoDatoCampo';
 import dayjs from 'dayjs';
 import { PDF_CONFIG } from './config';
 
-/**
- * Envuelve texto largo insertando saltos de línea cada N caracteres.
- * Prioriza cortar en espacios cuando existen, evitando partir palabras.
- * 
- * @param text - Texto a envolver
- * @param maxCharsPerLine - Máximo de caracteres por línea antes de insertar salto
- * @returns Texto con saltos de línea insertados
- */
 function wrapLongText(text: string, maxCharsPerLine: number = PDF_CONFIG.layout.maxCharsBeforeBreak): string {
   if (!text || text.length <= maxCharsPerLine) return text;
   
@@ -17,28 +9,23 @@ function wrapLongText(text: string, maxCharsPerLine: number = PDF_CONFIG.layout.
   let remaining = text;
   
   while (remaining.length > 0) {
-    // Si lo que queda es menor al límite, agregarlo y terminar
     if (remaining.length <= maxCharsPerLine) {
       result.push(remaining);
       break;
     }
     
-    // Tomar un chunk del tamaño máximo
     const chunk = remaining.substring(0, maxCharsPerLine);
     const lastSpaceIndex = chunk.lastIndexOf(' ');
     
-    // Si hay un espacio en la segunda mitad del chunk, cortar ahí para no partir palabras
     if (lastSpaceIndex > maxCharsPerLine * 0.5) {
       result.push(remaining.substring(0, lastSpaceIndex));
       remaining = remaining.substring(lastSpaceIndex + 1);
     } else {
-      // Si no hay espacios cercanos, cortar forzosamente en el límite
       result.push(chunk);
       remaining = remaining.substring(maxCharsPerLine);
     }
   }
   
-  // Unir con saltos de línea reales que pdfmake respeta
   return result.join('\n');
 }
 

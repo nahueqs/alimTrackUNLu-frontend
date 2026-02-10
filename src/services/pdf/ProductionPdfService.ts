@@ -31,18 +31,43 @@ export class ProductionPdfService {
   }
 
   generate(estructura: EstructuraProduccionDTO, respuestas: RespuestasProduccion) {
-    const pageOrientation = this.determineOrientation(estructura);
+    // El documento base es portrait, las tablas se rotan individualmente
+    const pageOrientation = 'portrait';
     
     const docDefinition: any = {
       pageSize: PDF_CONFIG.pageSize,
       pageOrientation: pageOrientation,
       pageMargins: PDF_CONFIG.margins,
+      
+      // NUEVO: Header y Footer con numeración
+      header: (currentPage: number, pageCount: number) => {
+        if (currentPage === 1) return null; // Sin header en primera página
+        
+        return {
+          text: `${estructura.metadata.nombre} - ${estructura.metadata.codigoVersionReceta}`,
+          alignment: 'center',
+          fontSize: 8,
+          margin: [0, 10, 0, 0],
+          color: '#666'
+        };
+      },
+      
+      footer: (currentPage: number, pageCount: number) => {
+        return {
+          text: `Página ${currentPage} de ${pageCount}`,
+          alignment: 'center',
+          fontSize: PDF_CONFIG.fonts.footer,
+          margin: [0, 10, 0, 0],
+          color: '#666'
+        };
+      },
+      
       content: [
         this.headerBuilder.build(estructura),
         this.metadataBuilder.build(respuestas),
-        { text: '', margin: [0, 10] },
         this.bodyBuilder.build(estructura, respuestas, pageOrientation),
       ],
+      
       styles: this.getStyles(),
       defaultStyle: { font: 'Roboto' },
     };
@@ -50,25 +75,41 @@ export class ProductionPdfService {
     pdfMake.createPdf(docDefinition).open();
   }
 
-  private determineOrientation(estructura: EstructuraProduccionDTO) {
-    const hasWideTables = estructura.estructura.some(seccion => 
-      seccion.tablas.some(tabla => 
-        (tabla.columnas?.length || 0) + 1 > PDF_CONFIG.layout.maxColumnasPortrait
-      )
-    );
-    
-    return hasWideTables ? 'landscape' : 'portrait';
-  }
-
   private getStyles() {
     return {
-      header: { fontSize: PDF_CONFIG.fonts.header, bold: true, margin: [0, 0, 0, 10] },
-      subheader: { fontSize: PDF_CONFIG.fonts.subheader, bold: true, margin: [0, 10, 0, 5] },
-      label: { fontSize: PDF_CONFIG.fonts.label, color: '#444' },
-      value: { fontSize: PDF_CONFIG.fonts.value, bold: true },
-      sectionTitle: { fontSize: PDF_CONFIG.fonts.sectionTitle, bold: true, margin: [0, 15, 0, 5], decoration: 'underline' },
-      tableHeader: { bold: true, fontSize: PDF_CONFIG.fonts.tableHeader, color: 'black', fillColor: '#eeeeee' },
-      tableCell: { fontSize: PDF_CONFIG.fonts.tableCell },
+      header: { 
+        fontSize: PDF_CONFIG.fonts.header, 
+        bold: true, 
+        margin: [0, 0, 0, 5] 
+      },
+      subheader: { 
+        fontSize: PDF_CONFIG.fonts.subheader, 
+        bold: true, 
+        margin: [0, 5, 0, 3] 
+      },
+      label: { 
+        fontSize: PDF_CONFIG.fonts.label, 
+        color: '#555' 
+      },
+      value: { 
+        fontSize: PDF_CONFIG.fonts.value, 
+        bold: true 
+      },
+      sectionTitle: { 
+        fontSize: PDF_CONFIG.fonts.sectionTitle, 
+        bold: true, 
+        decoration: 'underline',
+        decorationColor: '#333'
+      },
+      tableHeader: { 
+        bold: true, 
+        fontSize: PDF_CONFIG.fonts.tableHeader, 
+        color: '#000', 
+        fillColor: '#f5f5f5' 
+      },
+      tableCell: { 
+        fontSize: PDF_CONFIG.fonts.tableCell 
+      },
     };
   }
 }

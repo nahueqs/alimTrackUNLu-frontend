@@ -18,20 +18,15 @@ export class TableWidthCalculator {
       : this.config.table.pageWidths.portrait;
   }
 
-  // MEJORADO: Ultra-compresión de columna "Concepto"
   private calculateConceptWidth(tabla: TablaResponseDTO, fontSize: number): number {
     if (!tabla.filas || tabla.filas.length === 0) {
       return this.config.layout.conceptColumnMinWidth;
     }
     
-    // Buscar el texto más largo en los nombres de fila
     const maxLength = Math.max(...tabla.filas.map(f => f.nombre.length));
-    
-    // Factor más agresivo para comprimir (0.45 en lugar de 0.5)
-    const puntosPerChar = fontSize * 0.45;
+    const puntosPerChar = fontSize * 0.42; // Más agresivo
     const estimatedWidth = Math.ceil(maxLength * puntosPerChar);
     
-    // Límites ultra-comprimidos
     return Math.min(
       Math.max(estimatedWidth, this.config.layout.conceptColumnMinWidth),
       this.config.layout.conceptColumnMaxWidth
@@ -40,7 +35,6 @@ export class TableWidthCalculator {
 
   private distributeWidths(tabla: TablaResponseDTO, conceptWidth: number, espacioDisponible: number, fontSize: number): any[] {
     const widths: any[] = [];
-    
     const factorEscala = fontSize / 9;
     
     const ANCHO_ENTERO = Math.ceil(this.config.table.columnWidths.entero * factorEscala);
@@ -51,7 +45,6 @@ export class TableWidthCalculator {
 
     widths.push(conceptWidth);
     let espacioUsado = conceptWidth;
-    
     const columnasTexto: number[] = [];
     
     tabla.columnas?.forEach((col, index) => {
@@ -82,7 +75,7 @@ export class TableWidthCalculator {
     const numColumnasTexto = columnasTexto.length;
     
     if (numColumnasTexto > 0) {
-        const anchoMinimo = fontSize === this.config.fontSize.small ? 50 : 60;
+        const anchoMinimo = fontSize === this.config.fontSize.small ? 45 : 55;
         const anchoPorColumnaTexto = Math.max(anchoMinimo, Math.floor(espacioRestante / numColumnasTexto));
         columnasTexto.forEach(colIndex => {
             widths[colIndex] = anchoPorColumnaTexto;
