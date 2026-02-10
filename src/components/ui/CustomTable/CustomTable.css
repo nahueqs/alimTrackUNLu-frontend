@@ -51,11 +51,22 @@
     background-color: var(--bg-primary);
 }
 
+/* Ensure the table wrapper allows horizontal scrolling on ALL screens */
+.data-table-content .ant-table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.data-table-content .ant-table-content {
+    overflow-x: auto !important;
+}
+
 /* Estilo para los encabezados de la tabla */
 .data-table-content .ant-table-thead > tr > th {
     background-color: var(--bg-secondary, #f0f2f5) !important; /* Fondo gris claro */
     color: var(--text-secondary, #595959); /* Color de texto más suave */
     font-weight: 600; /* Un poco más de peso para los títulos */
+    white-space: nowrap; /* Prevent headers from wrapping unnecessarily */
 }
 
 /* Estilo para las filas de la tabla (Zebra Striping) */
@@ -118,15 +129,5 @@
 
     .ant-table-cell-fix-right.actions-column::after {
         box-shadow: none !important;
-    }
-    
-    /* Ensure the table wrapper allows horizontal scrolling */
-    .data-table-content .ant-table-wrapper {
-        overflow-x: auto;
-    }
-    
-    /* Ensure the table content itself doesn't overflow its container in a weird way */
-    .data-table-content .ant-table-content {
-        overflow-x: auto !important;
     }
 }

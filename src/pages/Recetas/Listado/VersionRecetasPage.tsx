@@ -9,6 +9,7 @@ import { usePageTitle } from '@/hooks/usePageTitle.ts';
 import { Button } from '@/components/ui';
 import { ArrowLeftIcon, PlusIcon } from 'lucide-react';
 import { message, Modal } from 'antd';
+import './VersionRecetasPage.css';
 
 export const VersionRecetasPage: React.FC = () => {
   usePageTitle('Versiones de Recetas');

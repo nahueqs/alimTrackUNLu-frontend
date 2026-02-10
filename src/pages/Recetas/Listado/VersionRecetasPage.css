@@ -1,0 +1,68 @@
+/* VersionRecetasPage.css */
+
+.dashboard {
+    background-color: var(--bg-secondary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard__main {
+    flex: 1;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    width: 100%;
+    max-width: 1200px; /* Ancho máximo consistente */
+    margin: 0 auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.productions-list__header {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    align-items: flex-start;
+    margin-top: 1rem;
+}
+
+.productions-list__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.productions-list__content {
+    background-color: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 1rem;
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   MEDIA QUERIES
+   ========================================================================== */
+@media (min-width: 768px) {
+    .dashboard__main {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+
+    .productions-list__header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 2rem;
+    }
+
+    .productions-list__title {
+        font-size: 2rem;
+    }
+
+    .productions-list__content {
+        padding: 1.5rem;
+    }
+}
