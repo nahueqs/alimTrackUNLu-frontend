@@ -15,7 +15,7 @@ export const PDF_CONFIG = {
     columnsThreshold: 6,
     maxCharsBeforeBreak: 25,      // Aumentado para menos wrapping
     fieldsPerRow: 3,
-    maxColumnasPortrait: 5,       // Aumentado de 4
+    maxColumnasPortrait: 6,       // Aumentado de 5 a 6 para evitar rotaciones innecesarias
     maxColumnasLandscape: 10,     // Aumentado de 8
     giantTableRowThreshold: 6,    // Aumentado de 5 para ser más selectivo
     giantTableMinHeight: 400,     // Aumentado para ser más selectivo
@@ -28,6 +28,8 @@ export const PDF_CONFIG = {
     groupSpacing: 5,              // Espacio entre grupos
     fieldSpacing: 3,              // Espacio entre campos
     tableSpacing: 5,              // Espacio antes de tabla
+    // NUEVO: Umbral para evitar rotación en tablas cortas
+    shortTableRows: 3,            // Si tiene <= 3 filas, intentar no rotar
   },
   charsPerLine: {
     small: 25,

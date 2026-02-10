@@ -41,18 +41,30 @@ export class SpaceCalculator {
       : this.config.table.pageHeight.portrait;
     
     const remainingSpace = totalHeight - currentHeight;
-    const spaceAfterTable = remainingSpace - tableHeight;
     
-    return (spaceAfterTable / totalHeight) >= this.config.layout.minPageSpacePercent;
+    // CORREGIDO: Verificar si cabe físicamente con un pequeño margen de seguridad (20 puntos)
+    // Antes exigía un % libre después de la tabla, lo cual era incorrecto.
+    return remainingSpace >= (tableHeight + 20);
   }
 
   shouldMoveToNewPage(currentHeight: number, tableHeight: number, pageOrientation: 'portrait' | 'landscape'): boolean {
     return !this.hasEnoughSpace(currentHeight, tableHeight, pageOrientation);
   }
 
-  // NUEVO: Determinar si tabla necesita rotación
+  // MEJORADO: Lógica inteligente para evitar rotación en tablas cortas
   shouldRotateTable(tabla: TablaResponseDTO): boolean {
     const numColumnas = (tabla.columnas?.length || 0) + 1;
-    return numColumnas > this.config.layout.maxColumnasPortrait;
+    const numFilas = tabla.filas?.length || 0;
+    
+    // Límite base
+    let limit = this.config.layout.maxColumnasPortrait;
+    
+    // Si es una tabla corta (pocas filas), somos más tolerantes
+    // Permitimos hasta 2 columnas extra si son pocas filas
+    if (numFilas <= this.config.layout.shortTableRows) {
+      limit += 2;
+    }
+    
+    return numColumnas > limit;
   }
 }
