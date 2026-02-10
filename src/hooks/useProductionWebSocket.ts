@@ -10,6 +10,7 @@ import type {
 import { findItemInStructure } from '@/utils/production/structureUtils';
 import { message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { useBrowserNotifications } from './useBrowserNotifications';
 
 export type NotificationLevel = 'ALL' | 'STATE_ONLY' | 'NONE';
 
@@ -45,33 +46,13 @@ export const useProductionWebSocket = ({
   notificationLevel = 'ALL',
 }: UseProductionWebSocketProps) => {
   const [isConnected, setIsConnected] = useState(false);
-  const isPageVisible = useRef(true);
   const navigate = useNavigate();
+  const { showNotification } = useBrowserNotifications();
 
   // Referencias para el batching (agrupamiento)
   const pendingFieldUpdates = useRef<FieldUpdatePayload[]>([]);
   const pendingTableUpdates = useRef<TableCellUpdatePayload[]>([]);
   const batchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Detectar visibilidad de la página
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      isPageVisible.current = document.visibilityState === 'visible';
-      if (import.meta.env.DEV) {
-        console.log(
-          '[WebSocket] Visibilidad cambiada:',
-          isPageVisible.current ? 'VISIBLE' : 'OCULTO'
-        );
-      }
-    };
-    // Inicializar valor correcto
-    isPageVisible.current = document.visibilityState === 'visible';
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, []);
 
   useEffect(() => {
     notificationService.connect(() => {
@@ -91,18 +72,6 @@ export const useProductionWebSocket = ({
       // notificationService.disconnect();
     };
   }, [codigoProduccion, getUltimasRespuestas]);
-
-  useEffect(() => {
-    if (!('Notification' in window)) {
-      console.warn('[WebSocket] Este navegador no soporta notificaciones de escritorio');
-    } else if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-      Notification.requestPermission().then((permission) => {
-        if (import.meta.env.DEV) console.log('[WebSocket] Permiso de notificaciones:', permission);
-      });
-    } else {
-      if (import.meta.env.DEV) console.log('[WebSocket] Estado de permisos de notificación:', Notification.permission);
-    }
-  }, []);
 
   // Función para procesar el lote de actualizaciones acumuladas
   const processBatch = useCallback(() => {
@@ -162,29 +131,7 @@ export const useProductionWebSocket = ({
           if (notificationLevel === 'NONE') return;
           if (notificationLevel === 'STATE_ONLY' && type !== 'STATE_CHANGED') return;
 
-          if (import.meta.env.DEV) {
-            console.log('[WebSocket] Intentando mostrar notificación:', {
-              visible: isPageVisible.current,
-              permission: Notification.permission,
-              title,
-            });
-          }
-
-          if (!isPageVisible.current && Notification.permission === 'granted') {
-            try {
-              const notif = new Notification(title, {
-                body,
-                tag: 'alimtrack-update',
-                icon: '/vite.svg', // Opcional: icono de la app
-              });
-              notif.onclick = () => {
-                window.focus();
-                notif.close();
-              };
-            } catch (e) {
-              console.error('[WebSocket] Error al crear notificación:', e);
-            }
-          }
+          showNotification(title, body, 'alimtrack-update');
         };
 
         switch (message.type) {
@@ -283,7 +230,8 @@ export const useProductionWebSocket = ({
     estructura,
     queueUpdate,
     notificationLevel,
-    navigate
+    navigate,
+    showNotification
   ]);
 
   return { isConnected };

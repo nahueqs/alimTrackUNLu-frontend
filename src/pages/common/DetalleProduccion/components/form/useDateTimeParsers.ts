@@ -23,23 +23,29 @@ export const useDateTimeParsers = (tipoDato: TipoDatoCampo) => {
     if (!val) return null;
     
     // Si viene del backend con fecha completa (ISO 8601)
-    // Ej: "2024-01-28T14:30:00" → extraer solo la hora
+    // Ej: "2024-01-28T14:30:00" o "2026-02-10T05:10"
     if (val.includes('T')) {
-      const timePart = val.split('T')[1]?.split('.')[0]; // "14:30:00"
+      const timePart = val.split('T')[1]?.split('.')[0]; // "14:30:00" o "05:10"
       if (timePart) {
-        const d = dayjs(timePart, 'HH:mm:ss', true);
+        // Intento 1: HH:mm:ss
+        let d = dayjs(timePart, 'HH:mm:ss', true);
+        
+        // Intento 2: HH:mm (si no tiene segundos)
+        if (!d.isValid()) {
+            d = dayjs(timePart, 'HH:mm', true);
+        }
+
         if (d.isValid()) {
           // CLAVE: Asignar la hora a HOY para que TimePicker la muestre correctamente
-          // El TimePicker necesita una fecha válida para funcionar
           return dayjs()
             .hour(d.hour())
             .minute(d.minute())
-            .second(d.second());
+            .second(d.second() || 0);
         }
       }
     }
     
-    // Intentar parsear HH:mm:ss (formato completo)
+    // Intentar parsear HH:mm:ss (formato completo solo hora)
     let d = dayjs(val, 'HH:mm:ss', true);
     if (d.isValid()) {
         return dayjs()
@@ -48,7 +54,7 @@ export const useDateTimeParsers = (tipoDato: TipoDatoCampo) => {
             .second(d.second());
     }
     
-    // Intentar parsear HH:mm (sin segundos)
+    // Intentar parsear HH:mm (sin segundos solo hora)
     d = dayjs(val, 'HH:mm', true);
     if (d.isValid()) {
         return dayjs()
@@ -75,8 +81,14 @@ export const useDateTimeParsers = (tipoDato: TipoDatoCampo) => {
       // HORA: usar fecha ACTUAL + hora seleccionada
       let timeValue: Dayjs | null = null;
       
-      // Extraer la hora del valor local (que debería ser HH:mm:ss)
+      // Extraer la hora del valor local (que debería ser HH:mm:ss o HH:mm)
+      // Primero intentamos con segundos
       timeValue = dayjs(val, 'HH:mm:ss', true);
+      
+      // Si falla, intentamos sin segundos
+      if (!timeValue.isValid()) {
+          timeValue = dayjs(val, 'HH:mm', true);
+      }
       
       if (!timeValue || !timeValue.isValid()) return val;
       

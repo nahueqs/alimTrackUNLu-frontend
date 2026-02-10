@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { notificationService } from '@/services/notificaciones/notificationService';
 import type { ProductionStateUpdatePayload } from '@/types/production';
+import { useBrowserNotifications } from './useBrowserNotifications';
 
 interface UseProductionListSocketsProps {
   onStateChange?: (codigoProduccion: string, payload: ProductionStateUpdatePayload & { timestamp: string }) => void;
@@ -13,6 +14,8 @@ export const useProductionListSockets = ({
   onCreated,
   onDeleted,
 }: UseProductionListSocketsProps) => {
+  const { showNotification } = useBrowserNotifications();
+
   useEffect(() => {
     let unsubscribeState: (() => void) | undefined;
     let unsubscribeCreated: (() => void) | undefined;
@@ -28,6 +31,11 @@ export const useProductionListSockets = ({
                 ...message.payload,
                 timestamp: message.timestamp,
               });
+              showNotification(
+                'Estado de Producción Actualizado',
+                `La producción ${message.codigoProduccion} cambió a estado: ${message.payload.estado}`,
+                'alimtrack-list-update'
+              );
             }
           });
         }
@@ -37,6 +45,11 @@ export const useProductionListSockets = ({
           unsubscribeCreated = notificationService.subscribeToProductionCreated((message) => {
             if (message.type === 'PRODUCTION_METADATA_CREATED') {
               onCreated();
+              showNotification(
+                'Nueva Producción',
+                `Se ha creado una nueva producción: ${message.payload.codigoProduccion || 'Nueva'}`,
+                'alimtrack-list-update'
+              );
             }
           });
         }
@@ -46,6 +59,11 @@ export const useProductionListSockets = ({
           unsubscribeDeleted = notificationService.subscribeToProduccionEliminada((message) => {
             if (message.type === 'PRODUCTION_DELETED') {
               onDeleted();
+              showNotification(
+                'Producción Eliminada',
+                `Se ha eliminado la producción: ${message.payload.codigoProduccion}`,
+                'alimtrack-list-update'
+              );
             }
           });
         }
@@ -58,8 +76,6 @@ export const useProductionListSockets = ({
       if (unsubscribeState) unsubscribeState();
       if (unsubscribeCreated) unsubscribeCreated();
       if (unsubscribeDeleted) unsubscribeDeleted();
-      // No desconectamos el servicio globalmente aquí para no afectar a otros componentes
-      // notificationService.disconnect(); 
     };
-  }, [onStateChange, onCreated, onDeleted]);
+  }, [onStateChange, onCreated, onDeleted, showNotification]);
 };
