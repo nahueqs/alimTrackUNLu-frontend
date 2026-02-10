@@ -16,6 +16,10 @@
     margin: 0 auto;
     width: 100%; /* Asegura que ocupe el ancho disponible */
     box-sizing: border-box;
+    /* Permitir que el contenido principal crezca pero no forzar espacios excesivos */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 /* ==========================================================================
@@ -27,6 +31,10 @@
     /* Añadimos un margen superior extra al contenido interno por si acaso */
     margin-top: 0.5rem;
     padding: 0 0.5rem; /* Padding interno para el texto */
+    /* Hacemos que el contenido se distribuya mejor */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .dashboard__welcome-title {
@@ -56,6 +64,8 @@
     gap: 1rem;
     align-items: stretch;
     width: 100%;
+    /* Opcional: si queremos que las cards ocupen espacio vertical disponible */
+    /* flex: 1; */
 }
 
 /* Ajustes específicos para las tarjetas dentro del dashboard */
@@ -85,30 +95,34 @@
    ========================================================================== */
 @media (min-width: 768px) {
     .dashboard__main {
-        /* Aumentamos el padding en desktop */
-        padding: 4rem 1.5rem; 
+        /* Reducimos el padding vertical para acercar el contenido a los bordes y footer */
+        padding: 2rem 1.5rem; 
     }
 
     .dashboard__welcome {
-        margin-bottom: 3rem;
-        margin-top: 1.5rem;
+        /* Reducimos margen inferior para acercar las cards al título */
+        margin-bottom: 2rem;
+        margin-top: 1rem;
         padding: 0;
+        /* En desktop no forzamos flex:1 para que no se estire innecesariamente si hay poco contenido */
+        display: block;
+        flex: unset;
     }
 
     .dashboard__welcome-title {
         font-size: 2.5rem;
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
     }
 
     .dashboard__welcome-subtitle {
         font-size: 1.125rem;
-        margin-bottom: 3rem;
+        margin-bottom: 2rem;
     }
 
     .dashboard__grid {
         /* En tablet/desktop, columnas automáticas */
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
+        gap: 1.5rem; /* Reducimos gap ligeramente */
     }
     
     .dashboard__grid .card--dashboard .dashboard-card__content {

@@ -1,8 +1,7 @@
 .app-footer {
     background-color: #fff;
     border-top: 1px solid var(--border-light);
-    padding: 1.5rem 1rem; /* Added horizontal padding */
-    padding: 1.5rem 1rem; /* Added horizontal padding */
+    padding: 1rem; /* Reducido de 1.5rem a 1rem para ser más compacto */
     margin-top: auto; /* Push to bottom if flex container */
 }
 
@@ -11,7 +10,7 @@
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 0.5rem; /* Reducido gap */
     max-width: 1200px; /* Consistent with other containers */
     margin: 0 auto; /* Center content */
     width: 100%;
@@ -25,7 +24,7 @@
 .app-footer__link {
     color: var(--text-secondary);
     text-decoration: none;
-    font-size: 0.9rem;
+    font-size: 0.85rem; /* Ligeramente más pequeño */
     transition: color 0.2s;
     display: flex;
     align-items: center;
@@ -38,12 +37,17 @@
 
 .app-footer__copyright {
     color: var(--text-secondary);
-    font-size: 0.85rem;
+    font-size: 0.8rem; /* Ligeramente más pequeño */
 }
 
 @media (max-width: 600px) {
     .app-footer__content {
         flex-direction: column;
         text-align: center;
+        gap: 1rem;
+    }
+    
+    .app-footer {
+        padding: 1.5rem 1rem; /* Un poco más de espacio táctil en móvil */
     }
 }

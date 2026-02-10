@@ -5,7 +5,7 @@ import { CustomTable } from '@/components/ui/CustomTable/CustomTable.tsx';
 import { getProductionColumns } from './ProduccionesColumns.tsx';
 import { useNavigate } from 'react-router-dom';
 import { Button, message, Modal } from 'antd';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteOutlined, FilterOutlined } from '@ant-design/icons';
 import { type LocalProductionFilters, ProduccionFilters } from './ProduccionFilters.tsx';
 import { usePageTitle } from '@/hooks/usePageTitle.ts';
 import './ProduccionesPage.css';
@@ -14,7 +14,6 @@ import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import { Button as UiButton } from '@/components/ui';
 import { ArrowLeftIcon } from 'lucide-react';
-import { PrintButton } from '@/components/common/PrintButton';
 import { useProductionListSockets } from '@/hooks/useProductionListSockets';
 
 // Extendemos dayjs con el plugin isBetween
@@ -40,6 +39,7 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
   // Estado para los filtros locales
   const [filters, setFilters] = useState<LocalProductionFilters>(initialFilters as LocalProductionFilters);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
   const isMobile = useIsMobile();
 
   // Cargar TODAS las producciones al montar el componente (sin filtros de backend)
@@ -190,6 +190,12 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', flexWrap: 'wrap', gap: '1rem' }}>
               <h1 className="productions-list__title">Listado de Producciones</h1>
               <div style={{ display: 'flex', gap: '8px' }}>
+                <Button 
+                    icon={<FilterOutlined />} 
+                    onClick={() => setShowFilters(!showFilters)}
+                >
+                    {showFilters ? 'Ocultar Filtros' : 'Filtros'}
+                </Button>
                 {selectedRowKeys.length > 0 && (
                   <Button 
                     danger 
@@ -207,10 +213,12 @@ const ProductionsResultPage: React.FC<ProductionsResultPageProps> = ({ initialFi
           </div>
         </div>
 
-        <ProduccionFilters 
-          onFilterChange={handleFilterChange} 
-          initialFilters={initialFilters} 
-        />
+        {showFilters && (
+            <ProduccionFilters 
+              onFilterChange={handleFilterChange} 
+              initialFilters={initialFilters} 
+            />
+        )}
 
         <div className="productions-list__content">
           <CustomTable

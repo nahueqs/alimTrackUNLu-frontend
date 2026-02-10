@@ -46,7 +46,7 @@ export const getPublicProductionColumns = ({
       dataIndex: 'fechaInicio',
       key: 'fechaInicio',
       render: (date) => dayjs(date).format('DD/MM/YYYY HH:mm:ss'),
-      responsive: ['sm', 'md', 'lg', 'xl'],
+      responsive: ['xs', 'sm', 'md', 'lg', 'xl'],
     },
     {
       title: 'Fin',
