@@ -1,7 +1,7 @@
 .app-footer {
     background-color: #fff;
     border-top: 1px solid var(--border-light);
-    padding: 1.5rem 0;
+    padding: 1.5rem 1rem; /* Added horizontal padding */
     margin-top: auto; /* Push to bottom if flex container */
 }
 
@@ -11,6 +11,9 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 1rem;
+    max-width: 1200px; /* Consistent with other containers */
+    margin: 0 auto; /* Center content */
+    width: 100%;
 }
 
 .app-footer__links {
