@@ -131,13 +131,32 @@ export const InfoProduccionCard: React.FC<InfoProduccionCardProps> = ({
 
       {isEditing ? (
         <Form form={form} layout="vertical">
-          <Form.Item name="lote" label="Lote">
+          <Form.Item name="lote" label="Lote" rules={[
+            {
+              max: 100,
+              message: 'El lote no pueden exceder los 255 caracteres.'
+            }
+          ]}>
             <Input />
           </Form.Item>
-          <Form.Item name="encargado" label="Encargado">
+          <Form.Item name="encargado" label="Encargado" rules={[
+            {
+              max: 100,
+              message: 'El encargado no pueden exceder los 255 caracteres.'
+            }
+          ]}>
             <Input />
           </Form.Item>
-          <Form.Item name="observaciones" label="Observaciones">
+          <Form.Item 
+            name="observaciones" 
+            label="Observaciones"
+            rules={[
+              { 
+                max: 255, 
+                message: 'Las observaciones no pueden exceder los 255 caracteres.' 
+              }
+            ]}
+          >
             <Input.TextArea />
           </Form.Item>
         </Form>
