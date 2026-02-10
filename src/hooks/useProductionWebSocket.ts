@@ -8,6 +8,8 @@ import type {
   TableCellUpdatePayload,
 } from '@/types/production';
 import { findItemInStructure } from '@/utils/production/structureUtils';
+import { message } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 export type NotificationLevel = 'ALL' | 'STATE_ONLY' | 'NONE';
 
@@ -44,6 +46,7 @@ export const useProductionWebSocket = ({
 }: UseProductionWebSocketProps) => {
   const [isConnected, setIsConnected] = useState(false);
   const isPageVisible = useRef(true);
+  const navigate = useNavigate();
 
   // Referencias para el batching (agrupamiento)
   const pendingFieldUpdates = useRef<FieldUpdatePayload[]>([]);
@@ -149,11 +152,10 @@ export const useProductionWebSocket = ({
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
+    let unsubscribeDeleted: (() => void) | undefined;
 
     if (codigoProduccion && isConnected) {
-      // Eliminamos la condición de estado final para permitir actualizaciones incluso si está finalizada
-      // (por ejemplo, si se reabre o si llegan mensajes tardíos)
-      
+      // Suscripción a actualizaciones generales
       unsubscribe = notificationService.subscribeToAutoSave(codigoProduccion, (message: any) => {
         const tryShowNotification = (title: string, body: string, type: string) => {
           // Filtrado de notificaciones según preferencia del usuario
@@ -245,11 +247,28 @@ export const useProductionWebSocket = ({
             break;
         }
       });
+
+      // Suscripción específica a eliminación
+      unsubscribeDeleted = notificationService.subscribeToProduccionEliminada((msg) => {
+        if (msg.payload.codigoProduccion === codigoProduccion) {
+          message.warning('La producción que estabas visualizando ha sido eliminada.');
+          // Determinar a dónde redirigir basado en la URL actual
+          const currentPath = window.location.pathname;
+          if (currentPath.includes('/public/')) {
+            navigate('/public/producciones');
+          } else {
+            navigate('/producciones');
+          }
+        }
+      });
     }
 
     return () => {
       if (unsubscribe) {
         unsubscribe();
+      }
+      if (unsubscribeDeleted) {
+        unsubscribeDeleted();
       }
       if (batchTimeoutRef.current) {
         clearTimeout(batchTimeoutRef.current);
@@ -264,6 +283,7 @@ export const useProductionWebSocket = ({
     estructura,
     queueUpdate,
     notificationLevel,
+    navigate
   ]);
 
   return { isConnected };

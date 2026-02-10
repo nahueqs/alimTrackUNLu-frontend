@@ -59,8 +59,8 @@ interface UseProductionActionsReturn {
     valor: string,
     tipoDato: TipoDatoCampo
   ) => Promise<void>;
-  debouncedMetadataChange: (data: ProduccionMetadataModifyRequestDTO) => void;
-  handleCambioEstado: (nuevoEstado: ProductionState) => void;
+  debouncedMetadataChange: (data: ProduccionMetadataModifyRequestDTO) => Promise<void>;
+  handleCambioEstado: (nuevoEstado: ProductionState) => Promise<void>;
 }
 
 // Helper function to build the request data object based on value and type
@@ -198,53 +198,41 @@ export const useProductionActions = ({
       if (!codigoProduccion) return;
       try {
         await guardarMetadata(codigoProduccion, data);
-        message.success('Metadatos guardados', 0.5);
+        // message.success('Metadatos guardados', 0.5); // Ya se muestra en el componente
       } catch (e: any) {
-        const errorMsg = e.message || 'Error al guardar los metadatos';
-        message.error(errorMsg);
+        // Re-lanzar el error para que el componente lo maneje y muestre el mensaje específico
+        throw e;
       }
     },
     [codigoProduccion, guardarMetadata]
   );
 
   const handleCambioEstado = useCallback(
-    (nuevoEstado: ProductionState) => {
+    async (nuevoEstado: ProductionState) => {
       if (!codigoProduccion || !user?.email) {
         return;
       }
 
+      // Si es un cambio de estado directo (no finalización/cancelación que requiere confirmación extra en el hook)
+      // Nota: La confirmación visual ya se maneja en InfoProduccionCard para todos los estados.
+      // Aquí solo ejecutamos la lógica de negocio.
+      
+      // Sin embargo, para mantener la lógica existente de redirección en finalización/cancelación:
       const isFinal = nuevoEstado === ProductionState.FINALIZADA;
       const isCancel = nuevoEstado === ProductionState.CANCELADA;
 
-      if (!isFinal && !isCancel) {
-        return;
+      try {
+        await cambiarEstadoProduccion(codigoProduccion, {
+          valor: nuevoEstado,
+          emailCreador: user.email!,
+        });
+        
+        if (isFinal || isCancel) {
+             navigate('/producciones');
+        }
+      } catch (e: any) {
+        throw e;
       }
-
-      Modal.confirm({
-        title: `¿Confirmar ${isFinal ? 'finalización' : 'cancelación'} de producción?`,
-        content: `Está a punto de ${
-          isFinal ? 'finalizar' : 'cancelar'
-        } la producción ${codigoProduccion}. Esta acción no se puede deshacer.`,
-        okText: isFinal ? 'Finalizar' : 'Cancelar',
-        cancelText: 'Volver',
-        onOk: async () => {
-          try {
-            await cambiarEstadoProduccion(codigoProduccion, {
-              valor: nuevoEstado,
-              emailCreador: user.email!,
-            });
-            message.success(
-              `Producción ${isFinal ? 'finalizada' : 'cancelada'} correctamente.`,
-              0.5
-            );
-            navigate('/producciones');
-          } catch (e: any) {
-            const errorMsg =
-              e.message || `Error al ${isFinal ? 'finalizar' : 'cancelar'} la producción.`;
-            message.error(errorMsg);
-          }
-        },
-      });
     },
     [codigoProduccion, user?.email, cambiarEstadoProduccion, navigate]
   );
@@ -252,16 +240,7 @@ export const useProductionActions = ({
   // Removed debounce since we now have explicit save actions
   const debouncedCampoChange = _handleCampoChange;
   const debouncedTablaChange = _handleTablaChange;
-  const debouncedMetadataChange = useMemo(
-    () => debounce(_handleMetadataChange, 300),
-    [_handleMetadataChange]
-  );
-
-  useEffect(() => {
-    return () => {
-      debouncedMetadataChange.cancel();
-    };
-  }, [debouncedMetadataChange]);
+  const debouncedMetadataChange = _handleMetadataChange; // No debounce for metadata save button
 
   return {
     isSaving,

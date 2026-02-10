@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Card, Descriptions, Form, Input, Modal, Select, Tag, Typography } from 'antd';
+import { Button, Card, Descriptions, Form, Input, Modal, Select, Tag, Typography, message } from 'antd';
 import { EditOutlined, SaveOutlined } from '@ant-design/icons';
 import type {
   EstructuraProduccionDTO,
@@ -22,8 +22,8 @@ interface InfoProduccionCardProps {
   produccion: ProduccionProtectedResponseDTO | ProduccionPublicMetadataDTO;
   versionReceta: EstructuraProduccionDTO;
   isEditable?: boolean;
-  onCambioEstado?: (nuevoEstado: ProductionState) => void;
-  onMetadataChange?: (data: ProduccionMetadataModifyRequestDTO) => void;
+  onCambioEstado?: (nuevoEstado: ProductionState) => Promise<void> | void;
+  onMetadataChange?: (data: ProduccionMetadataModifyRequestDTO) => Promise<void> | void;
 }
 
 export const InfoProduccionCard: React.FC<InfoProduccionCardProps> = ({
@@ -34,6 +34,7 @@ export const InfoProduccionCard: React.FC<InfoProduccionCardProps> = ({
   onMetadataChange,
 }) => {
   const [isEditing, setIsEditable] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const isMobile = useIsMobile();
 
@@ -48,29 +49,54 @@ export const InfoProduccionCard: React.FC<InfoProduccionCardProps> = ({
     setIsEditable(true);
   };
 
-  const handleSave = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        if (onMetadataChange) {
-          onMetadataChange(values);
-        }
-        setIsEditable(false);
-      })
-      .catch((info) => {
-        console.log('Validate Failed:', info);
-      });
+  const handleSave = async () => {
+    try {
+      const values = await form.validateFields();
+      setLoading(true);
+      
+      if (onMetadataChange) {
+        await onMetadataChange(values);
+      }
+      
+      setIsEditable(false);
+      message.success('Información actualizada correctamente');
+    } catch (error: any) {
+      if (error.errorFields) {
+        // Error de validación del formulario (campos requeridos, etc.)
+        console.log('Validate Failed:', error);
+      } else {
+        // Error del backend o de red
+        console.error('Error al guardar metadatos:', error);
+        message.error(error.message || 'Error al actualizar la información. Intente nuevamente.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleEstadoChange = (value: ProductionState) => {
+    // Guardar el valor anterior para revertir si falla o cancela
+    const previousValue = produccion.estado;
+
     Modal.confirm({
       title: '¿Estás seguro de cambiar el estado?',
       content: `La producción pasará a estado ${PRODUCTION_STATE_LABELS[value]}.`,
-      onOk: () => {
-        if (onCambioEstado) {
-          onCambioEstado(value);
+      onOk: async () => {
+        try {
+          if (onCambioEstado) {
+            await onCambioEstado(value);
+            message.success(`Estado cambiado a ${PRODUCTION_STATE_LABELS[value]}`);
+          }
+        } catch (error: any) {
+          console.error('Error al cambiar estado:', error);
+          message.error(error.message || 'Error al cambiar el estado. Intente nuevamente.');
+          // Revertir visualmente si es necesario (aunque el componente se re-renderizará con props)
         }
       },
+      onCancel: () => {
+        // No hacemos nada, el Select mantendrá el valor visualmente hasta que se actualicen las props
+        // o podemos forzar un re-render si fuera un componente controlado localmente
+      }
     });
   };
 
@@ -92,7 +118,12 @@ export const InfoProduccionCard: React.FC<InfoProduccionCardProps> = ({
           </Button>
         )}
         {isEditable && isEditing && isProtected && (
-          <Button type="primary" icon={<SaveOutlined />} onClick={handleSave}>
+          <Button 
+            type="primary" 
+            icon={<SaveOutlined />} 
+            onClick={handleSave}
+            loading={loading}
+          >
             {isMobile ? '' : 'Guardar'}
           </Button>
         )}
@@ -125,7 +156,7 @@ export const InfoProduccionCard: React.FC<InfoProduccionCardProps> = ({
           <Descriptions.Item label="Estado">
             {isEditable && isProtected ? (
               <Select
-                defaultValue={produccion.estado}
+                value={produccion.estado} // Usar value controlado en lugar de defaultValue
                 style={{ width: '100%', minWidth: 120 }}
                 onChange={handleEstadoChange}
                 disabled={
