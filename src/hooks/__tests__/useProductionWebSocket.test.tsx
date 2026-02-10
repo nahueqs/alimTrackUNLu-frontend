@@ -2,6 +2,7 @@ import { renderHook, waitFor } from '@/test/test-utils';
 import { useProductionWebSocket } from '../useProductionWebSocket';
 import { notificationService } from '@/services/notificaciones/notificationService';
 import { vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 
 // Mock del servicio de notificaciones
 vi.mock('@/services/notificaciones/notificationService', () => ({
@@ -10,6 +11,7 @@ vi.mock('@/services/notificaciones/notificationService', () => ({
     disconnect: vi.fn(),
     subscribeToAutoSave: vi.fn(),
     setOnReconnectedCallback: vi.fn(),
+    subscribeToProduccionEliminada: vi.fn(),
   },
 }));
 
@@ -31,15 +33,24 @@ describe('useProductionWebSocket - Robustez y Reconexión', () => {
     updateProductionMetadata: mockUpdateProductionMetadata,
   };
 
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    <MemoryRouter>{children}</MemoryRouter>
+  );
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('Se conecta al montar y configura los callbacks', () => {
-    renderHook(() => useProductionWebSocket(defaultProps));
+    // Simulamos que connect llama al callback de éxito inmediatamente
+    (notificationService.connect as any).mockImplementation((onConnect: any) => onConnect && onConnect());
+
+    renderHook(() => useProductionWebSocket(defaultProps), { wrapper });
 
     expect(notificationService.connect).toHaveBeenCalled();
     expect(notificationService.setOnReconnectedCallback).toHaveBeenCalled();
+    // Ahora debería llamarse porque simulamos la conexión exitosa
+    expect(notificationService.subscribeToProduccionEliminada).toHaveBeenCalled();
   });
 
   it('Resincroniza datos (getUltimasRespuestas) cuando ocurre una reconexión', async () => {
@@ -50,7 +61,7 @@ describe('useProductionWebSocket - Robustez y Reconexión', () => {
       reconnectCallback = cb;
     });
 
-    renderHook(() => useProductionWebSocket(defaultProps));
+    renderHook(() => useProductionWebSocket(defaultProps), { wrapper });
 
     // 2. Verificar que se registró el callback
     expect(reconnectCallback).toBeDefined();
@@ -78,7 +89,7 @@ describe('useProductionWebSocket - Robustez y Reconexión', () => {
       return vi.fn(); // unsubscribe mock
     });
 
-    renderHook(() => useProductionWebSocket(defaultProps));
+    renderHook(() => useProductionWebSocket(defaultProps), { wrapper });
 
     // Simular llegada de mensaje por WebSocket
     const mockMessage = {
@@ -104,7 +115,7 @@ describe('useProductionWebSocket - Robustez y Reconexión', () => {
       return vi.fn();
     });
 
-    renderHook(() => useProductionWebSocket(defaultProps));
+    renderHook(() => useProductionWebSocket(defaultProps), { wrapper });
 
     const mockMessage = {
       type: 'STATE_CHANGED',

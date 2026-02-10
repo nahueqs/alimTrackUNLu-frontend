@@ -1,6 +1,6 @@
 import type { TablaResponseDTO } from '@/types/production';
 import { PDF_CONFIG } from '../config';
-import { ContentAnalyzer, TableAnalysis } from './ContentAnalyzer';
+import { ContentAnalyzer, type TableAnalysis } from './ContentAnalyzer';
 
 export class SpaceCalculator {
   constructor(
