@@ -17,6 +17,7 @@ const VersionRecetasPage = lazy(() => import('@/pages/Recetas/Listado/VersionRec
 const RecetasPadrePage = lazy(() => import('@/pages/Recetas/Listado/RecetasPadrePage.tsx').then(module => ({ default: module.RecetasPadrePage })));
 const VisualizarRecetaPage = lazy(() => import('@/pages/Recetas/Detalle/VisualizarRecetaPage.tsx').then(module => ({ default: module.VisualizarRecetaPage })));
 const RecipeBuilderPage = lazy(() => import('@/pages/Recetas/Builder/RecipeBuilderPage.tsx').then(module => ({ default: module.RecipeBuilderPage })));
+const HelpPage = lazy(() => import('@/pages/Help/HelpPage.tsx').then(module => ({ default: module.HelpPage })));
 
 const produccionesActivasFilters: Partial<LocalProductionFilters> = {
   estado: ProductionState.EN_PROCESO,
@@ -54,6 +55,14 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <DashboardPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/ayuda',
+    element: (
+      <ProtectedRoute>
+        <HelpPage />
       </ProtectedRoute>
     ),
   },

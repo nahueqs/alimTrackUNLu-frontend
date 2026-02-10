@@ -3,6 +3,7 @@ import { useAuth } from '@/context/auth/AuthProvider.tsx';
 import { ProductionsCard } from './ProductionsCard.tsx';
 import { RecetasCard } from './RecipesCard.tsx';
 import { AppHeader } from '@/components/AppHeader/AppHeader.tsx';
+import { AppFooter } from '@/components/AppFooter/AppFooter.tsx';
 import { usePageTitle } from '@/hooks/usePageTitle.ts';
 import './DashboardPage.css';
 
@@ -28,6 +29,8 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
       </main>
+      
+      <AppFooter />
     </div>
   );
 };
