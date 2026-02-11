@@ -134,8 +134,11 @@ export const useProductionWebSocket = ({
           showNotification(title, body, 'alimtrack-update');
         };
 
+        if (!message) return;
+
         switch (message.type) {
           case 'FIELD_UPDATED': {
+            if (!message.payload) break;
             queueUpdate('FIELD', message.payload);
 
             const { sectionTitle, itemTitle } = findItemInStructure(
@@ -151,6 +154,7 @@ export const useProductionWebSocket = ({
             break;
           }
           case 'TABLE_CELL_UPDATED': {
+            if (!message.payload) break;
             queueUpdate('TABLE', message.payload);
 
             const { sectionTitle, itemTitle } = findItemInStructure(
@@ -166,6 +170,7 @@ export const useProductionWebSocket = ({
             break;
           }
           case 'STATE_CHANGED':
+            if (!message.payload) break;
             updateProductionState(message.payload);
             tryShowNotification(
               `Estado Actualizado`,
@@ -174,6 +179,7 @@ export const useProductionWebSocket = ({
             );
             break;
           case 'PRODUCTION_METADATA_UPDATED':
+            if (!message.payload) break;
             // Aseguramos que haya un timestamp
             const payloadWithTimestamp = {
               ...message.payload,
@@ -197,7 +203,8 @@ export const useProductionWebSocket = ({
 
       // Suscripción específica a eliminación
       unsubscribeDeleted = notificationService.subscribeToProduccionEliminada((msg) => {
-        if (msg.payload.codigoProduccion === codigoProduccion) {
+        const msgCodigo = msg?.payload?.codigoProduccion || msg?.codigoProduccion;
+        if (msgCodigo === codigoProduccion) {
           message.warning('La producción que estabas visualizando ha sido eliminada.');
           // Determinar a dónde redirigir basado en la URL actual
           const currentPath = window.location.pathname;

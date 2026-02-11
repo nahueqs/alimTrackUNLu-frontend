@@ -26,14 +26,15 @@ export const useProductionListSockets = ({
         // 1. Suscribirse a cambios de estado
         if (onStateChange) {
           unsubscribeState = notificationService.subscribeToProductionStateChanges((message) => {
-            if (message.type === 'STATE_CHANGED') {
-              onStateChange(message.codigoProduccion, {
+            if (message?.type === 'STATE_CHANGED') {
+              const codigo = message.codigoProduccion || message.payload?.codigoProduccion || 'Desconocido';
+              onStateChange(codigo, {
                 ...message.payload,
                 timestamp: message.timestamp,
               });
               showNotification(
                 'Estado de Producción Actualizado',
-                `La producción ${message.codigoProduccion} cambió a estado: ${message.payload.estado}`,
+                `La producción ${codigo} cambió a estado: ${message.payload?.estado || 'Desconocido'}`,
                 'alimtrack-list-update'
               );
             }
@@ -43,11 +44,12 @@ export const useProductionListSockets = ({
         // 2. Suscribirse a nuevas producciones
         if (onCreated) {
           unsubscribeCreated = notificationService.subscribeToProductionCreated((message) => {
-            if (message.type === 'PRODUCTION_METADATA_CREATED') {
+            if (message?.type === 'PRODUCTION_METADATA_CREATED') {
               onCreated();
+              const codigo = message.payload?.codigoProduccion || message.codigoProduccion || 'Nueva';
               showNotification(
                 'Nueva Producción',
-                `Se ha creado una nueva producción: ${message.payload.codigoProduccion || 'Nueva'}`,
+                `Se ha creado una nueva producción: ${codigo}`,
                 'alimtrack-list-update'
               );
             }
@@ -57,11 +59,12 @@ export const useProductionListSockets = ({
         // 3. Suscribirse a eliminaciones
         if (onDeleted) {
           unsubscribeDeleted = notificationService.subscribeToProduccionEliminada((message) => {
-            if (message.type === 'PRODUCTION_DELETED') {
+            if (message?.type === 'PRODUCTION_DELETED') {
               onDeleted();
+              const codigo = message.payload?.codigoProduccion || message.codigoProduccion || 'Desconocida';
               showNotification(
                 'Producción Eliminada',
-                `Se ha eliminado la producción: ${message.payload.codigoProduccion}`,
+                `Se ha eliminado la producción: ${codigo}`,
                 'alimtrack-list-update'
               );
             }
