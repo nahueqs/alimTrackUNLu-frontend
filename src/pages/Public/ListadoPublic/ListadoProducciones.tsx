@@ -10,6 +10,7 @@ import { usePageTitle } from '@/hooks/usePageTitle.ts';
 import { Button } from '@/components/ui';
 import { ArrowLeftIcon } from 'lucide-react';
 import { useProductionListSockets } from '@/hooks/useProductionListSockets';
+import { message } from 'antd';
 
 export const ListadoProducciones: React.FC = () => {
   usePageTitle('Producciones');
@@ -28,11 +29,17 @@ export const ListadoProducciones: React.FC = () => {
     getProduccionesPublicas();
   }, [getProduccionesPublicas]);
 
-  // Usar el nuevo hook para WebSockets
+  // Usar el nuevo hook para WebSockets con feedback visual
   useProductionListSockets({
     onStateChange: updateProductionStateInList,
-    onCreated: getProduccionesPublicas,
-    onDeleted: getProduccionesPublicas,
+    onCreated: () => {
+      getProduccionesPublicas();
+      message.info('Nueva producción detectada. Lista actualizada.');
+    },
+    onDeleted: () => {
+      getProduccionesPublicas();
+      message.warning('Una producción ha sido eliminada. Lista actualizada.');
+    },
   });
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
