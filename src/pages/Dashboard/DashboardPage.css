@@ -12,7 +12,7 @@
 .dashboard__main {
     /* Padding mínimo en móvil para maximizar espacio */
     padding: 1rem 0.5rem; 
-    max-width: 1200px;
+    max-width: 1600px; /* Aumentado de 1200px a 1600px para aprovechar pantallas grandes */
     margin: 0 auto;
     width: 100%; /* Asegura que ocupe el ancho disponible */
     box-sizing: border-box;
